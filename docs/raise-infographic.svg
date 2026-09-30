@@ -1,138 +1,124 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2160" height="1550" viewBox="0 0 2160 1550" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" width="2160" height="1500" viewBox="0 0 2160 1500" role="img" aria-labelledby="title description">
 <title id="title">RAISE: Five pillars for secure agentic applications</title>
-<desc id="description">Five equal-height architectural pillars labeled R A I S E support one shared platform labeled Secure Agentic Applications. Their shared foundation is Security Enforced in Application Code: permissions, approvals and limits. RAISE means Responsible Agentic Innovation through Secure Engineering. Its five complementary pillars are Risk and Responsibility: define the risks and assign an owner. Authority and Access: scope every identity, tool and action. Isolation and Integrity: protect data, memory and execution. Security Verification: test allowed actions and attempted bypasses. Evidence and Evolution: observe, stop, recover and improve. The model proposes, and the application enforces permissions, approvals and limits before an action. Informed by AIUC-1, ISO/IEC 42001 and NIST AI RMF. Risk coverage uses the OWASP Agentic Top 10. The pillar names are RAISE's original synthesis. A detailed explanation is provided in pillars.md.</desc>
+<desc id="description">Five equal-height pillars labeled R A I S E hold up a roof labeled Secure Agentic Applications and stand on a shared foundation labeled Security Enforced in Application Code: permissions, approvals and limits. RAISE means Responsible Agentic Innovation through Secure Engineering. Each pillar asks one question. Risk and Responsibility: what could go wrong, and who owns it? Authority and Access: who may do what, and under which limits? Isolation and Integrity: what must stay separate and trustworthy? Security Verification: can we show that the controls work? Evidence and Evolution: can we see, stop, and improve behavior? Central principle: the model proposes, the application enforces. Informed by AIUC-1, ISO/IEC 42001 and NIST AI RMF. Risk coverage uses the OWASP Top 10 for Agentic Applications. The pillar names are RAISE's own engineering synthesis; the mappings are not certification. pillars.md explains each pillar.</desc>
+<!-- Type: Geist (sans) and IBM Plex Mono (labels), both SIL OFL 1.1; the PNG is rendered with them. Colour: flat fills on the work green; facets, chamfers and slashes use the 2:1 slope. -->
 <defs>
-  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M 1 1 L 8 5 L 1 9" fill="none" stroke="#191C1B" stroke-width="1.25"/></marker>
-  <linearGradient id="pillarFace" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EAE8E2"/><stop offset="0.12" stop-color="#FAF9F4"/><stop offset="1" stop-color="#E1DED7"/></linearGradient>
-  <linearGradient id="pillarSide" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C3C3BB"/><stop offset="1" stop-color="#DADAD3"/></linearGradient>
-  <filter id="shadow" x="-10%" y="-100%" width="120%" height="300%"><feGaussianBlur stdDeviation="13"/></filter>
+  <filter id="plate" x="-5%" y="-100%" width="110%" height="300%"><feGaussianBlur stdDeviation="18"/></filter>
 </defs>
-<rect width="2160" height="1550" fill="#F7F5EF"/>
-<g font-family="Geist, DejaVu Sans, sans-serif">
-
-<rect x="96" y="66" width="10" height="32" fill="#D8422C"/>
-<text x="122" y="99" font-size="44" font-weight="600" fill="#191C1B" letter-spacing="-1.8">RAISE</text>
-<text x="317" y="97" font-size="25" font-weight="400" fill="#636964">Responsible Agentic Innovation through Secure Engineering</text>
-<text x="2064" y="94" font-size="22" font-weight="400" fill="#636964" letter-spacing="2.2" text-anchor="end" font-family="DejaVu Sans Mono, monospace">THE FIVE PILLARS</text>
-<path d="M 96 129 L 2064 129" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
-<text x="92" y="235" font-size="89" font-weight="500" fill="#191C1B" letter-spacing="-4">Secure agents,</text>
-<text x="92" y="329" font-size="89" font-weight="500" fill="#191C1B" letter-spacing="-4">built on five pillars.</text>
-<rect x="1505" y="210" width="4" height="109" fill="#D8422C"/>
-<text x="1540" y="241" font-size="32" font-weight="500" fill="#191C1B" letter-spacing="-0.5">The model proposes.</text>
-<text x="1540" y="283" font-size="32" font-weight="500" fill="#D8422C" letter-spacing="-0.5">The application enforces.</text>
-<text x="96" y="391" font-size="20" font-weight="400" fill="#636964" letter-spacing="1.8" font-family="DejaVu Sans Mono, monospace">FIVE COMPLEMENTARY PILLARS</text>
-<ellipse cx="1070" cy="1128" rx="898" ry="17" fill="#2D352C" opacity="0.12" filter="url(#shadow)"/>
-<polygon points="104,1071 1940,1071 2060,951 224,951" fill="#E7E5DD" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="1940,1071 2060,951 2060,1003 1940,1123" fill="#ABAEA5" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="104,1071 1940,1071 1940,1123 104,1123" fill="#D0D1C8" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<text x="148" y="1106" font-size="23" font-weight="500" fill="#191C1B" letter-spacing="1.3">SECURITY ENFORCED IN APPLICATION CODE</text>
-<text x="1900" y="1106" font-size="20" font-weight="400" fill="#191C1B" text-anchor="end" font-family="DejaVu Sans Mono, monospace">PERMISSIONS  /  APPROVALS  /  LIMITS</text>
-<polygon points="378,611 464,525 464,985 378,1071" fill="url(#pillarSide)" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<rect x="156" y="611" width="222" height="460" fill="url(#pillarFace)" stroke="#191C1B" stroke-width="1.5"/>
-<rect x="157" y="611" width="17" height="459" fill="#FFFFFF"/>
-<rect x="157" y="611" width="220" height="20" fill="#BBBDB3"/>
-<path d="M 405 584 L 405 1044" fill="none" stroke="#AEAEA4" stroke-width="1"/>
-<path d="M 435 554 L 435 1014" fill="none" stroke="#AEAEA4" stroke-width="1"/>
-<text x="267.0" y="854" font-size="167" font-weight="500" fill="#191C1B" letter-spacing="-4" text-anchor="middle">R</text>
-<rect x="245.0" y="901" width="44" height="6" fill="#D8422C"/>
-<path d="M 190 1033 L 344 1033" fill="none" stroke="#B4B5AA" stroke-width="1.5"/>
-<circle cx="195" cy="1050" r="3" fill="#949C8F"/>
-<circle cx="339" cy="1050" r="3" fill="#949C8F"/>
-<path d="M 267.0 1130 L 267.0 1162" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
-<circle cx="267.0" cy="1164" r="3" fill="#D8422C"/>
-<text x="156" y="1220" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Risk &amp;</text>
-<text x="156" y="1266" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Responsibility</text>
-<text x="156" y="1320" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Define the risks.</text>
-<text x="156" y="1356" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Assign an owner.</text>
-<polygon points="737,611 823,525 823,985 737,1071" fill="url(#pillarSide)" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<rect x="515" y="611" width="222" height="460" fill="url(#pillarFace)" stroke="#191C1B" stroke-width="1.5"/>
-<rect x="516" y="611" width="17" height="459" fill="#FFFFFF"/>
-<rect x="516" y="611" width="220" height="20" fill="#BBBDB3"/>
-<path d="M 764 584 L 764 1044" fill="none" stroke="#AEAEA4" stroke-width="1"/>
-<path d="M 794 554 L 794 1014" fill="none" stroke="#AEAEA4" stroke-width="1"/>
-<text x="626.0" y="854" font-size="167" font-weight="500" fill="#191C1B" letter-spacing="-4" text-anchor="middle">A</text>
-<rect x="604.0" y="901" width="44" height="6" fill="#D8422C"/>
-<path d="M 549 1033 L 703 1033" fill="none" stroke="#B4B5AA" stroke-width="1.5"/>
-<circle cx="554" cy="1050" r="3" fill="#949C8F"/>
-<circle cx="698" cy="1050" r="3" fill="#949C8F"/>
-<path d="M 626.0 1130 L 626.0 1162" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
-<circle cx="626.0" cy="1164" r="3" fill="#D8422C"/>
-<text x="515" y="1220" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Authority</text>
-<text x="515" y="1266" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">&amp; Access</text>
-<text x="515" y="1320" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Scope every identity,</text>
-<text x="515" y="1356" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">tool and action.</text>
-<polygon points="1096,611 1182,525 1182,985 1096,1071" fill="url(#pillarSide)" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<rect x="874" y="611" width="222" height="460" fill="url(#pillarFace)" stroke="#191C1B" stroke-width="1.5"/>
-<rect x="875" y="611" width="17" height="459" fill="#FFFFFF"/>
-<rect x="875" y="611" width="220" height="20" fill="#BBBDB3"/>
-<path d="M 1123 584 L 1123 1044" fill="none" stroke="#AEAEA4" stroke-width="1"/>
-<path d="M 1153 554 L 1153 1014" fill="none" stroke="#AEAEA4" stroke-width="1"/>
-<text x="985.0" y="854" font-size="167" font-weight="500" fill="#191C1B" letter-spacing="-4" text-anchor="middle">I</text>
-<rect x="963.0" y="901" width="44" height="6" fill="#D8422C"/>
-<path d="M 908 1033 L 1062 1033" fill="none" stroke="#B4B5AA" stroke-width="1.5"/>
-<circle cx="913" cy="1050" r="3" fill="#949C8F"/>
-<circle cx="1057" cy="1050" r="3" fill="#949C8F"/>
-<path d="M 985.0 1130 L 985.0 1162" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
-<circle cx="985.0" cy="1164" r="3" fill="#D8422C"/>
-<text x="874" y="1220" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Isolation</text>
-<text x="874" y="1266" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">&amp; Integrity</text>
-<text x="874" y="1320" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Protect data, memory</text>
-<text x="874" y="1356" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">and execution.</text>
-<polygon points="1455,611 1541,525 1541,985 1455,1071" fill="url(#pillarSide)" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<rect x="1233" y="611" width="222" height="460" fill="url(#pillarFace)" stroke="#191C1B" stroke-width="1.5"/>
-<rect x="1234" y="611" width="17" height="459" fill="#FFFFFF"/>
-<rect x="1234" y="611" width="220" height="20" fill="#BBBDB3"/>
-<path d="M 1482 584 L 1482 1044" fill="none" stroke="#AEAEA4" stroke-width="1"/>
-<path d="M 1512 554 L 1512 1014" fill="none" stroke="#AEAEA4" stroke-width="1"/>
-<text x="1344.0" y="854" font-size="167" font-weight="500" fill="#191C1B" letter-spacing="-4" text-anchor="middle">S</text>
-<rect x="1322.0" y="901" width="44" height="6" fill="#D8422C"/>
-<path d="M 1267 1033 L 1421 1033" fill="none" stroke="#B4B5AA" stroke-width="1.5"/>
-<circle cx="1272" cy="1050" r="3" fill="#949C8F"/>
-<circle cx="1416" cy="1050" r="3" fill="#949C8F"/>
-<path d="M 1344.0 1130 L 1344.0 1162" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
-<circle cx="1344.0" cy="1164" r="3" fill="#D8422C"/>
-<text x="1233" y="1220" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Security</text>
-<text x="1233" y="1266" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Verification</text>
-<text x="1233" y="1320" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Test allowed actions</text>
-<text x="1233" y="1356" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">and attempted bypasses.</text>
-<polygon points="1814,611 1900,525 1900,985 1814,1071" fill="url(#pillarSide)" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<rect x="1592" y="611" width="222" height="460" fill="url(#pillarFace)" stroke="#191C1B" stroke-width="1.5"/>
-<rect x="1593" y="611" width="17" height="459" fill="#FFFFFF"/>
-<rect x="1593" y="611" width="220" height="20" fill="#BBBDB3"/>
-<path d="M 1841 584 L 1841 1044" fill="none" stroke="#AEAEA4" stroke-width="1"/>
-<path d="M 1871 554 L 1871 1014" fill="none" stroke="#AEAEA4" stroke-width="1"/>
-<text x="1703.0" y="854" font-size="167" font-weight="500" fill="#191C1B" letter-spacing="-4" text-anchor="middle">E</text>
-<rect x="1681.0" y="901" width="44" height="6" fill="#D8422C"/>
-<path d="M 1626 1033 L 1780 1033" fill="none" stroke="#B4B5AA" stroke-width="1.5"/>
-<circle cx="1631" cy="1050" r="3" fill="#949C8F"/>
-<circle cx="1775" cy="1050" r="3" fill="#949C8F"/>
-<path d="M 1703.0 1130 L 1703.0 1162" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
-<circle cx="1703.0" cy="1164" r="3" fill="#D8422C"/>
-<text x="1592" y="1220" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Evidence</text>
-<text x="1592" y="1266" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">&amp; Evolution</text>
-<text x="1592" y="1320" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Observe, stop,</text>
-<text x="1592" y="1356" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">recover and improve.</text>
-<polygon points="104,535 1940,535 2060,415 224,415" fill="#2A302C" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="1940,535 2060,415 2060,491 1940,611" fill="#151D19" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="104,535 1940,535 1940,611 104,611" fill="#1C2420" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
-<rect x="105" y="535" width="1834" height="5" fill="#D8422C"/>
-<text x="148" y="588" font-size="42" font-weight="500" fill="#FFFFFF" letter-spacing="2.2">SECURE AGENTIC APPLICATIONS</text>
-<path d="M 384 473 L 1855 473" fill="none" stroke="#819484" stroke-width="2"/>
-<polygon points="389,473 417,454 445,473 417,492" fill="#2A302C" stroke="#99AA9C" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="410,473 417,468 424,473 417,478" fill="#D8422C" stroke="#D8422C" stroke-width="1" stroke-linejoin="round"/>
-<polygon points="748,473 776,454 804,473 776,492" fill="#2A302C" stroke="#99AA9C" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="769,473 776,468 783,473 776,478" fill="#D8422C" stroke="#D8422C" stroke-width="1" stroke-linejoin="round"/>
-<polygon points="1107,473 1135,454 1163,473 1135,492" fill="#2A302C" stroke="#99AA9C" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="1128,473 1135,468 1142,473 1135,478" fill="#D8422C" stroke="#D8422C" stroke-width="1" stroke-linejoin="round"/>
-<polygon points="1466,473 1494,454 1522,473 1494,492" fill="#2A302C" stroke="#99AA9C" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="1487,473 1494,468 1501,473 1494,478" fill="#D8422C" stroke="#D8422C" stroke-width="1" stroke-linejoin="round"/>
-<polygon points="1825,473 1853,454 1881,473 1853,492" fill="#2A302C" stroke="#99AA9C" stroke-width="1.5" stroke-linejoin="round"/>
-<polygon points="1846,473 1853,468 1860,473 1853,478" fill="#D8422C" stroke="#D8422C" stroke-width="1" stroke-linejoin="round"/>
-<path d="M 96 1420 L 2064 1420" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
-<text x="96" y="1471" font-size="18" font-weight="400" fill="#636964" letter-spacing="1.6" font-family="DejaVu Sans Mono, monospace">INFORMED BY</text>
-<text x="307" y="1471" font-size="25" font-weight="500" fill="#191C1B">AIUC-1  /  ISO/IEC 42001  /  NIST AI RMF</text>
-<text x="2064" y="1471" font-size="25" font-weight="500" fill="#191C1B" text-anchor="end">Risk coverage: OWASP Agentic Top 10</text>
-<text x="96" y="1510" font-size="19" font-weight="400" fill="#636964">RAISE&#x27;s own engineering pillars</text>
-<text x="2064" y="1510" font-size="19" font-weight="400" fill="#636964" text-anchor="end">Original artwork: MIT</text>
+<g font-family="Geist, Inter, 'Helvetica Neue', Arial, sans-serif">
+<!-- Ground and facets: flat fills; every edge is horizontal, vertical or on the 2:1 slope. -->
+<rect width="2160" height="1500" fill="#0E7A5F"/>
+<path fill="#FFFFFF" opacity=".05" d="M0 0H600L0 1200Z"/>
+<path fill="#0B3E38" opacity=".32" d="M0 640 430 1500H0Z"/>
+<path fill="#2FB48A" opacity=".16" d="M1150 0H1240L640 1200H550Z"/>
+<path fill="#0B3E38" opacity=".30" d="M1660 0H2160V1000Z"/>
+<path fill="#2FB48A" d="M1400 0h18L1158 520h-18Z"/>
+<path fill="#FFFFFF" opacity=".6" d="M1432 0h7L1179 520h-7Z"/>
+<path fill="#0B3E38" opacity=".55" d="M1456 0h12L1208 520h-12Z"/>
+<!-- Header -->
+<polygon points="113.0,66 125.0,66 108,100 96,100" fill="#2FB48A"/>
+  <text x="132" y="100" font-size="44" font-weight="600" fill="#FFFFFF" letter-spacing="-0.9">RAISE</text>
+  <text x="300" y="97" font-size="24" font-weight="400" fill="#FFFFFF">Responsible Agentic Innovation through Secure Engineering</text>
+  <text x="2064" y="96" font-size="20" font-weight="500" fill="#FFFFFF" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">Security engineering framework</text>
+<path d="M96 132H2064" stroke="#FFFFFF" stroke-opacity=".24" stroke-width="1.5"/>
+  <text x="90" y="252" font-size="96" font-weight="600" fill="#FFFFFF" letter-spacing="-1.9">Secure agents,</text>
+  <text x="90" y="352" font-size="96" font-weight="600" fill="#A7DDC0" letter-spacing="-1.9">built on five pillars.</text>
+<polygon points="1480,190 2050,190 2064,218 2064,360 1480,360" fill="#052E22" fill-opacity=".34"/>
+  <text x="1520" y="238" font-size="19" font-weight="500" fill="#A7DDC0" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">Central principle</text>
+  <text x="1520" y="290" font-size="36" font-weight="500" fill="#A7DDC0" letter-spacing="-0.5">The model proposes.</text>
+  <text x="1520" y="334" font-size="36" font-weight="600" fill="#FFFFFF" letter-spacing="-0.5">The application enforces.</text>
+<!-- Foundation shadow -->
+<rect x="130" y="1238" width="1900" height="40" fill="#021C14" opacity=".45" filter="url(#plate)"/>
+<!-- Pillars -->
+<g><!-- R -->
+  <rect x="142" y="566" width="340" height="24" fill="#D5E9DF"/>
+  <rect x="152" y="590" width="320" height="530" fill="#FFFFFF"/>
+  <rect x="452" y="590" width="20" height="530" fill="#EEF6F1"/>
+  <rect x="142" y="1120" width="340" height="24" fill="#D5E9DF"/>
+  <text x="182" y="642" font-size="19" font-weight="500" fill="#5C7469" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">01</text>
+  <text x="176" y="852" font-size="214" font-weight="600" fill="#0E7A5F" letter-spacing="-4">R</text>
+  <polygon points="188.0,882 238.0,882 232,894 182,894" fill="#2FB48A"/>
+  <text x="182" y="960" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Risk &amp;</text>
+  <text x="182" y="1002" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Responsibility</text>
+  <text x="182" y="1054" font-size="22" font-weight="400" fill="#466358">What could go wrong,</text>
+  <text x="182" y="1086" font-size="22" font-weight="400" fill="#466358">and who owns it?</text>
+</g>
+<g><!-- A -->
+  <rect x="526" y="566" width="340" height="24" fill="#D5E9DF"/>
+  <rect x="536" y="590" width="320" height="530" fill="#FFFFFF"/>
+  <rect x="836" y="590" width="20" height="530" fill="#EEF6F1"/>
+  <rect x="526" y="1120" width="340" height="24" fill="#D5E9DF"/>
+  <text x="566" y="642" font-size="19" font-weight="500" fill="#5C7469" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">02</text>
+  <text x="560" y="852" font-size="214" font-weight="600" fill="#0E7A5F" letter-spacing="-4">A</text>
+  <polygon points="572.0,882 622.0,882 616,894 566,894" fill="#2FB48A"/>
+  <text x="566" y="960" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Authority</text>
+  <text x="566" y="1002" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">&amp; Access</text>
+  <text x="566" y="1054" font-size="22" font-weight="400" fill="#466358">Who may do what,</text>
+  <text x="566" y="1086" font-size="22" font-weight="400" fill="#466358">and under which limits?</text>
+</g>
+<g><!-- I -->
+  <rect x="910" y="566" width="340" height="24" fill="#D5E9DF"/>
+  <rect x="920" y="590" width="320" height="530" fill="#FFFFFF"/>
+  <rect x="1220" y="590" width="20" height="530" fill="#EEF6F1"/>
+  <rect x="910" y="1120" width="340" height="24" fill="#D5E9DF"/>
+  <text x="950" y="642" font-size="19" font-weight="500" fill="#5C7469" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">03</text>
+  <text x="944" y="852" font-size="214" font-weight="600" fill="#0E7A5F" letter-spacing="-4">I</text>
+  <polygon points="956.0,882 1006.0,882 1000,894 950,894" fill="#2FB48A"/>
+  <text x="950" y="960" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Isolation</text>
+  <text x="950" y="1002" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">&amp; Integrity</text>
+  <text x="950" y="1054" font-size="22" font-weight="400" fill="#466358">What must stay separate</text>
+  <text x="950" y="1086" font-size="22" font-weight="400" fill="#466358">and trustworthy?</text>
+</g>
+<g><!-- S -->
+  <rect x="1294" y="566" width="340" height="24" fill="#D5E9DF"/>
+  <rect x="1304" y="590" width="320" height="530" fill="#FFFFFF"/>
+  <rect x="1604" y="590" width="20" height="530" fill="#EEF6F1"/>
+  <rect x="1294" y="1120" width="340" height="24" fill="#D5E9DF"/>
+  <text x="1334" y="642" font-size="19" font-weight="500" fill="#5C7469" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">04</text>
+  <text x="1328" y="852" font-size="214" font-weight="600" fill="#0E7A5F" letter-spacing="-4">S</text>
+  <polygon points="1340.0,882 1390.0,882 1384,894 1334,894" fill="#2FB48A"/>
+  <text x="1334" y="960" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Security</text>
+  <text x="1334" y="1002" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Verification</text>
+  <text x="1334" y="1054" font-size="22" font-weight="400" fill="#466358">Can we show that</text>
+  <text x="1334" y="1086" font-size="22" font-weight="400" fill="#466358">the controls work?</text>
+</g>
+<g><!-- E -->
+  <rect x="1678" y="566" width="340" height="24" fill="#D5E9DF"/>
+  <rect x="1688" y="590" width="320" height="530" fill="#FFFFFF"/>
+  <rect x="1988" y="590" width="20" height="530" fill="#EEF6F1"/>
+  <rect x="1678" y="1120" width="340" height="24" fill="#D5E9DF"/>
+  <text x="1718" y="642" font-size="19" font-weight="500" fill="#5C7469" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">05</text>
+  <text x="1712" y="852" font-size="214" font-weight="600" fill="#0E7A5F" letter-spacing="-4">E</text>
+  <polygon points="1724.0,882 1774.0,882 1768,894 1718,894" fill="#2FB48A"/>
+  <text x="1718" y="960" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Evidence</text>
+  <text x="1718" y="1002" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">&amp; Evolution</text>
+  <text x="1718" y="1054" font-size="22" font-weight="400" fill="#466358">Can we see, stop,</text>
+  <text x="1718" y="1086" font-size="22" font-weight="400" fill="#466358">and improve behavior?</text>
+</g>
+<!-- Roof: Secure Agentic Applications -->
+<polygon points="96,430 2042,430 2064,474 2064,566 96,566" fill="#0B3E38"/>
+<polygon points="96,430 2053,430 2064,452 2064,452 96,452" fill="#052E22"/>
+<rect x="96" y="560" width="1968" height="6" fill="#2FB48A"/>
+  <text x="1080" y="514" font-size="50" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="-0.8">Secure Agentic Applications</text>
+<!-- Foundation: Security Enforced in Application Code -->
+<polygon points="72,1236 2088,1236 2088,1244 2078,1264 72,1264" fill="#052E22"/>
+<polygon points="96,1144 2064,1144 2064,1196 2044,1236 96,1236" fill="#0B3E38"/>
+<rect x="96" y="1144" width="1968" height="6" fill="#2FB48A"/>
+  <text x="144" y="1204" font-size="36" font-weight="600" fill="#FFFFFF" letter-spacing="-0.6">Security Enforced in Application Code</text>
+  <text x="2004" y="1201" font-size="22" font-weight="500" fill="#A7DDC0" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">Permissions / Approvals / Limits</text>
+<!-- Footer: sources and limits -->
+<path d="M96 1318H2064" stroke="#FFFFFF" stroke-opacity=".24" stroke-width="1.5"/>
+  <text x="96" y="1384" font-size="19" font-weight="500" fill="#FFFFFF" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">Informed by</text>
+  <polygon points="250,1357 342,1357 348,1369 348,1397 250,1397" fill="#052E22" fill-opacity=".34"/>
+  <text x="264" y="1384" font-size="19" font-weight="500" fill="#FFFFFF" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">AIUC-1</text>
+  <polygon points="358,1357 530,1357 536,1369 536,1397 358,1397" fill="#052E22" fill-opacity=".34"/>
+  <text x="372" y="1384" font-size="19" font-weight="500" fill="#FFFFFF" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">ISO/IEC 42001</text>
+  <polygon points="546,1357 696,1357 702,1369 702,1397 546,1397" fill="#052E22" fill-opacity=".34"/>
+  <text x="560" y="1384" font-size="19" font-weight="500" fill="#FFFFFF" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">NIST AI RMF</text>
+  <polygon points="1804,1357 2058,1357 2064,1369 2064,1397 1804,1397" fill="#052E22" fill-opacity=".34"/>
+  <text x="1818" y="1384" font-size="19" font-weight="500" fill="#FFFFFF" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">OWASP Agentic Top 10</text>
+  <text x="1786" y="1384" font-size="19" font-weight="500" fill="#FFFFFF" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">Risk coverage</text>
+  <text x="96" y="1450" font-size="20" font-weight="400" fill="#FFFFFF">RAISE's own engineering pillars. Engineering mappings, not certification.</text>
+  <text x="2064" y="1450" font-size="20" font-weight="400" fill="#FFFFFF" text-anchor="end">Original artwork: MIT</text>
 </g>
 </svg>
