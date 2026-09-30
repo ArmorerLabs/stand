@@ -1,4 +1,4 @@
 interface:
-  display_name: "Secure Agentic Development"
+  display_name: "RAISE"
   short_description: "Build agents with security controls and evidence"
-  default_prompt: "Use $secure-agentic-development to build or update this agentic application with enforceable security controls and verification evidence."
+  default_prompt: "Use $raise to build or update this agentic application with enforceable security controls and verification evidence."

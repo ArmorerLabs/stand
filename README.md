@@ -1,6 +1,10 @@
-# Secure Agentic Development
+# RAISE
 
-A reusable skill for coding agents that helps developers build agentic applications with explicit authority limits, enforceable security controls, and verification evidence.
+**Responsible Agentic Innovation through Secure Engineering**
+
+Build capable agents with security by design.
+
+RAISE is a security engineering framework delivered as a reusable coding-agent skill. It helps developers build agentic applications with explicit authority limits, enforceable security controls, and verification evidence.
 
 The model proposes actions. Application code enforces permissions, resource limits, and approval policy. The workflow supports new applications and focused changes to existing systems, across languages, model providers, and orchestration frameworks.
 
@@ -20,7 +24,7 @@ The entry point is [SKILL.md](SKILL.md). Keep it together with `references/` and
 For any coding agent that can read local files, give it a concrete request such as:
 
 ```text
-Read SKILL.md in the secure-agentic-development checkout and apply it to this task.
+Read SKILL.md in the raise checkout and apply it to this task.
 Add a support agent that searches tenant documents and proposes account changes.
 Implement the relevant controls, test the execution paths, and record remaining risks.
 ```
@@ -32,7 +36,7 @@ That is explicit file loading. Native discovery, invocation syntax, and supporte
 From a reviewed checkout, copy the skill files into the configured personal skills directory. This example uses the personal directory described in [OpenAI's skill evaluation guide](https://developers.openai.com/blog/eval-skills). It refuses to overwrite an existing installation:
 
 ```bash
-skill_destination="${CODEX_HOME:-$HOME/.codex}/skills/secure-agentic-development"
+skill_destination="${CODEX_HOME:-$HOME/.codex}/skills/raise"
 if [ -e "$skill_destination" ] || [ -L "$skill_destination" ]; then
   printf '%s\n' "Already installed: $skill_destination. Review updates before replacing it."
 else
@@ -44,7 +48,7 @@ fi
 Confirm the skill appears in your Codex skill list, starting a new session if needed. Invoke it with a task:
 
 ```text
-$secure-agentic-development Add a document-search agent with tenant isolation and scoped tools.
+$raise Add a document-search agent with tenant isolation and scoped tools.
 ```
 
 For a team installation, use the repository or managed skill location supported by your coding agent. Pin a reviewed commit or release and review changes before updating installed copies. This repository contains one skill; it does not require an MCP server or application credentials.

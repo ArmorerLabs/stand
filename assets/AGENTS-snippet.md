@@ -1,6 +1,6 @@
-## Required workflow for agentic application changes
+## Required RAISE workflow for agentic application changes
 
-Use the `secure-agentic-development` skill when creating or changing agent planning, tool execution, MCP integration, retrieval, memory, delegation, autonomous jobs, or their permission boundaries. Load its `SKILL.md` from the team's configured skill location before implementation. Make the skill folder available to every supported coding agent.
+Use the `raise` skill when creating or changing agent planning, tool execution, MCP integration, retrieval, memory, delegation, autonomous jobs, or their permission boundaries. Load its `SKILL.md` from the team's configured skill location before implementation. Make the skill folder available to every supported coding agent.
 
 For a new application, assess all ten OWASP Agentic Top 10 categories and record applicable controls and evidence. For an existing application, update the affected controls and tests. Enforce permissions and resource limits in application code, independently of model instructions. Verify authorized behavior and adversarial cases through the actual execution path.
 

@@ -1,10 +1,12 @@
 ---
-name: secure-agentic-development
+name: raise
 description: Build, change, or harden agentic applications with enforceable security controls and adversarial verification. Use for LLM tool execution, MCP integrations, retrieval and memory, delegated agents, autonomous workflows, and their permission boundaries. Covers OWASP Agentic Top 10 with AIUC-1, NIST AI RMF, and ISO 42001 inspired evidence. Unrelated cosmetic or documentation edits do not require this workflow.
 license: MIT AND CC-BY-SA-4.0
 ---
 
-# Secure Agentic Development
+# RAISE
+
+RAISE stands for Responsible Agentic Innovation through Secure Engineering.
 
 Deliver the requested application behavior with explicit authority limits, enforced runtime controls, and evidence of what was tested. Treat model decisions as untrusted proposals. Security must survive a model that follows an injected instruction or produces a harmful tool call.
 

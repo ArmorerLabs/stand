@@ -1,4 +1,4 @@
-name: Validate skill repository
+name: Validate RAISE
 
 on:
   push:
