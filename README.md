@@ -8,6 +8,12 @@ RAISE is a security engineering framework delivered as a reusable coding-agent s
 
 The model proposes actions. Application code enforces permissions, resource limits, and approval policy. The workflow supports new applications and focused changes to existing systems, across languages, model providers, and orchestration frameworks.
 
+## The five pillars
+
+![RAISE: Risk & Responsibility, Authority & Access, Isolation & Integrity, Security Verification, and Evidence & Evolution.](docs/raise-infographic.png)
+
+Read the [pillar guide and worked example](docs/pillars.md), download the [PNG](docs/raise-infographic.png), or edit the [SVG](docs/raise-infographic.svg).
+
 ## What the skill does
 
 - Maps all ten OWASP Agentic Application risks to concrete control outcomes and adversarial tests.
@@ -64,6 +70,7 @@ Require the application's relevant security tests in its CI and protect conseque
 | Path | Purpose |
 | --- | --- |
 | [SKILL.md](SKILL.md) | Main development workflow and reference routing |
+| [docs/pillars.md](docs/pillars.md) | Five-pillar explanation, infographic, and worked example |
 | [references/owasp-agentic-top-10.md](references/owasp-agentic-top-10.md) | All ten risk categories, control outcomes, and test ideas |
 | [references/runtime-controls.md](references/runtime-controls.md) | Implementation guidance for application boundaries |
 | [references/verification.md](references/verification.md) | Test design, evidence, and readiness criteria |

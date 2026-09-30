@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2160" height="1550" viewBox="0 0 2160 1550" role="img" aria-labelledby="title description">
+<title id="title">RAISE: Five pillars for secure agentic applications</title>
+<desc id="description">Five equal-height architectural pillars labeled R A I S E support one shared platform labeled Secure Agentic Applications. Their shared foundation is Security Enforced in Application Code: permissions, approvals and limits. RAISE means Responsible Agentic Innovation through Secure Engineering. Its five complementary pillars are Risk and Responsibility: define the risks and assign an owner. Authority and Access: scope every identity, tool and action. Isolation and Integrity: protect data, memory and execution. Security Verification: test allowed actions and attempted bypasses. Evidence and Evolution: observe, stop, recover and improve. The model proposes, and the application enforces permissions, approvals and limits before an action. Informed by AIUC-1, ISO/IEC 42001 and NIST AI RMF. Risk coverage uses the OWASP Agentic Top 10. The pillar names are RAISE's original synthesis. A detailed explanation is provided in pillars.md.</desc>
+<defs>
+  <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M 1 1 L 8 5 L 1 9" fill="none" stroke="#191C1B" stroke-width="1.25"/></marker>
+  <linearGradient id="pillarFace" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#EAE8E2"/><stop offset="0.12" stop-color="#FAF9F4"/><stop offset="1" stop-color="#E1DED7"/></linearGradient>
+  <linearGradient id="pillarSide" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#C3C3BB"/><stop offset="1" stop-color="#DADAD3"/></linearGradient>
+  <filter id="shadow" x="-10%" y="-100%" width="120%" height="300%"><feGaussianBlur stdDeviation="13"/></filter>
+</defs>
+<rect width="2160" height="1550" fill="#F7F5EF"/>
+<g font-family="Geist, DejaVu Sans, sans-serif">
+
+<rect x="96" y="66" width="10" height="32" fill="#D8422C"/>
+<text x="122" y="99" font-size="44" font-weight="600" fill="#191C1B" letter-spacing="-1.8">RAISE</text>
+<text x="317" y="97" font-size="25" font-weight="400" fill="#636964">Responsible Agentic Innovation through Secure Engineering</text>
+<text x="2064" y="94" font-size="22" font-weight="400" fill="#636964" letter-spacing="2.2" text-anchor="end" font-family="DejaVu Sans Mono, monospace">THE FIVE PILLARS</text>
+<path d="M 96 129 L 2064 129" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
+<text x="92" y="235" font-size="89" font-weight="500" fill="#191C1B" letter-spacing="-4">Secure agents,</text>
+<text x="92" y="329" font-size="89" font-weight="500" fill="#191C1B" letter-spacing="-4">built on five pillars.</text>
+<rect x="1505" y="210" width="4" height="109" fill="#D8422C"/>
+<text x="1540" y="241" font-size="32" font-weight="500" fill="#191C1B" letter-spacing="-0.5">The model proposes.</text>
+<text x="1540" y="283" font-size="32" font-weight="500" fill="#D8422C" letter-spacing="-0.5">The application enforces.</text>
+<text x="96" y="391" font-size="20" font-weight="400" fill="#636964" letter-spacing="1.8" font-family="DejaVu Sans Mono, monospace">FIVE COMPLEMENTARY PILLARS</text>
+<ellipse cx="1070" cy="1128" rx="898" ry="17" fill="#2D352C" opacity="0.12" filter="url(#shadow)"/>
+<polygon points="104,1071 1940,1071 2060,951 224,951" fill="#E7E5DD" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="1940,1071 2060,951 2060,1003 1940,1123" fill="#ABAEA5" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="104,1071 1940,1071 1940,1123 104,1123" fill="#D0D1C8" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<text x="148" y="1106" font-size="23" font-weight="500" fill="#191C1B" letter-spacing="1.3">SECURITY ENFORCED IN APPLICATION CODE</text>
+<text x="1900" y="1106" font-size="20" font-weight="400" fill="#191C1B" text-anchor="end" font-family="DejaVu Sans Mono, monospace">PERMISSIONS  /  APPROVALS  /  LIMITS</text>
+<polygon points="378,611 464,525 464,985 378,1071" fill="url(#pillarSide)" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<rect x="156" y="611" width="222" height="460" fill="url(#pillarFace)" stroke="#191C1B" stroke-width="1.5"/>
+<rect x="157" y="611" width="17" height="459" fill="#FFFFFF"/>
+<rect x="157" y="611" width="220" height="20" fill="#BBBDB3"/>
+<path d="M 405 584 L 405 1044" fill="none" stroke="#AEAEA4" stroke-width="1"/>
+<path d="M 435 554 L 435 1014" fill="none" stroke="#AEAEA4" stroke-width="1"/>
+<text x="267.0" y="854" font-size="167" font-weight="500" fill="#191C1B" letter-spacing="-4" text-anchor="middle">R</text>
+<rect x="245.0" y="901" width="44" height="6" fill="#D8422C"/>
+<path d="M 190 1033 L 344 1033" fill="none" stroke="#B4B5AA" stroke-width="1.5"/>
+<circle cx="195" cy="1050" r="3" fill="#949C8F"/>
+<circle cx="339" cy="1050" r="3" fill="#949C8F"/>
+<path d="M 267.0 1130 L 267.0 1162" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
+<circle cx="267.0" cy="1164" r="3" fill="#D8422C"/>
+<text x="156" y="1220" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Risk &amp;</text>
+<text x="156" y="1266" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Responsibility</text>
+<text x="156" y="1320" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Define the risks.</text>
+<text x="156" y="1356" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Assign an owner.</text>
+<polygon points="737,611 823,525 823,985 737,1071" fill="url(#pillarSide)" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<rect x="515" y="611" width="222" height="460" fill="url(#pillarFace)" stroke="#191C1B" stroke-width="1.5"/>
+<rect x="516" y="611" width="17" height="459" fill="#FFFFFF"/>
+<rect x="516" y="611" width="220" height="20" fill="#BBBDB3"/>
+<path d="M 764 584 L 764 1044" fill="none" stroke="#AEAEA4" stroke-width="1"/>
+<path d="M 794 554 L 794 1014" fill="none" stroke="#AEAEA4" stroke-width="1"/>
+<text x="626.0" y="854" font-size="167" font-weight="500" fill="#191C1B" letter-spacing="-4" text-anchor="middle">A</text>
+<rect x="604.0" y="901" width="44" height="6" fill="#D8422C"/>
+<path d="M 549 1033 L 703 1033" fill="none" stroke="#B4B5AA" stroke-width="1.5"/>
+<circle cx="554" cy="1050" r="3" fill="#949C8F"/>
+<circle cx="698" cy="1050" r="3" fill="#949C8F"/>
+<path d="M 626.0 1130 L 626.0 1162" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
+<circle cx="626.0" cy="1164" r="3" fill="#D8422C"/>
+<text x="515" y="1220" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Authority</text>
+<text x="515" y="1266" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">&amp; Access</text>
+<text x="515" y="1320" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Scope every identity,</text>
+<text x="515" y="1356" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">tool and action.</text>
+<polygon points="1096,611 1182,525 1182,985 1096,1071" fill="url(#pillarSide)" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<rect x="874" y="611" width="222" height="460" fill="url(#pillarFace)" stroke="#191C1B" stroke-width="1.5"/>
+<rect x="875" y="611" width="17" height="459" fill="#FFFFFF"/>
+<rect x="875" y="611" width="220" height="20" fill="#BBBDB3"/>
+<path d="M 1123 584 L 1123 1044" fill="none" stroke="#AEAEA4" stroke-width="1"/>
+<path d="M 1153 554 L 1153 1014" fill="none" stroke="#AEAEA4" stroke-width="1"/>
+<text x="985.0" y="854" font-size="167" font-weight="500" fill="#191C1B" letter-spacing="-4" text-anchor="middle">I</text>
+<rect x="963.0" y="901" width="44" height="6" fill="#D8422C"/>
+<path d="M 908 1033 L 1062 1033" fill="none" stroke="#B4B5AA" stroke-width="1.5"/>
+<circle cx="913" cy="1050" r="3" fill="#949C8F"/>
+<circle cx="1057" cy="1050" r="3" fill="#949C8F"/>
+<path d="M 985.0 1130 L 985.0 1162" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
+<circle cx="985.0" cy="1164" r="3" fill="#D8422C"/>
+<text x="874" y="1220" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Isolation</text>
+<text x="874" y="1266" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">&amp; Integrity</text>
+<text x="874" y="1320" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Protect data, memory</text>
+<text x="874" y="1356" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">and execution.</text>
+<polygon points="1455,611 1541,525 1541,985 1455,1071" fill="url(#pillarSide)" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<rect x="1233" y="611" width="222" height="460" fill="url(#pillarFace)" stroke="#191C1B" stroke-width="1.5"/>
+<rect x="1234" y="611" width="17" height="459" fill="#FFFFFF"/>
+<rect x="1234" y="611" width="220" height="20" fill="#BBBDB3"/>
+<path d="M 1482 584 L 1482 1044" fill="none" stroke="#AEAEA4" stroke-width="1"/>
+<path d="M 1512 554 L 1512 1014" fill="none" stroke="#AEAEA4" stroke-width="1"/>
+<text x="1344.0" y="854" font-size="167" font-weight="500" fill="#191C1B" letter-spacing="-4" text-anchor="middle">S</text>
+<rect x="1322.0" y="901" width="44" height="6" fill="#D8422C"/>
+<path d="M 1267 1033 L 1421 1033" fill="none" stroke="#B4B5AA" stroke-width="1.5"/>
+<circle cx="1272" cy="1050" r="3" fill="#949C8F"/>
+<circle cx="1416" cy="1050" r="3" fill="#949C8F"/>
+<path d="M 1344.0 1130 L 1344.0 1162" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
+<circle cx="1344.0" cy="1164" r="3" fill="#D8422C"/>
+<text x="1233" y="1220" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Security</text>
+<text x="1233" y="1266" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Verification</text>
+<text x="1233" y="1320" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Test allowed actions</text>
+<text x="1233" y="1356" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">and attempted bypasses.</text>
+<polygon points="1814,611 1900,525 1900,985 1814,1071" fill="url(#pillarSide)" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<rect x="1592" y="611" width="222" height="460" fill="url(#pillarFace)" stroke="#191C1B" stroke-width="1.5"/>
+<rect x="1593" y="611" width="17" height="459" fill="#FFFFFF"/>
+<rect x="1593" y="611" width="220" height="20" fill="#BBBDB3"/>
+<path d="M 1841 584 L 1841 1044" fill="none" stroke="#AEAEA4" stroke-width="1"/>
+<path d="M 1871 554 L 1871 1014" fill="none" stroke="#AEAEA4" stroke-width="1"/>
+<text x="1703.0" y="854" font-size="167" font-weight="500" fill="#191C1B" letter-spacing="-4" text-anchor="middle">E</text>
+<rect x="1681.0" y="901" width="44" height="6" fill="#D8422C"/>
+<path d="M 1626 1033 L 1780 1033" fill="none" stroke="#B4B5AA" stroke-width="1.5"/>
+<circle cx="1631" cy="1050" r="3" fill="#949C8F"/>
+<circle cx="1775" cy="1050" r="3" fill="#949C8F"/>
+<path d="M 1703.0 1130 L 1703.0 1162" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
+<circle cx="1703.0" cy="1164" r="3" fill="#D8422C"/>
+<text x="1592" y="1220" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">Evidence</text>
+<text x="1592" y="1266" font-size="39" font-weight="600" fill="#191C1B" letter-spacing="-1.2">&amp; Evolution</text>
+<text x="1592" y="1320" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">Observe, stop,</text>
+<text x="1592" y="1356" font-size="27" font-weight="400" fill="#636964" letter-spacing="-0.15">recover and improve.</text>
+<polygon points="104,535 1940,535 2060,415 224,415" fill="#2A302C" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="1940,535 2060,415 2060,491 1940,611" fill="#151D19" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="104,535 1940,535 1940,611 104,611" fill="#1C2420" stroke="#191C1B" stroke-width="1.5" stroke-linejoin="round"/>
+<rect x="105" y="535" width="1834" height="5" fill="#D8422C"/>
+<text x="148" y="588" font-size="42" font-weight="500" fill="#FFFFFF" letter-spacing="2.2">SECURE AGENTIC APPLICATIONS</text>
+<path d="M 384 473 L 1855 473" fill="none" stroke="#819484" stroke-width="2"/>
+<polygon points="389,473 417,454 445,473 417,492" fill="#2A302C" stroke="#99AA9C" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="410,473 417,468 424,473 417,478" fill="#D8422C" stroke="#D8422C" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="748,473 776,454 804,473 776,492" fill="#2A302C" stroke="#99AA9C" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="769,473 776,468 783,473 776,478" fill="#D8422C" stroke="#D8422C" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="1107,473 1135,454 1163,473 1135,492" fill="#2A302C" stroke="#99AA9C" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="1128,473 1135,468 1142,473 1135,478" fill="#D8422C" stroke="#D8422C" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="1466,473 1494,454 1522,473 1494,492" fill="#2A302C" stroke="#99AA9C" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="1487,473 1494,468 1501,473 1494,478" fill="#D8422C" stroke="#D8422C" stroke-width="1" stroke-linejoin="round"/>
+<polygon points="1825,473 1853,454 1881,473 1853,492" fill="#2A302C" stroke="#99AA9C" stroke-width="1.5" stroke-linejoin="round"/>
+<polygon points="1846,473 1853,468 1860,473 1853,478" fill="#D8422C" stroke="#D8422C" stroke-width="1" stroke-linejoin="round"/>
+<path d="M 96 1420 L 2064 1420" fill="none" stroke="#C9CDC6" stroke-width="1.5"/>
+<text x="96" y="1471" font-size="18" font-weight="400" fill="#636964" letter-spacing="1.6" font-family="DejaVu Sans Mono, monospace">INFORMED BY</text>
+<text x="307" y="1471" font-size="25" font-weight="500" fill="#191C1B">AIUC-1  /  ISO/IEC 42001  /  NIST AI RMF</text>
+<text x="2064" y="1471" font-size="25" font-weight="500" fill="#191C1B" text-anchor="end">Risk coverage: OWASP Agentic Top 10</text>
+<text x="96" y="1510" font-size="19" font-weight="400" fill="#636964">RAISE&#x27;s own engineering pillars</text>
+<text x="2064" y="1510" font-size="19" font-weight="400" fill="#636964" text-anchor="end">Original artwork: MIT</text>
+</g>
+</svg>
