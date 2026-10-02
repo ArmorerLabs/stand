@@ -6,7 +6,7 @@ RAISE organizes secure agent development into five engineering pillars. The cent
 
 ![Five illustrated RAISE pillars support secure agentic applications on a shared foundation of security enforced in application code. Detailed explanations follow below.](raise-infographic.png)
 
-Download the [PNG](raise-infographic.png) or edit the [SVG](raise-infographic.svg).
+Download the [PNG](raise-infographic.png) or edit the [SVG](raise-infographic.svg). The SVG names the Geist and IBM Plex Mono typefaces (SIL Open Font License 1.1) but does not embed them. Install both before editing or rendering it; otherwise it falls back to system fonts. The PNG was rendered with both.
 
 ## R: Risk & Responsibility
 
