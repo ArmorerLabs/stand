@@ -14,7 +14,7 @@ This project is independent. Citing a standard, publication or project does not 
 
 - Copyright in this project's original material belongs to its contributors, as recorded in [LICENSE](LICENSE). Contributions are accepted under the license of the path they change.
 - Documentation and data: Copyright (c) 2026 the project contributors. Licensed under CC BY-SA 4.0.
-- Suggested credit: "STAND by its contributors, https://github.com/ArmorerLabs/raise, licensed under CC BY-SA 4.0". If the project or repository is renamed, use the name and URL given here at the time of the copy.
+- Suggested credit: "STAND by its contributors, https://github.com/ArmorerLabs/stand, licensed under CC BY-SA 4.0". If the project or repository is renamed, use the name and URL given here at the time of the copy.
 - `references/controls/` and `references/mappings.md` are generated from `catalog/` and are licensed under CC BY-SA 4.0, like their source.
 - A file that states its own license follows that statement. A new path that this table does not cover gets its license recorded here before it is merged.
 - The installed skill bundle (`SKILL.md`, `references/`, `assets/`, `agents/`, `LICENSE`, `LICENSES/` and this file) contains only CC BY-SA 4.0 material and license texts.
