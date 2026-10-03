@@ -30,7 +30,7 @@ The entry point is [SKILL.md](SKILL.md). Keep it together with `references/` and
 For any coding agent that can read local files, give it a concrete request such as:
 
 ```text
-Read SKILL.md in the raise checkout and apply it to this task.
+Read SKILL.md in this raise repository branch, and apply it to this task.
 Add a support agent that searches tenant documents and proposes account changes.
 Implement the relevant controls, test the execution paths, and record remaining risks.
 ```
@@ -39,7 +39,7 @@ That is explicit file loading. Native discovery, invocation syntax, and supporte
 
 ### Codex installation
 
-From a reviewed checkout, copy the skill files into the configured personal skills directory. This example uses the personal directory described in [OpenAI's skill evaluation guide](https://developers.openai.com/blog/eval-skills). It refuses to overwrite an existing installation:
+From a reviewed, up-to-date checkout, copy the skill files into the configured user-scoped skills directory. This example uses the personal directory described in [OpenAI's skill evaluation guide](https://developers.openai.com/blog/eval-skills). It refuses to overwrite an existing installation:
 
 ```bash
 skill_destination="${CODEX_HOME:-$HOME/.codex}/skills/raise"
@@ -81,7 +81,7 @@ Require the application's relevant security tests in its CI and protect conseque
 
 ## Validate and contribute
 
-With Python 3.10 or newer, run from this checkout:
+With Python 3.10 or newer, run from this branch:
 
 ```bash
 python3 scripts/validate.py
