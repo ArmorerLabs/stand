@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: MIT
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # Wait a week before proposing a new action release, so a compromised release
+    # has time to be detected and pulled before it reaches a pull request.
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: ci

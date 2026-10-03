@@ -1,23 +1,44 @@
-name: Validate RAISE
+# SPDX-License-Identifier: MIT
+name: Validate
 
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   validate:
+    name: Validate (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.13"]
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Validate portable package
-        run: python3 scripts/validate.py
-      - name: Verify validator failure handling
-        run: python3 -m unittest discover -s tests -v
+          # The parent commit lets the validator reject ledger entries removed by this change.
+          fetch-depth: 2
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Check generated catalog views
+        run: python scripts/render_catalog.py --check
+      - name: Validate repository
+        run: python scripts/validate.py --ledger-base HEAD^1
+      - name: Validate staged skill bundle
+        run: python scripts/validate.py --stage "$RUNNER_TEMP/stand"
+      - name: Run validator tests
+        run: python -m unittest discover -s tests -v
