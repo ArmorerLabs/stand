@@ -39,7 +39,7 @@ That is explicit file loading. Native discovery, invocation syntax, and supporte
 
 ### Codex installation
 
-From an up-to-date branch, copy the skill files into the configured user-scoped skills directory. This example uses the personal directory described in [OpenAI's skill evaluation guide](https://developers.openai.com/blog/eval-skills). It refuses to overwrite an existing installation:
+From a reviewed, up-to-date checkout, copy the skill files into the configured user-scoped skills directory. This example uses the personal directory described in [OpenAI's skill evaluation guide](https://developers.openai.com/blog/eval-skills). It refuses to overwrite an existing installation:
 
 ```bash
 skill_destination="${CODEX_HOME:-$HOME/.codex}/skills/raise"
