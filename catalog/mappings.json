@@ -1,0 +1,3672 @@
+{
+  "version": "0.1.0",
+  "license": "CC-BY-SA-4.0",
+  "checked": "2026-10-03",
+  "disclaimer": "These are engineering mappings between this catalog's controls and external frameworks, written in this project's own words. They are not certification, attestation or an audit opinion, and they do not claim conformance to, or coverage of, AIUC-1, NIST AI RMF 1.0, NIST AI 600-1, OWASP AISVS or any other framework. A mapped requirement is not evidence that an application's control works, and implementing a control does not by itself satisfy the mapped requirement.",
+  "relations": {
+    "direct": "The external requirement covers essentially the same obligation as the control.",
+    "partial": "The external requirement covers part of the control, or the same obligation in a narrower scope.",
+    "supports": "The external requirement helps implement or evidence the control but is not equivalent to it."
+  },
+  "aiuc1": {
+    "framework": "AIUC-1",
+    "source_version": "AIUC-1 release of July 15, 2026",
+    "source_url": "https://standard.aiuc-1.com/",
+    "notes": [
+      "Snapshot: the AIUC-1 release of July 15, 2026, which was still the most recent release when checked against the public changelog on 2026-10-03. The next release is announced for October 15, 2026. Recheck every identifier after each quarterly release, because releases can renumber controls (the July 2026 release renumbered controls under A003, A006, B008 and C008). Retired E007 and E014 are not cited.",
+      "Structure: AIUC-1 requirements are mandatory or optional, and a requirement becomes optional when the agent lacks the capability it addresses. Each requirement lists core controls and supplemental controls. Each justification says whether the cited control is core or supplemental. Whether each cited requirement is mandatory or optional is recorded in the application map of catalog/mappings.json, which the validator checks against the Application column of the requirement table in references/frameworks.md; justifications do not repeat it. C008, E013 and E017, like B002, C007 and C009, are optional requirements.",
+      "Capability scoping: D003, D004 and B006 carry the Automation capability. C006 applies to text-, voice- or code-generating products. A008 and B010 (Code-generation) apply only when the assessed product generates code for its users, so they are never evidence for a coding agent that builds the application. They appear only as capability-scoped supports: A008.3 on T-05 and T-23, A008.5 on N-01, and B010.3 on T-24.",
+      "Relations: no AIUC-1 relation is direct. D003.1, B006.1 and B006.3 each cover parts of A-01, A-02 and S-05, but none requires one non-bypassable dispatcher, canonicalization or fail-closed behavior. B001, D004 and C012 require third-party testers while D-04 and D-08 do not, so those links are partial or supports.",
+      "Gaps: T-04 has no AIUC-1 counterpart. A-05, A-18, A-21, T-02, T-08, T-09, T-20, N-07, D-03 and D-05 have only weak supports links. A-11 (approval binding), A-15 (delegation by intersection) and A-20 (cumulative budgets across descendants) go beyond AIUC-1 core controls, consistent with the gaps listed in the OWASP and AIUC-1 crosswalk. Owner risk acceptance under S-01 and D-06 has no AIUC-1 expiry analogue.",
+      "Reuse boundary: justifications are written in this project's own words. No AIUC-1 requirement text, control activity or evidence text is reproduced; cite AIUC-1 by identifier and link only."
+    ],
+    "requirement_urls": {
+      "A001": "https://standard.aiuc-1.com/data-and-privacy/establish-data-use-policy",
+      "A003": "https://standard.aiuc-1.com/data-and-privacy/implement-contextual-data-safeguards",
+      "A004": "https://standard.aiuc-1.com/data-and-privacy/protect-ip-trade-secrets",
+      "A005": "https://standard.aiuc-1.com/data-and-privacy/prevent-cross-customer-data-exposure",
+      "A006": "https://standard.aiuc-1.com/data-and-privacy/prevent-pii-leakage",
+      "A008": "https://standard.aiuc-1.com/data-and-privacy/prevent-secrets-leakage",
+      "B001": "https://standard.aiuc-1.com/security/test-adversarial-robustness",
+      "B002": "https://standard.aiuc-1.com/security/detect-adversarial-input",
+      "B004": "https://standard.aiuc-1.com/security/prevent-ai-endpoint-scraping",
+      "B006": "https://standard.aiuc-1.com/security/enforce-contextual-access-controls",
+      "B007": "https://standard.aiuc-1.com/security/enforce-ai-access-privileges",
+      "B008": "https://standard.aiuc-1.com/security/protect-model-deployment-environment",
+      "B010": "https://standard.aiuc-1.com/security/promote-secure-code-patterns",
+      "C001": "https://standard.aiuc-1.com/safety/define-ai-risk-taxonomy",
+      "C002": "https://standard.aiuc-1.com/safety/conduct-pre-deployment-testing",
+      "C006": "https://standard.aiuc-1.com/safety/prevent-output-vulnerabilities",
+      "C007": "https://standard.aiuc-1.com/safety/flag-high-risk-recommendations",
+      "C008": "https://standard.aiuc-1.com/safety/monitor-ai-risk-categories",
+      "C009": "https://standard.aiuc-1.com/safety/collect-real-time-feedback",
+      "C012": "https://standard.aiuc-1.com/safety/3rd-party-testing-for-other-risk",
+      "D003": "https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls",
+      "D004": "https://standard.aiuc-1.com/reliability/3rd-party-testing-of-tool-calls",
+      "E001": "https://standard.aiuc-1.com/accountability/ai-failure-plan-for-security-breaches",
+      "E004": "https://standard.aiuc-1.com/accountability/assign-accountability",
+      "E005": "https://standard.aiuc-1.com/accountability/assess-cloud-vs-on-prem-processing",
+      "E006": "https://standard.aiuc-1.com/accountability/conduct-vendor-due-diligence",
+      "E008": "https://standard.aiuc-1.com/accountability/review-internal-processes",
+      "E009": "https://standard.aiuc-1.com/accountability/monitor-3rd-party-access",
+      "E011": "https://standard.aiuc-1.com/accountability/record-processing-locations",
+      "E013": "https://standard.aiuc-1.com/accountability/implement-quality-management-system",
+      "E015": "https://standard.aiuc-1.com/accountability/log-model-activity",
+      "E017": "https://standard.aiuc-1.com/accountability/document-system-transparency-policy"
+    },
+    "application": {
+      "A001": "Mandatory",
+      "A003": "Mandatory",
+      "A004": "Mandatory",
+      "A005": "Mandatory",
+      "A006": "Mandatory",
+      "A008": "Mandatory",
+      "B001": "Mandatory",
+      "B002": "Optional",
+      "B004": "Mandatory",
+      "B006": "Mandatory",
+      "B007": "Mandatory",
+      "B008": "Mandatory",
+      "B010": "Mandatory",
+      "C001": "Mandatory",
+      "C002": "Mandatory",
+      "C006": "Mandatory",
+      "C007": "Optional",
+      "C008": "Optional",
+      "C009": "Optional",
+      "C012": "Mandatory",
+      "D003": "Mandatory",
+      "D004": "Mandatory",
+      "E001": "Mandatory",
+      "E004": "Mandatory",
+      "E005": "Mandatory",
+      "E006": "Mandatory",
+      "E008": "Mandatory",
+      "E009": "Mandatory",
+      "E011": "Mandatory",
+      "E013": "Optional",
+      "E015": "Mandatory",
+      "E017": "Optional"
+    },
+    "refs": {
+      "S-01": [
+        {
+          "ref": "E004.1",
+          "relation": "partial",
+          "justification": "Core control: name an accountable lead for defined AI system changes and keep their sign-off records. S-01 adds one owner for the whole claimed scope, owner-only risk acceptance with an expiry of 90 days or less, and a ban on agents entering acceptances themselves."
+        },
+        {
+          "ref": "C002.1",
+          "relation": "partial",
+          "justification": "Core control: before deployment, record a residual-risk assessment and an accountable person's sign-off with its rationale. S-01 makes these per-exception records with severity, scope, compensating controls and an expiry."
+        },
+        {
+          "ref": "E008.1",
+          "relation": "supports",
+          "justification": "Core control: keep a central log of decisions and track remediation of identified risks. This gives a place to keep S-01 acceptances, but AIUC-1 sets no expiry for them and does not require an owner per acceptance."
+        }
+      ],
+      "S-02": [
+        {
+          "ref": "C001.1",
+          "relation": "supports",
+          "justification": "Core control: a risk taxonomy with severity levels fitted to the deployment context. S-02's per-context capability profile and Level selection are a finer-grained input to it. Note that AIUC-1's capability tags (Automation, Code-generation, External-facing) are a scoping device, not a requirement."
+        },
+        {
+          "ref": "E017.1",
+          "relation": "supports",
+          "justification": "Core control: transparency documentation that describes system characteristics. A recorded capability profile can feed it. AIUC-1 does not ask for property-level profiles, the unknown-means-present rule or recomputation when tools change."
+        }
+      ],
+      "S-03": [
+        {
+          "ref": "B006.1",
+          "relation": "partial",
+          "justification": "Core control (Automation capability): technically limit which services, APIs and MCP servers an agent can reach to its authorized scope. S-03 also requires a recorded task need for each capability, and a deterministic workflow or lower autonomy where that is enough."
+        },
+        {
+          "ref": "A003.1",
+          "relation": "supports",
+          "justification": "Core control: limit agent data access to what the task, role and context need. This is least privilege for data, a related idea: S-03 applies least agency to tools, triggers, delegates and autonomy, and A-09 handles data scope."
+        },
+        {
+          "ref": "D003.5",
+          "relation": "supports",
+          "justification": "Supplemental control: periodically review tool usage and retire unused or high-risk functions. This trims capability after the fact. S-03 blocks a capability that has no recorded need from being enabled at all."
+        },
+        {
+          "ref": "A003.3",
+          "relation": "supports",
+          "justification": "Supplemental control: per-agent permission scopes and just-in-time permissions for subtasks are consistent with least agency."
+        }
+      ],
+      "S-04": [
+        {
+          "ref": "E017.1",
+          "relation": "partial",
+          "justification": "Core control: transparency artifacts such as an AI bill of materials that records system and model versions. S-04 goes further: every recipient account, descriptor hashes, entry-point boundary tracing, the principals a run touches, and an ASI applicability decision for each category."
+        },
+        {
+          "ref": "C001.1",
+          "relation": "supports",
+          "justification": "Core control: an AI risk taxonomy aligned with external frameworks. S-04's ASI applicability analysis can serve as the agent-security part of that taxonomy."
+        },
+        {
+          "ref": "E011.1",
+          "relation": "supports",
+          "justification": "Core control: document where AI processing happens and which third-party providers are involved. This overlaps S-04's inventory of inference, embedding and telemetry recipients."
+        },
+        {
+          "ref": "B006.1",
+          "relation": "supports",
+          "justification": "Core control evidence can include an MCP server allowlist or registration config and an architecture diagram of agent boundaries. Both overlap S-04's inventory and boundary trace."
+        },
+        {
+          "ref": "C002.2",
+          "relation": "supports",
+          "justification": "Supplemental control: build threat modelling into design-phase SDLC gates. S-04 is a concrete agent threat model that meets this intent."
+        }
+      ],
+      "S-05": [
+        {
+          "ref": "D003.1",
+          "relation": "partial",
+          "justification": "Core control (Automation): tool allowlists, parameter validation and authorization before a tool runs. S-05 adds a versioned register with consequence classes and a trusted source for each consequential argument, and makes tool registration fail without them."
+        },
+        {
+          "ref": "D003.2",
+          "relation": "partial",
+          "justification": "Core control: rate limits and transaction caps on autonomous tool use. These match S-05's value and rate limits for each operation."
+        },
+        {
+          "ref": "D003.4",
+          "relation": "partial",
+          "justification": "Supplemental control: human approval for sensitive or high-risk tool operations. S-05 sets the approval policy for each operation in the register and bars the model from lowering an operation's class."
+        }
+      ],
+      "S-06": [
+        {
+          "ref": "A001.1",
+          "relation": "partial",
+          "justification": "Core control: a documented policy on how input data is used for inference and training, and how long it is kept. S-06 needs a machine-read policy for each data class covering providers, sinks, memory, logs and audiences."
+        },
+        {
+          "ref": "A001.2",
+          "relation": "supports",
+          "justification": "Core control: retention and deletion enforced technically. This matches S-06's retention and deletion obligations for each class."
+        },
+        {
+          "ref": "A003.1",
+          "relation": "supports",
+          "justification": "Core control: data access scoped by task and context. It is one consumer of a classification policy."
+        },
+        {
+          "ref": "E011.1",
+          "relation": "supports",
+          "justification": "Core control: records where providers process data. This informs which destinations S-06 may allow for each class."
+        },
+        {
+          "ref": "A006.1",
+          "relation": "supports",
+          "justification": "Core control: detect and filter personal data in outputs and logs. This applies one class rule (personal data) that S-06 generalizes to all classes and sinks."
+        },
+        {
+          "ref": "E005.1",
+          "relation": "supports",
+          "justification": "Core control: document data storage security in light of data sensitivity and regulatory needs. This relates to S-06's per-class rules for memory stores and logs."
+        }
+      ],
+      "A-01": [
+        {
+          "ref": "D003.1",
+          "relation": "partial",
+          "justification": "Core control (Automation): authorization and validation checks before a tool runs. AIUC-1 does not require one non-bypassable dispatcher covering every entry point, fallback model and subagent, or adapters that nothing else can reach."
+        },
+        {
+          "ref": "B006.3",
+          "relation": "partial",
+          "justification": "Supplemental control: pre-execution hooks or a policy engine that checks runtime tool calls against policy. This is close to a dispatcher, but AIUC-1 requires neither one path nor bypass prevention."
+        },
+        {
+          "ref": "B006.1",
+          "relation": "supports",
+          "justification": "Core control: gateway or service-level authorization that restricts agent backend access. This helps keep adapters reachable only through approved paths."
+        }
+      ],
+      "A-02": [
+        {
+          "ref": "D003.1",
+          "relation": "partial",
+          "justification": "Core control: tool allowlists and parameter validation before execution. A-02 adds fail-closed handling of policy errors, canonicalization before authorization, execution of only the validated request, and parameterized adapters."
+        },
+        {
+          "ref": "B008.3",
+          "relation": "partial",
+          "justification": "Supplemental control: schema validation and sanitization of MCP tool-call inputs and outputs. This covers A-02's strict-schema element for MCP."
+        },
+        {
+          "ref": "C006.1",
+          "relation": "supports",
+          "justification": "Core control: check structured model output against safe schemas. This partly overlaps A-02's argument validation."
+        }
+      ],
+      "A-03": [
+        {
+          "ref": "A003.1",
+          "relation": "partial",
+          "justification": "Core control: role-based permission checks before data access, and scoping per session. A-03 also requires identity and authority to come only from authenticated server-side state, with per-call checks by the owning service and never a broad service credential instead."
+        },
+        {
+          "ref": "D003.1",
+          "relation": "partial",
+          "justification": "Core control: authorization checks before a tool runs. AIUC-1 does not say where identity and ownership must come from."
+        },
+        {
+          "ref": "A003.3",
+          "relation": "supports",
+          "justification": "Supplemental control: stop agents from silently inheriting elevated permissions from orchestrators. This supports A-03's ban on authority taken from untrusted sources."
+        }
+      ],
+      "A-04": [
+        {
+          "ref": "D003.1",
+          "relation": "partial",
+          "justification": "Core control: authorize before a tool runs. AIUC-1 does not require re-evaluation against current state for queued, retried or delegated work, or atomicity between the final check and the effect."
+        },
+        {
+          "ref": "B006.3",
+          "relation": "supports",
+          "justification": "Supplemental control: pre-execution authorization hooks verify tool calls at runtime, close to the moment of effect."
+        }
+      ],
+      "A-05": [
+        {
+          "ref": "D003.2",
+          "relation": "supports",
+          "justification": "Core control: transaction caps relate to A-05's cumulative limits across split requests. AIUC-1 has no idempotency-key, durable-ledger or reconcile-before-retry requirement."
+        }
+      ],
+      "A-06": [
+        {
+          "ref": "C006.2",
+          "relation": "supports",
+          "justification": "Core control: label untrusted content and handle it by trust level, framed around output shown to users. A-06's matching of consequential tool arguments to trusted sources, destination normalization and look-alike checks have no AIUC-1 counterpart."
+        },
+        {
+          "ref": "D003.1",
+          "relation": "supports",
+          "justification": "Core control: parameter validation before a tool runs is where A-06's provenance check would sit."
+        },
+        {
+          "ref": "D003.4",
+          "relation": "supports",
+          "justification": "Supplemental control: human confirmation of high-risk actions. This is the fallback path A-06 uses for values from untrusted sources."
+        }
+      ],
+      "A-07": [
+        {
+          "ref": "B006.1",
+          "relation": "supports",
+          "justification": "Core control (Automation): technical limits keep each agent within a fixed service scope. A-07 instead binds a task scope to each run from the principal's request before untrusted content enters, which no AIUC-1 control addresses."
+        },
+        {
+          "ref": "D003.1",
+          "relation": "supports",
+          "justification": "Core control: stop tool calls that go beyond intended scope. That scope is set per system, not per run, and AIUC-1 does not require denying or confirming out-of-scope actions in tainted contexts."
+        },
+        {
+          "ref": "A003.3",
+          "relation": "supports",
+          "justification": "Supplemental control: just-in-time permissions scoped to individual subtasks are close in spirit to per-run task scope."
+        }
+      ],
+      "A-08": [
+        {
+          "ref": "D003.4",
+          "relation": "partial",
+          "justification": "Supplemental control: human approval for sensitive operations corresponds to A-08 option (a). AIUC-1 does not define the three-property trigger, the fixed-configuration option (b), the separation option (c), or plan-binding rules."
+        },
+        {
+          "ref": "C006.2",
+          "relation": "supports",
+          "justification": "Core control: treating content differently by trust level is the basis for detecting the untrusted-input property."
+        },
+        {
+          "ref": "B006.1",
+          "relation": "supports",
+          "justification": "Core control: fixed service and endpoint restrictions can implement option (b), where trusted configuration fixes the destinations."
+        }
+      ],
+      "A-09": [
+        {
+          "ref": "D003.1",
+          "relation": "partial",
+          "justification": "Core control: access control lists that limit the tools available to each agent or user. A-09 also requires a credential limited to the profile, and auto-run only for tools with neither egress nor state change, judged on parsed arguments."
+        },
+        {
+          "ref": "D003.2",
+          "relation": "partial",
+          "justification": "Core control: rate limits and quotas for each tool match A-09's per-tool rate limits."
+        },
+        {
+          "ref": "B006.1",
+          "relation": "partial",
+          "justification": "Core control: network policies and service restrictions for each agent match A-09's egress limits and enforced profile."
+        },
+        {
+          "ref": "A003.3",
+          "relation": "supports",
+          "justification": "Supplemental control: per-agent permission scopes and just-in-time credentials support credentials limited to a profile."
+        }
+      ],
+      "A-10": [
+        {
+          "ref": "D003.4",
+          "relation": "partial",
+          "justification": "Supplemental control: human confirmation before high-risk actions. A-10 offers reversibility by design as an alternative, and requires a side-effect-free dry-run diff in the approval. AIUC-1 requires neither."
+        }
+      ],
+      "A-11": [
+        {
+          "ref": "D003.4",
+          "relation": "partial",
+          "justification": "Supplemental control: approval workflows for sensitive tool operations. A-11 adds binding to approver, arguments, target, policy and resource version, single use, and consumption atomically with the effect or its durable intent record."
+        },
+        {
+          "ref": "E015.2",
+          "relation": "supports",
+          "justification": "Supplemental control: log approval events linked to executions with approver and outcome. This supports evidence of binding, not the binding itself."
+        }
+      ],
+      "A-12": [
+        {
+          "ref": "C006.2",
+          "relation": "partial",
+          "justification": "Core control: visibly separate untrusted or third-party content from system content in the UI. A-12 applies this to approval screens, with provenance for each field, a model-unwritable region, new-destination flags and previews that make no network requests."
+        },
+        {
+          "ref": "D003.4",
+          "relation": "supports",
+          "justification": "Supplemental control: human approval workflows are what A-12 protects."
+        }
+      ],
+      "A-13": [
+        {
+          "ref": "D003.5",
+          "relation": "supports",
+          "justification": "Supplemental control: periodic review of tool usage patterns for anomalies. AIUC-1 does not measure approval rates or time to decision, or flag changed payment details."
+        },
+        {
+          "ref": "C007.3",
+          "relation": "supports",
+          "justification": "Supplemental control: track response times of human review queues and review workflow effectiveness. This is related to A-13's measures of approver fatigue, though AIUC-1 applies it to flagged outputs."
+        }
+      ],
+      "A-14": [
+        {
+          "ref": "A003.3",
+          "relation": "supports",
+          "justification": "Supplemental control: segregation of duties across agent permissions. This is related to A-14's two distinct human approvers and its ban on agent approvers. AIUC-1 does not require step-up authentication or dual control."
+        },
+        {
+          "ref": "D003.4",
+          "relation": "supports",
+          "justification": "Supplemental control: human approval for high-risk operations is the base that A-14 strengthens."
+        }
+      ],
+      "A-15": [
+        {
+          "ref": "A003.3",
+          "relation": "partial",
+          "justification": "Supplemental control: bound or surface permissions inherited from parent agents and prevent silent elevation. A-15 adds the three-way intersection, a verified envelope, receiver re-authorization against the initiating principal, depth limits and revocation of all descendants."
+        },
+        {
+          "ref": "B008.1",
+          "relation": "supports",
+          "justification": "Core control: mutual authentication on agent-to-agent interfaces supports verifying delegation envelopes."
+        },
+        {
+          "ref": "E015.2",
+          "relation": "supports",
+          "justification": "Supplemental control: records of delegation chains with identity and task context at each hop."
+        }
+      ],
+      "A-16": [
+        {
+          "ref": "B008.1",
+          "relation": "partial",
+          "justification": "Core control: caller authentication with scoped tokens and OAuth/OIDC validation for MCP connections. A-16 adds no token passthrough, audience checks by every operated service, short-lived bound delegated credentials, session IDs that are not authentication, per-client consent at proxies and egress-routed discovery."
+        },
+        {
+          "ref": "B008.2",
+          "relation": "supports",
+          "justification": "Core control: transport security and credential rotation for MCP and agent connections."
+        },
+        {
+          "ref": "A003.2",
+          "relation": "supports",
+          "justification": "Supplemental control: identity federation through standard protocols supports issuing a credential for each audience."
+        }
+      ],
+      "A-17": [
+        {
+          "ref": "A003.2",
+          "relation": "partial",
+          "justification": "Supplemental control: a unique, verifiable identity per agent, federated through standard IAM protocols, with token exchange as example evidence. A-17 also requires a recorded owner, separation from served principals, and short-lived, audience-restricted on-behalf-of tokens that record subject and actor."
+        },
+        {
+          "ref": "A003.3",
+          "relation": "supports",
+          "justification": "Supplemental control: just-in-time credentials scoped to subtasks are consistent with short-lived delegated tokens."
+        }
+      ],
+      "A-18": [
+        {
+          "ref": "B008.1",
+          "relation": "supports",
+          "justification": "Core control: signed requests and mutual authentication are related to sender constraint. AIUC-1 does not require proof-of-possession tokens (DPoP or mTLS-bound) or tie token lifetime to revocation latency."
+        },
+        {
+          "ref": "B008.2",
+          "relation": "supports",
+          "justification": "Core control: credential rotation for long-lived connections limits how long a stolen token is useful."
+        }
+      ],
+      "A-19": [
+        {
+          "ref": "A003.1",
+          "relation": "supports",
+          "justification": "Core control: data access scoped by user role and session. AIUC-1 does not treat trigger senders as untrusted, authorize each turn against its sender, or limit shared-context output to what every principal who can view it may see, including later members."
+        },
+        {
+          "ref": "A005.2",
+          "relation": "supports",
+          "justification": "Core control: isolation between customers. This is the tenant-level part of disclosure limits in shared contexts."
+        },
+        {
+          "ref": "C006.2",
+          "relation": "supports",
+          "justification": "Core control: handling content by trust level supports treating trigger content as untrusted."
+        }
+      ],
+      "A-20": [
+        {
+          "ref": "D003.2",
+          "relation": "partial",
+          "justification": "Core control: rate limits, transaction caps and circuit breakers on autonomous tool calls. A-20 requires budgets enforced outside the model across the whole run tree with shared accounting, so that child work, fallbacks and retries draw on the parent's budget."
+        }
+      ],
+      "A-21": [
+        {
+          "ref": "D003.2",
+          "relation": "supports",
+          "justification": "Core control: circuit breakers against excessive autonomous calls are related to bounded retries. AIUC-1 does not separate denials from transient errors, ban re-attempts through other routes, or require deadlines enforced by the caller."
+        }
+      ],
+      "A-22": [
+        {
+          "ref": "B004.2",
+          "relation": "partial",
+          "justification": "Core control: per-user quotas and throttling on AI endpoints. A-22 adds tenant-level limits and a spend cap at each model provider account as an independent backstop."
+        },
+        {
+          "ref": "D003.2",
+          "relation": "supports",
+          "justification": "Core control: time-windowed limits on tool usage."
+        }
+      ],
+      "A-23": [
+        {
+          "ref": "B007.1",
+          "relation": "partial",
+          "justification": "Core control: limit the ability to change model configuration, tools and system behavior to authorized personnel. A-23 enforces this against the agent's own credentials, covering policies, prompts, budgets, audit config, CI gates and the spawning of agents or compute."
+        },
+        {
+          "ref": "B006.1",
+          "relation": "supports",
+          "justification": "Core control: service-level restrictions can keep agents away from configuration and control-plane systems."
+        },
+        {
+          "ref": "B006.3",
+          "relation": "supports",
+          "justification": "Supplemental control: detect unauthorized changes to tool definitions and scan agent hooks, skills and rules for unauthorized behavior. This detects self-modification."
+        }
+      ],
+      "A-24": [
+        {
+          "ref": "C006.1",
+          "relation": "supports",
+          "justification": "Core control (Text-, Voice- or Code-generation products): block or rewrite unsafe URLs in output. This supports A-24's removal of remote references from content posted to third-party renderers, but not its per-recipient data-class check."
+        },
+        {
+          "ref": "D003.1",
+          "relation": "supports",
+          "justification": "Core control: validate tool parameters before a tool runs. This is where A-24's payload check sits, although the AIUC-1 control does not address what data an outbound message or comment carries."
+        }
+      ],
+      "A-25": [
+        {
+          "ref": "D003.1",
+          "relation": "supports",
+          "justification": "Core control: parameter validation before a tool runs is where A-25 denies a redirecting value with no trusted or principal-linked source."
+        },
+        {
+          "ref": "D003.4",
+          "relation": "supports",
+          "justification": "Supplemental control: human approval for sensitive or high-risk tool operations. A-25 goes further for redirecting values: in-app approval alone does not let a new or untrusted-derived value take effect without verification through a channel outside the conversation."
+        }
+      ],
+      "T-01": [
+        {
+          "ref": "C006.2",
+          "relation": "partial",
+          "justification": "Core control: label untrusted content, track its source and trust level, and apply controls by source. T-01 also requires a data-only position in context, context-level taint that survives summarization, compaction and memory, and no reliance on filters alone."
+        },
+        {
+          "ref": "B002.4",
+          "relation": "supports",
+          "justification": "Supplemental control: detect adversarial input before the model processes it. T-01 allows detectors as extra signals but never as the only enforcement."
+        }
+      ],
+      "T-02": [
+        {
+          "ref": "C006.2",
+          "relation": "supports",
+          "justification": "Core control: separating external data from system-generated content is the idea behind separation patterns. AIUC-1 does not require code-enforced patterns such as dual LLM or plan-then-execute."
+        }
+      ],
+      "T-03": [
+        {
+          "ref": "B002.4",
+          "relation": "supports",
+          "justification": "Supplemental control: pre-processing filters on inputs. T-03 specifically requires removing tag and bidi characters, flagging zero-width and hidden text, and giving reviewers a view of the text the model received."
+        },
+        {
+          "ref": "C006.2",
+          "relation": "supports",
+          "justification": "Core control: provenance tags on content support T-03's provenance for OCR, transcript and metadata text."
+        }
+      ],
+      "T-04": [],
+      "T-05": [
+        {
+          "ref": "B006.3",
+          "relation": "partial",
+          "justification": "Supplemental control: sandboxing that limits credentials, files and network for code the agent runs and for MCP servers the deployer operates. T-05 also covers browser profiles, CLI tools and CI jobs, bans refresh tokens in the runtime, and keeps model-influenced processes away from enforcement components."
+        },
+        {
+          "ref": "A003.3",
+          "relation": "supports",
+          "justification": "Supplemental control: just-in-time credentials scoped to subtasks reduce ambient credentials."
+        },
+        {
+          "ref": "A008.3",
+          "relation": "supports",
+          "justification": "Core control, capability-scoped (Code-generation): applies only when the assessed product is itself a code-generating agent. There, keeping user-supplied credentials in a secret manager, scoped per tool and session and fetched at invocation rather than held in context, parallels T-05. Not evidence for a coding agent that builds the application."
+        },
+        {
+          "ref": "B008.2",
+          "relation": "supports",
+          "justification": "Core control: credential rotation for long-lived MCP and agent-to-agent connections. For agents that do not generate code, B008.2 and A003.3 are where credential scoping and rotation are recorded; this partly covers T-05's ban on long-lived keys in the runtime."
+        }
+      ],
+      "T-06": [
+        {
+          "ref": "A003.1",
+          "relation": "partial",
+          "justification": "Core control: retrieval functions that filter documents by permission and scope. T-06 adds authorization before context assembly, no leakage of counts or scores, cache keys bound to permissions, rechecks after revocation, and purge on deletion."
+        },
+        {
+          "ref": "A005.2",
+          "relation": "partial",
+          "justification": "Core control: separate customer data per tenant, including in the vector store. This matches T-06's per-tenant indexes."
+        },
+        {
+          "ref": "A001.2",
+          "relation": "supports",
+          "justification": "Core control: automated deletion supports purging indexes and embeddings on deletion requests."
+        }
+      ],
+      "T-07": [
+        {
+          "ref": "A005.2",
+          "relation": "partial",
+          "justification": "Core control: tenant isolation covers T-07's tenant partition of memory. AIUC-1 does not cover partition by principal and purpose, provenance and taint for each entry, a ban on promoting entries, or purge of derived content."
+        },
+        {
+          "ref": "A003.1",
+          "relation": "supports",
+          "justification": "Core control: keep agent data access within the task's scope and duration. This is related to memory scoping."
+        },
+        {
+          "ref": "C006.2",
+          "relation": "supports",
+          "justification": "Core control: trust-level metadata supports storing memory as untrusted-derived."
+        },
+        {
+          "ref": "A001.2",
+          "relation": "supports",
+          "justification": "Core control: retention-based deletion supports memory expiry."
+        }
+      ],
+      "T-08": [
+        {
+          "ref": "D003.1",
+          "relation": "supports",
+          "justification": "Core control: parameter validation before execution is where a system-of-record lookup would sit. No AIUC-1 control asks for consequential facts to be read from their system of record at execution time."
+        }
+      ],
+      "T-09": [
+        {
+          "ref": "A003.1",
+          "relation": "supports",
+          "justification": "Core control evidence can include data access scoped per session, related to binding state to the session. AIUC-1 does not require server-held history or rejection of client-supplied role messages."
+        },
+        {
+          "ref": "B008.3",
+          "relation": "supports",
+          "justification": "Supplemental control: integrity controls on agentic interface data are related to rejecting forged client-side tool results."
+        }
+      ],
+      "T-10": [
+        {
+          "ref": "E006.1",
+          "relation": "partial",
+          "justification": "Core control: due diligence on foundation and upstream model providers, including data handling and retention practices. T-10 enforces approved routes for each data class at runtime, including fallbacks, telemetry and tracing."
+        },
+        {
+          "ref": "E011.1",
+          "relation": "partial",
+          "justification": "Core control: document provider processing locations and regions. This matches the region and provider part of an approved route."
+        },
+        {
+          "ref": "A001.1",
+          "relation": "supports",
+          "justification": "Core control: a policy stating how data is used for inference and training and how long it is kept, related to the training and retention terms in each route."
+        },
+        {
+          "ref": "A006.2",
+          "relation": "supports",
+          "justification": "Supplemental control: DLP on outbound data can enforce part of the routing policy."
+        },
+        {
+          "ref": "A004.2",
+          "relation": "supports",
+          "justification": "Supplemental control: rely on provider commitments such as zero data retention and no training on inputs. These are the retention and training terms that each approved T-10 route must fix."
+        }
+      ],
+      "T-11": [
+        {
+          "ref": "B006.1",
+          "relation": "partial",
+          "justification": "Core control: restrict which services and MCP servers an agent can reach. This covers part of T-11's allowlisting of provider-hosted tools and connectors, but not the inventory as egress channels, per-call approval through the application, or the fallback to application-executed tools."
+        },
+        {
+          "ref": "E009.1",
+          "relation": "partial",
+          "justification": "Core control: log third-party connections and data exchanges. This matches T-11's logging of call records returned by the provider."
+        },
+        {
+          "ref": "D003.3",
+          "relation": "supports",
+          "justification": "Core control: tool-call logs that include the originating MCP server."
+        },
+        {
+          "ref": "E006.1",
+          "relation": "supports",
+          "justification": "Core control: due diligence on upstream model providers informs whether their hosted tools may receive a data class."
+        },
+        {
+          "ref": "E017.3",
+          "relation": "supports",
+          "justification": "Supplemental control, added in July 2026: document which security duties the platform holds and which the deployer holds. This supports T-11's rule that a control the provider cannot enforce moves to an application-executed tool."
+        }
+      ],
+      "T-12": [
+        {
+          "ref": "B006.1",
+          "relation": "partial",
+          "justification": "Core control: network segmentation and policies that define the endpoints an agent may reach. T-12 adds a deny-by-default egress proxy with checks on resolved addresses and every redirect hop, controlled DNS, blocking of metadata and internal ranges, and coverage of OAuth and MCP discovery."
+        },
+        {
+          "ref": "B006.3",
+          "relation": "supports",
+          "justification": "Supplemental control: network restrictions inside execution sandboxes."
+        }
+      ],
+      "T-13": [
+        {
+          "ref": "C006.1",
+          "relation": "partial",
+          "justification": "Core control (Text-, Voice- or Code-generation products): block or rewrite unsafe URLs and use safe rendering modes and CSP. T-13 specifically requires no automatic remote image loading, inert or fully shown links, disabled unfurling, and allowlists without open redirects."
+        }
+      ],
+      "T-14": [
+        {
+          "ref": "C006.1",
+          "relation": "partial",
+          "justification": "Core control: encode or validate model output before presenting it, including HTML, script and shell encoding. T-14 extends this to every sink (logs, admin and trace consoles, spreadsheet formulas) and bans implicit execution and model-built query strings."
+        },
+        {
+          "ref": "C006.3",
+          "relation": "supports",
+          "justification": "Supplemental control: detect payloads in outputs that target downstream systems. This is an extra signal."
+        }
+      ],
+      "T-15": [
+        {
+          "ref": "B006.3",
+          "relation": "partial",
+          "justification": "Supplemental control: sandboxes for agent-executed code with configurable filesystem, network and credential limits. T-15 adds non-root, external resource supervision, default-deny DNS, pinned images and a validation gate between code generation and execution."
+        },
+        {
+          "ref": "B008.4",
+          "relation": "supports",
+          "justification": "Supplemental control: minimal, scanned container images and isolation sized to risk, stated for model hosting but applicable to sandbox images."
+        }
+      ],
+      "T-16": [
+        {
+          "ref": "B008.4",
+          "relation": "supports",
+          "justification": "Supplemental control: choose infrastructure isolation (namespaces or VM separation) by risk level, stated for model hosting. T-16 requires a boundary stronger than a shared kernel, and one sandbox per session, for code shaped by untrusted input."
+        },
+        {
+          "ref": "B006.3",
+          "relation": "supports",
+          "justification": "Supplemental control: sandboxed execution for agent code. AIUC-1 does not set an isolation strength."
+        }
+      ],
+      "T-17": [
+        {
+          "ref": "B006.3",
+          "relation": "supports",
+          "justification": "Supplemental control: runtime containment with credential and network restrictions. AIUC-1 has no browser or computer-use requirements (isolated profile, navigation allowlists, download quarantine)."
+        },
+        {
+          "ref": "B006.1",
+          "relation": "supports",
+          "justification": "Core control: network policies on allowed endpoints can enforce navigation allowlists."
+        },
+        {
+          "ref": "C006.2",
+          "relation": "supports",
+          "justification": "Core control: treat third-party web content as untrusted."
+        }
+      ],
+      "T-18": [
+        {
+          "ref": "B006.3",
+          "relation": "partial",
+          "justification": "Supplemental control: detect changes to MCP tool definitions made after approval. T-18 adds hash pinning over names, descriptions, schemas and annotations, refusal to load unpinned servers, disabling on list_changed, and failing closed on colliding names."
+        },
+        {
+          "ref": "B006.1",
+          "relation": "partial",
+          "justification": "Core control: an MCP server allowlist or registration config limits which servers and tools load. This matches the inventory gate."
+        },
+        {
+          "ref": "D003.1",
+          "relation": "supports",
+          "justification": "Core control: limit tool calls to an approved set of functions and servers."
+        },
+        {
+          "ref": "B008.3",
+          "relation": "supports",
+          "justification": "Supplemental control: signed agent cards. T-18 notes that a signature identifies the publisher, not the safety of the descriptor."
+        }
+      ],
+      "T-19": [
+        {
+          "ref": "B006.3",
+          "relation": "partial",
+          "justification": "Supplemental control: sandbox first-party MCP servers and scan agent hooks, skills and rules. T-19 covers local third-party servers and tools, re-approval of exact launch commands, sandboxing limited to declared resources, and agent-unwritable definition files."
+        },
+        {
+          "ref": "B007.1",
+          "relation": "supports",
+          "justification": "Core control: limit changes to tools and system behavior to authorized personnel. This supports keeping tool and rule files unwritable by the agent."
+        }
+      ],
+      "T-20": [
+        {
+          "ref": "C006.2",
+          "relation": "supports",
+          "justification": "Core control: handling content by trust level supports treating sampling results as untrusted. AIUC-1 has no MCP sampling or elicitation requirement."
+        },
+        {
+          "ref": "D003.2",
+          "relation": "supports",
+          "justification": "Core control: rate limits on autonomous use support counting sampling requests against budgets."
+        }
+      ],
+      "T-21": [
+        {
+          "ref": "B008.1",
+          "relation": "partial",
+          "justification": "Core control: mutual authentication on agent-to-agent interfaces covers T-21's authentication element."
+        },
+        {
+          "ref": "B008.2",
+          "relation": "partial",
+          "justification": "Core control: TLS on agent-to-agent channels covers confidentiality and transport integrity."
+        },
+        {
+          "ref": "B008.3",
+          "relation": "partial",
+          "justification": "Supplemental control: message signing and schema validation for agent interfaces. T-21 also requires binding to a run with nonce and expiry, replay and downgrade rejection, and not treating authenticated content as trusted."
+        }
+      ],
+      "T-22": [
+        {
+          "ref": "D003.2",
+          "relation": "partial",
+          "justification": "Core control: circuit breakers and time-windowed caps on autonomous calls. T-22 adds an independent gate before fan-out, fan-out caps for each upstream decision, halting of oscillation, and lineage IDs."
+        },
+        {
+          "ref": "E015.2",
+          "relation": "supports",
+          "justification": "Supplemental control: delegation chain logging supports lineage tracing of propagated actions."
+        }
+      ],
+      "T-23": [
+        {
+          "ref": "B006.3",
+          "relation": "partial",
+          "justification": "Supplemental control: sandbox agent-executed code and scan hooks, skills and rules for injected instructions. T-23 also bans write and publish secrets on outsider-triggered events, requires a versioned command allowlist, and requires human review of CI, branch protection and instruction changes."
+        },
+        {
+          "ref": "C002.2",
+          "relation": "supports",
+          "justification": "Supplemental control: CI gates and branch protection, which T-23 bars the agent from changing."
+        },
+        {
+          "ref": "B007.1",
+          "relation": "supports",
+          "justification": "Core control: restrict configuration privileges to authorized personnel."
+        },
+        {
+          "ref": "A008.3",
+          "relation": "supports",
+          "justification": "Core control, capability-scoped (Code-generation): applies only when the assessed product is itself a code-generating agent offered to users (for example a CI or coding agent product). Per-tool and per-session scoping of user-supplied credentials then supports T-23. It does not apply to a coding agent used to build an application."
+        }
+      ],
+      "T-24": [
+        {
+          "ref": "C002.3",
+          "relation": "supports",
+          "justification": "Supplemental control: scan AI artifacts and dependencies for vulnerabilities before deployment. This supports intake review; T-24 itself requires pinning, provenance, permission diffs on upgrade and reviewed runtime discovery."
+        },
+        {
+          "ref": "E004.2",
+          "relation": "supports",
+          "justification": "Supplemental control: allow only signed models, libraries and artifacts into production. This supports provenance."
+        },
+        {
+          "ref": "E006.1",
+          "relation": "supports",
+          "justification": "Core control: assess foundation and upstream model vendors before adopting them, as part of intake review."
+        },
+        {
+          "ref": "E017.1",
+          "relation": "supports",
+          "justification": "Core control: an AI bill of materials with versions supports pinning records."
+        },
+        {
+          "ref": "B010.3",
+          "relation": "supports",
+          "justification": "Core control, capability-scoped (Code-generation): only when the assessed product generates code for its users. Its rule on pinned, registry-verified dependencies in generated manifests then parallels T-24's last sentence. Not applicable to a coding agent building the application."
+        },
+        {
+          "ref": "B006.3",
+          "relation": "supports",
+          "justification": "Supplemental control: detect unauthorized changes to tool definitions after approval. This parallels T-24's diff of tool schemas on upgrade and its ban on adding components through runtime discovery without review."
+        }
+      ],
+      "T-25": [
+        {
+          "ref": "B008.5",
+          "relation": "partial",
+          "justification": "Supplemental control: verify model checksums or signatures and scan model files for unsafe serialized payloads. This covers T-25's first sentence. T-25 also requires non-executable formats and provenance review of fine-tuning data as a poisoning path."
+        },
+        {
+          "ref": "E017.1",
+          "relation": "supports",
+          "justification": "Core control: transparency records of training and fine-tuning data sources support data provenance."
+        },
+        {
+          "ref": "E004.2",
+          "relation": "supports",
+          "justification": "Supplemental control: signing and verifying model artifacts."
+        }
+      ],
+      "T-26": [
+        {
+          "ref": "C009.1",
+          "relation": "supports",
+          "justification": "Core control: user mechanisms to report issues support T-26's reporting path. AIUC-1 does not require trusted-only collection of credentials or labelling of out-of-application requests from the agent."
+        },
+        {
+          "ref": "C006.2",
+          "relation": "supports",
+          "justification": "Core control: visual labelling by trust level supports showing agent suggestions as unverified."
+        }
+      ],
+      "T-27": [
+        {
+          "ref": "A005.2",
+          "relation": "supports",
+          "justification": "Core control: enforced isolation of each customer's data. A separate kernel or dedicated host per tenant for executed code supports that isolation at the compute layer; A005.2 does not address code execution."
+        },
+        {
+          "ref": "B008.4",
+          "relation": "supports",
+          "justification": "Supplemental control: choose infrastructure isolation (namespaces or VM separation) by risk level, stated for model hosting. T-27 requires that no kernel be shared across tenants for agent-run code."
+        },
+        {
+          "ref": "B006.3",
+          "relation": "supports",
+          "justification": "Supplemental control: sandboxed execution for agent code. AIUC-1 does not set an isolation strength or a per-tenant boundary."
+        }
+      ],
+      "D-01": [
+        {
+          "ref": "C002.1",
+          "relation": "partial",
+          "justification": "Core control: documented pre-deployment testing with results and issues. D-01 specifies tests of the real path from entry point through dispatcher to a recording adapter."
+        },
+        {
+          "ref": "D004.1",
+          "relation": "supports",
+          "justification": "Core control (Automation): third-party testing of tool calls for unauthorized actions. This is complementary external evidence."
+        }
+      ],
+      "D-02": [
+        {
+          "ref": "C002.1",
+          "relation": "supports",
+          "justification": "Core control: pre-deployment testing records. AIUC-1 does not prescribe injected proposals or authorized-success twins."
+        },
+        {
+          "ref": "B001.1",
+          "relation": "supports",
+          "justification": "Core control: adversarial testing that includes simulated malicious tool invocations, done by a third party."
+        }
+      ],
+      "D-03": [
+        {
+          "ref": "C002.1",
+          "relation": "supports",
+          "justification": "Core control: keep test results and approval records. D-03 adds closed evidence scopes, a commit reference and minimum evidence scopes for each control. AIUC-1's evidence categories (documentation, config, logs, report, demonstration) are analogous but are not runtime evidence scopes."
+        }
+      ],
+      "D-04": [
+        {
+          "ref": "B001.1",
+          "relation": "partial",
+          "justification": "Core control: regular third-party prompt injection and red-team testing against a stated taxonomy. D-04 requires an internal fixture for each untrusted channel and capability, including payloads within the user's authority but outside the task, run through the real path."
+        },
+        {
+          "ref": "C002.1",
+          "relation": "supports",
+          "justification": "Core control: adversarial prompting as part of pre-deployment testing."
+        }
+      ],
+      "D-05": [
+        {
+          "ref": "C002.1",
+          "relation": "supports",
+          "justification": "Core control: pre-deployment testing generally. AIUC-1 has no failure, revocation or concurrency test matrix."
+        }
+      ],
+      "D-06": [
+        {
+          "ref": "C002.1",
+          "relation": "partial",
+          "justification": "Core control: severity-rated test findings, residual risk decisions and an accountable sign-off before deployment. D-06 adds a fixed rubric, a block on readiness claims while critical findings are open, and a ban on the agent recording acceptance."
+        },
+        {
+          "ref": "C001.1",
+          "relation": "supports",
+          "justification": "Core control: consistent severity grading across risk categories."
+        },
+        {
+          "ref": "C002.2",
+          "relation": "supports",
+          "justification": "Supplemental control: deployment gates in CI/CD."
+        }
+      ],
+      "D-07": [
+        {
+          "ref": "C002.2",
+          "relation": "partial",
+          "justification": "Supplemental control: CI/CD gates that require tests to pass, plus branch protection. D-07 adds tests keyed by control ID, triggers on model, prompt and descriptor changes, code-owner review, and a regression fixture for each incident."
+        },
+        {
+          "ref": "B001.1",
+          "relation": "supports",
+          "justification": "Core control: track remediation of adversarial findings. This is related to turning bypasses into regression fixtures."
+        }
+      ],
+      "D-08": [
+        {
+          "ref": "B001.1",
+          "relation": "partial",
+          "justification": "Core control: quarterly adversarial testing (injection, jailbreak, red teaming) with documented methods and findings. AIUC-1 requires a third party. D-08 can be internal and specifies channels, repeated trials and attack-success and utility metrics."
+        },
+        {
+          "ref": "D004.1",
+          "relation": "supports",
+          "justification": "Core control (Automation): third-party tool-call testing for unauthorized actions and scope violations."
+        },
+        {
+          "ref": "C012.1",
+          "relation": "supports",
+          "justification": "Core control: third-party testing of agent-specific high-risk areas."
+        }
+      ],
+      "D-09": [
+        {
+          "ref": "B001.1",
+          "relation": "partial",
+          "justification": "Core control: adversarial testing by expert third parties, so independent of the implementer. D-09 targets every critical-boundary control through the real execution path with adaptive attacks, and turns each bypass into a regression fixture."
+        },
+        {
+          "ref": "D004.1",
+          "relation": "partial",
+          "justification": "Core control (Automation): independent third-party evaluation of tool calls for unauthorized actions, restricted access and out-of-scope decisions, with remediation tracking."
+        },
+        {
+          "ref": "B004.3",
+          "relation": "supports",
+          "justification": "Core control: external penetration testing of AI endpoints."
+        }
+      ],
+      "D-10": [
+        {
+          "ref": "C002.1",
+          "relation": "partial",
+          "justification": "Core control: test and approve before deploying changes that need formal review. D-10 specifies replaying recorded runs in an isolated clone, human review of differences in consequential actions, and blocking expansions that exceed blast-radius caps."
+        },
+        {
+          "ref": "E004.1",
+          "relation": "supports",
+          "justification": "Core control: model selection and prompt changes need an accountable approver."
+        }
+      ],
+      "N-01": [
+        {
+          "ref": "E015.2",
+          "relation": "partial",
+          "justification": "Supplemental control: log agent execution chains (tool parameters and results, delegations, approval events, provenance). N-01 adds policy decisions with reason codes, a clear split between proposed, attempted, denied and confirmed effects, taint state, and lineage IDs."
+        },
+        {
+          "ref": "D003.3",
+          "relation": "partial",
+          "justification": "Core control (Automation): log each tool call with server, tool, version, parameters and time."
+        },
+        {
+          "ref": "E015.1",
+          "relation": "partial",
+          "justification": "Core control: log system inputs, steps, outputs and metadata for investigation."
+        },
+        {
+          "ref": "A006.1",
+          "relation": "supports",
+          "justification": "Core control: redact personal data from logs, in line with N-01's minimization under S-06."
+        },
+        {
+          "ref": "A008.5",
+          "relation": "supports",
+          "justification": "Supplemental control, capability-scoped (Code-generation): applies only to code-generating products. Redacting secrets from logs and stored artifacts parallels N-01's rule that audit events contain no secrets. For other agents, A006.1 is the related control."
+        }
+      ],
+      "N-02": [
+        {
+          "ref": "E015.4",
+          "relation": "partial",
+          "justification": "Supplemental control: logs that cannot be changed or deleted after they are created. N-02 frames this against agent identities, and adds audit-before-effect (or a durable outbox), which AIUC-1 does not address."
+        },
+        {
+          "ref": "E015.3",
+          "relation": "partial",
+          "justification": "Core control: access controls and retention on log storage."
+        }
+      ],
+      "N-03": [
+        {
+          "ref": "E015.2",
+          "relation": "partial",
+          "justification": "Supplemental control: agent provenance metadata, tool results, delegations and reasoning traces where available. N-03 requires a hash-referenced manifest of everything in context for each consequential proposal, and deletion markers."
+        },
+        {
+          "ref": "E015.1",
+          "relation": "supports",
+          "justification": "Core control: logging of inputs and metadata."
+        }
+      ],
+      "N-04": [
+        {
+          "ref": "B006.2",
+          "relation": "partial",
+          "justification": "Core control (Automation): monitor and alert on agent actions that cross security boundaries. N-04 lists specific signal types and requires routing to a named owner with a response target."
+        },
+        {
+          "ref": "D003.3",
+          "relation": "partial",
+          "justification": "Core control: alerts on unauthorized tool access and scope violations."
+        },
+        {
+          "ref": "B002.2",
+          "relation": "supports",
+          "justification": "Core control: escalate suspected attacks to designated staff by severity."
+        },
+        {
+          "ref": "C009.1",
+          "relation": "supports",
+          "justification": "Core control: user issue reporting, one of N-04's signal sources."
+        },
+        {
+          "ref": "C008.3",
+          "relation": "supports",
+          "justification": "Supplemental control: forward AI alerts into existing security tooling."
+        },
+        {
+          "ref": "E009.2",
+          "relation": "supports",
+          "justification": "Supplemental control, added in July 2026: alerting on anomalous third-party access, with each alert assigned to an owner. This matches N-04's rule that each signal goes to a named owner."
+        }
+      ],
+      "N-05": [
+        {
+          "ref": "B006.2",
+          "relation": "partial",
+          "justification": "Core control: anomaly detection on unusual agent connection patterns. N-05 adds per-agent baselines, named high-risk sequences, automatic throttling or suspension at the narrowest scope, and recorded false-positive rates."
+        },
+        {
+          "ref": "B004.1",
+          "relation": "supports",
+          "justification": "Core control: behavioral analytics with calibrated thresholds to limit false positives."
+        },
+        {
+          "ref": "E009.2",
+          "relation": "supports",
+          "justification": "Supplemental control: alerts on anomalous third-party access, such as out-of-scope endpoints."
+        },
+        {
+          "ref": "D003.5",
+          "relation": "supports",
+          "justification": "Supplemental control: review tool usage for anomalies."
+        }
+      ],
+      "N-06": [
+        {
+          "ref": "C009.1",
+          "relation": "partial",
+          "justification": "Core control: users can pause, stop or redirect system behavior. N-06 is an operator capability to stop a run and all its descendants and disable a tool, model or agent without a deploy, with no new effects afterwards."
+        },
+        {
+          "ref": "E001.1",
+          "relation": "supports",
+          "justification": "Core control: a breach plan that includes the ability to freeze the system."
+        }
+      ],
+      "N-07": [
+        {
+          "ref": "E001.1",
+          "relation": "supports",
+          "justification": "Core control: freeze capability and access-control updates in the breach plan. AIUC-1 does not require tenant or global kill scopes or measured revocation latency."
+        }
+      ],
+      "N-08": [
+        {
+          "ref": "E001.1",
+          "relation": "partial",
+          "justification": "Core control: a security breach plan with a response lead, notification, remediation (including freeze) and evidence preservation. N-08 adds quarantine of agents, servers, memory and indexes, purge by lineage, verified reintegration, and at least one exercise per release cycle."
+        },
+        {
+          "ref": "B002.2",
+          "relation": "supports",
+          "justification": "Core control: log and respond to suspected adversarial incidents."
+        }
+      ],
+      "N-09": [
+        {
+          "ref": "E004.1",
+          "relation": "partial",
+          "justification": "Core control: define which AI system changes need approval (such as model selection, prompt and guardrail changes) and record the accountable approver's sign-off. N-09 adds versioned configuration, NONE/SCOPED/FULL triage, re-running mapped tests and updating the record."
+        },
+        {
+          "ref": "C002.1",
+          "relation": "partial",
+          "justification": "Core control: test before deploying changes that need formal review, with approval."
+        },
+        {
+          "ref": "E008.1",
+          "relation": "supports",
+          "justification": "Core control: quarterly review of AI system changes and model selection decisions."
+        },
+        {
+          "ref": "E013.2",
+          "relation": "supports",
+          "justification": "Core control: change management and approval procedures in a quality management system."
+        }
+      ],
+      "N-10": [
+        {
+          "ref": "E015.4",
+          "relation": "partial",
+          "justification": "Supplemental control: tamper-evident, independently verifiable logs using WORM storage or cryptographic hashing, with detectable gaps and reordering. This covers N-10's tamper evidence; N-10 also requires scheduled integrity checks and checks before forensic use, so the relation is partial."
+        }
+      ]
+    }
+  },
+  "nist": {
+    "framework": "NIST AI RMF 1.0 (NIST AI 100-1) with NIST AI 600-1",
+    "source_version": "NIST AI 100-1, AI RMF 1.0, January 2023 (doi:10.6028/NIST.AI.100-1); NIST AI 600-1, Generative Artificial Intelligence Profile, July 2024 (doi:10.6028/NIST.AI.600-1)",
+    "source_url": "https://www.nist.gov/itl/ai-risk-management-framework",
+    "notes": [
+      "Sources: AI RMF 1.0 subcategories come from NIST AI 100-1 Tables 1 to 4, cited with the printed page where each subcategory ends. Suggested actions come from NIST AI 600-1 Section 3, cited with the printed page where each action starts. In the justifications in catalog/mappings.json, text in single quotes is quoted from the NIST publication, apart from whitespace, ligatures and dash normalization. NIST CSF is not used.",
+      "Revision: NIST states that AI RMF 1.0 is being revised. Recheck these identifiers when a revision is published.",
+      "Relations: no AI RMF subcategory and no AI 600-1 action is marked direct. Each subcategory includes organization-level outcomes that no single control meets, and the AI 600-1 actions cited are broader or differently scoped than the control.",
+      "Generic anchors: every control recorded as implemented supports MAP 4.2 (internal risk controls identified and documented) and MANAGE 1.3 (risk responses documented). They are listed per control only where the control itself produces that documentation or response. Controls with no NIST reference are runtime authorization, credential, isolation and state mechanisms for which neither publication has a subcategory or action more specific than these anchors.",
+      "Exclusions: GOVERN 1.7 (decommissioning) is not mapped, because stop and revocation map to MANAGE 2.4 with MG-2.4-002 and MG-2.4-004, and no control covers system retirement. MS-2.8-003 (tamper-proof content history) concerns digital content transparency, not audit logs, and is not used for N-02 or N-10. AI 600-1 Information Integrity actions about synthetic-content provenance are cited only where the wording fits data lineage (MP-2.1-001, MP-2.1-002, MG-2.2-007, MG-4.1-006, MP-3.4-001), and those justifications note the different framing.",
+      "Context, not cited as references: AI 600-1 section 2.9 (Information Security) describes indirect prompt injection and is relevant to T-01, A-06, A-08 and D-04; section 2.7 (Human-AI Configuration) to A-13; section 2.12 (Value Chain and Component Integration) to T-18, T-24 and T-25; and section 2.4 (Data Privacy) to S-06 and T-10.",
+      "Source quirks: AI 600-1 has no suggested actions for some subcategories used here (for example MAP 3.5, MAP 4.2, MEASURE 2.4, MANAGE 1.1 and MANAGE 1.4), so those carry only AI 100-1 references. AI 600-1 prints GV-4.3-001 as 'GV4.3--001'; that action is not used here."
+    ],
+    "refs": {
+      "S-01": [
+        {
+          "ref": "GOVERN 2.1",
+          "relation": "partial",
+          "justification": "Roles and responsibilities 'are documented and are clear'; S-01 records one accountable human owner and named delegates and blocks readiness while the owner is unassigned. Organization-wide lines of communication are outside the control. [AI 100-1 Table 1 p.23]"
+        },
+        {
+          "ref": "MAP 1.1",
+          "relation": "supports",
+          "justification": "Intended purposes, context and impacted parties 'are understood and documented'; S-01 records claimed scope, intended use, forbidden outcomes and affected principals. [AI 100-1 Table 2 p.26]"
+        },
+        {
+          "ref": "MAP 3.3",
+          "relation": "partial",
+          "justification": "'Targeted application scope is specified and documented'; S-01 states the claimed scope (agents, entry points, deployments, environments). [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MANAGE 1.3",
+          "relation": "partial",
+          "justification": "Risk response options 'can include mitigating, transferring, avoiding, or accepting'; S-01 governs who may accept a residual risk or exception and records severity, scope, compensating controls and expiry. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MANAGE 1.4",
+          "relation": "supports",
+          "justification": "'Negative residual risks ... are documented'; accepted residual risks and exceptions recorded under S-01 form part of that documentation. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "GOVERN 3.2",
+          "relation": "supports",
+          "justification": "Policies 'define and differentiate roles and responsibilities for human-AI configurations and oversight'; S-01 forbids a coding agent or model from entering an owner, acceptance or exception. [AI 100-1 Table 1 p.23]"
+        },
+        {
+          "ref": "MG-1.3-001",
+          "relation": "supports",
+          "justification": "Document trade-offs and decision processes for risks within tolerance, and 'Mitigate, transfer, or avoid risks that surpass organizational risk tolerances'; S-01 exception records hold that decision trail. [AI 600-1 p.40]"
+        },
+        {
+          "ref": "MP-1.1-002",
+          "relation": "supports",
+          "justification": "'Determine and document the expected and acceptable GAI system context of use' (assumptions, intended operational environment, impacts); S-01 intended use and forbidden outcomes feed it. [AI 600-1 p.23]"
+        }
+      ],
+      "S-02": [
+        {
+          "ref": "GOVERN 1.3",
+          "relation": "partial",
+          "justification": "Processes 'to determine the needed level of risk management activities'; the S-02 selection rule derives the required Level from the capability profile. The organization's risk tolerance is not an input to the rule. [AI 100-1 Table 1 p.22]"
+        },
+        {
+          "ref": "MAP 3.3",
+          "relation": "supports",
+          "justification": "Scope is documented 'based on the system's capability, established context, and AI system categorization'; S-02 is that capability categorization per agent context. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined and documented; the recorded autonomy scope (1 to 4) states how much oversight each context has. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "GV-1.3-001",
+          "relation": "supports",
+          "justification": "Risk-tier factors include 'Dependencies between GAI and other IT or data systems' and 'Whether the system introduces significant new security vulnerabilities'; the three capability properties and feature tags operationalize these for agents. [AI 600-1 p.14]"
+        },
+        {
+          "ref": "MP-1.1-001",
+          "relation": "supports",
+          "justification": "Consider 'narrow vs. broad application scope' and 'varieties of data sources (e.g., grounding, retrieval-augmented generation)'; S-02 records sources and capability breadth per context. [AI 600-1 p.22]"
+        },
+        {
+          "ref": "MP-4.1-008",
+          "relation": "supports",
+          "justification": "'establish warning systems to determine if a GAI system is being used in a new domain where previous assumptions ... may no longer hold'; S-02 requires recomputing the profile in the same change that adds a tool, source, trigger, renderer, delegate or autonomy. [AI 600-1 p.26]"
+        }
+      ],
+      "S-03": [
+        {
+          "ref": "MANAGE 2.1",
+          "relation": "partial",
+          "justification": "Resources are considered 'along with viable non-AI alternative systems, approaches, or methods' to reduce impacts; S-03 requires a deterministic workflow or lower autonomy scope where it meets the need. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MAP 3.3",
+          "relation": "supports",
+          "justification": "Targeted application scope is specified; S-03 ties each tool, step, trigger and delegate to a recorded task need within the intended use. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MP-1.1-001",
+          "relation": "supports",
+          "justification": "Consider 'narrow vs. broad application scope' when identifying intended purposes; S-03 forbids enabling capabilities without a recorded need. [AI 600-1 p.22]"
+        }
+      ],
+      "S-04": [
+        {
+          "ref": "MAP 4.1",
+          "relation": "partial",
+          "justification": "Approaches for mapping technology and legal risks 'of its components - including the use of third-party data or software' are documented; S-04 inventories and traces models, providers, tools, MCP servers and remote agents (technology risk only, not legal or IP risk). [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MAP 4.2",
+          "relation": "partial",
+          "justification": "'Internal risk controls for components of the AI system, including third-party AI technologies, are identified and documented'; S-04 maps each ASI category to control IDs or a verifiable not-applicable reason. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "GOVERN 1.6",
+          "relation": "supports",
+          "justification": "Mechanisms to inventory AI systems; the per-system component inventory feeds the organization's AI system inventory. [AI 100-1 Table 1 p.23]"
+        },
+        {
+          "ref": "MAP 5.1",
+          "relation": "supports",
+          "justification": "Likelihood and magnitude of identified impacts are documented; S-04 abuse cases within granted authority supply the scenarios, though S-04 does not itself rate likelihood. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "GV-3.2-005",
+          "relation": "partial",
+          "justification": "'Engage in threat modeling to anticipate potential risks from GAI systems.' S-04 is one system-level threat model; the action is a broader, one-line obligation whose listed GAI risks (CBRN Information or Capabilities; Information Security) differ in scope, and it does not specify an inventory, boundary trace, principals or ASI applicability. [AI 600-1 p.18]"
+        },
+        {
+          "ref": "GV-1.6-003",
+          "relation": "partial",
+          "justification": "Inventory entries include 'Data provenance information (e.g., source, signatures, versioning, watermarks)' and 'versions of underlying models, and access modes'; S-04 records model, descriptor and component versions and hashes, but not advisories (CVE, AVID) or IP considerations. [AI 600-1 p.16]"
+        },
+        {
+          "ref": "GV-6.1-007",
+          "relation": "supports",
+          "justification": "'Inventory all third-party entities with access to organizational content'; S-04 lists inference, embedding, evaluation, telemetry and tracing recipients with accounts. [AI 600-1 p.21]"
+        },
+        {
+          "ref": "GV-4.2-003",
+          "relation": "supports",
+          "justification": "'Verify that downstream GAI system impacts (such as the use of third-party plugins) are included in the impact documentation process'; S-04 traces tools, MCP servers and remote agents. [AI 600-1 p.19]"
+        },
+        {
+          "ref": "MP-2.2-001",
+          "relation": "supports",
+          "justification": "'Identify and document how the system relies on upstream data sources'; the S-04 boundary trace marks where data becomes instruction, identity, permission, destination or state. [AI 600-1 p.24]"
+        },
+        {
+          "ref": "MP-5.1-006",
+          "relation": "supports",
+          "justification": "'Profile threats and negative impacts arising from GAI systems interacting with, manipulating, or generating content, and outlining known and potential vulnerabilities'; S-04 abuse cases do this per ASI category. [AI 600-1 p.27]"
+        },
+        {
+          "ref": "MS-2.7-001",
+          "relation": "supports",
+          "justification": "Assess vulnerabilities and threats 'such as backdoors, compromised dependencies, ... autonomous agents, ... bypass'; the S-04 ASI applicability analysis is the agent-specific input to that assessment. [AI 600-1 p.33]"
+        }
+      ],
+      "S-05": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined and documented; S-05 records the approval policy of each consequential operation in trusted configuration. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MAP 5.1",
+          "relation": "supports",
+          "justification": "Magnitude of identified impacts is documented; S-05 consequence classes, value limits and reversibility record magnitude per operation. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MEASURE 2.6",
+          "relation": "supports",
+          "justification": "The system 'can fail safely'; S-05 requires a fail-safe default (deny, confine or confirm) when a required fact is unknown. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MP-2.2-001",
+          "relation": "supports",
+          "justification": "'Identify and document how the system relies on upstream data sources'; S-05 records the system of record for each fact an operation relies on. [AI 600-1 p.24]"
+        },
+        {
+          "ref": "MAP 4.2",
+          "relation": "supports",
+          "justification": "'Internal risk controls for components of the AI system ... are identified and documented'; for each consequential operation, the S-05 register documents the class, destinations, trusted sources, limits and approval policy that the dispatcher reads. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "S-06": [
+        {
+          "ref": "MEASURE 2.10",
+          "relation": "supports",
+          "justification": "'Privacy risk of the AI system ... is examined and documented'; S-06 names which providers, stores, logs and audiences may receive each data class. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "GOVERN 1.1",
+          "relation": "supports",
+          "justification": "Legal and regulatory requirements 'are understood, managed, and documented'; S-06 records retention and deletion obligations per data class. [AI 100-1 Table 1 p.22]"
+        },
+        {
+          "ref": "GOVERN 6.1",
+          "relation": "supports",
+          "justification": "Policies address AI risks associated with third-party entities; S-06 names the third-party providers and sinks permitted per data class. [AI 100-1 Table 1 p.24]"
+        },
+        {
+          "ref": "GV-6.1-001",
+          "relation": "supports",
+          "justification": "'Categorize different types of GAI content with associated third-party rights (e.g., copyright, intellectual property, data privacy)'; S-06 is the data classification for model context. [AI 600-1 p.20]"
+        },
+        {
+          "ref": "GV-6.1-007",
+          "relation": "supports",
+          "justification": "'establish approved GAI technology and service provider lists'; S-06 keeps approved recipients per data class in trusted configuration. [AI 600-1 p.21]"
+        },
+        {
+          "ref": "MP-4.1-005",
+          "relation": "supports",
+          "justification": "'Establish policies for collection, retention, and minimum quality of data' considering 'Leak of personally identifiable information'; the action targets training data, and S-06 applies retention policy to runtime context data. [AI 600-1 p.26]"
+        }
+      ],
+      "A-01": [
+        {
+          "ref": "MAP 4.2",
+          "relation": "supports",
+          "justification": "Internal risk controls for components 'including third-party AI technologies' are identified; A-01 makes the dispatcher the single control point for framework-native tool and MCP clients, fallback models and subagents. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "A-02": [
+        {
+          "ref": "MEASURE 2.6",
+          "relation": "supports",
+          "justification": "The system 'can fail safely'; A-02 turns missing rules, policy errors or timeouts, and unverifiable identity, approval, budget or audit into denial. [AI 100-1 Table 3 p.30]"
+        }
+      ],
+      "A-03": [],
+      "A-04": [],
+      "A-05": [],
+      "A-06": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; A-06 requires fresh confirmation showing the value and its untrusted origin when a consequential value does not match its trusted source. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "A-07": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; out-of-scope consequential operations from tainted contexts are denied or freshly confirmed. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "A-08": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are 'defined, assessed, and documented'; A-08 fixes when human confirmation is required and which non-human alternative ((b) or (c)) applies when no human can confirm. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "A-09": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; A-09 limits which tools may run without approval and forbids persistent always-allow grants for consequential tools. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "A-10": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; irreversible or high-cost operations need approval with a dry-run diff unless reversible by design. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "A-11": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; A-11 makes approvals bound, single-use and non-forgeable so model or client claims cannot bypass oversight. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "A-12": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; A-12 protects the integrity of what the approver sees. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MP-3.4-001",
+          "relation": "supports",
+          "justification": "'Evaluate whether GAI operators and end-users can accurately understand content lineage and origin'; the action is framed around digital content transparency, and A-12 supplies per-field origin that such an evaluation can test for approvers. [AI 600-1 p.25]"
+        }
+      ],
+      "A-13": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "partial",
+          "justification": "Human oversight processes are 'defined, assessed, and documented'; A-13 assesses oversight quality through approval rate, volume and time to decision per approver. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MAP 3.4",
+          "relation": "supports",
+          "justification": "Processes for operator 'proficiency with AI system performance and trustworthiness' are assessed; rubber-stamping signals reveal approvers not exercising effective review. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MP-3.4-005",
+          "relation": "partial",
+          "justification": "'Implement systems to continually monitor and track the outcomes of human-GAI configurations for future refinement and improvements'; A-13 tracks approval behavior and signals rubber-stamping. [AI 600-1 p.25]"
+        },
+        {
+          "ref": "MS-4.2-004",
+          "relation": "supports",
+          "justification": "Monitor and document instances where human operators or other systems override the GAI's decisions; approval rejections measured under A-13 are such overrides. The action's content-provenance follow-up is not addressed. [AI 600-1 p.39]"
+        }
+      ],
+      "A-14": [
+        {
+          "ref": "GOVERN 3.2",
+          "relation": "supports",
+          "justification": "Policies 'define and differentiate roles and responsibilities for human-AI configurations and oversight'; A-14 requires two distinct human approvers, neither the requester, and bars agent identities from approving. [AI 100-1 Table 1 p.23]"
+        },
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined for highest-impact effects through step-up authentication and dual control. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "A-15": [],
+      "A-16": [
+        {
+          "ref": "MANAGE 3.1",
+          "relation": "supports",
+          "justification": "For third-party resources, 'risk controls are applied and documented'; A-16 requires audience-restricted credentials and forbids token passthrough to tools and MCP servers. [AI 100-1 Table 4 p.32]"
+        }
+      ],
+      "A-17": [
+        {
+          "ref": "GOVERN 1.6",
+          "relation": "supports",
+          "justification": "Mechanisms to inventory AI systems; A-17 gives every agent and delegated worker its own workload identity with a recorded owner. [AI 100-1 Table 1 p.23]"
+        }
+      ],
+      "A-18": [],
+      "A-19": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; unattended runs need owner approval or an explicit pre-authorized rule for consequential effects. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MEASURE 2.10",
+          "relation": "supports",
+          "justification": "Privacy risk is examined; A-19 limits shared-context output to data every principal who can view it may see, including later readers of the history, and drops cached authority when the speaker changes. [AI 100-1 Table 3 p.30]"
+        }
+      ],
+      "A-20": [
+        {
+          "ref": "MANAGE 2.4",
+          "relation": "supports",
+          "justification": "Mechanisms 'to supersede, disengage, or deactivate AI systems that demonstrate performance or outcomes inconsistent with intended use'; run budgets stop runaway runs and their descendants automatically. [AI 100-1 Table 4 p.32]"
+        }
+      ],
+      "A-21": [
+        {
+          "ref": "MEASURE 2.6",
+          "relation": "supports",
+          "justification": "The system 'can fail safely'; A-21 bounds retries, keeps denials denied across routes, and enforces caller-side deadlines. [AI 100-1 Table 3 p.30]"
+        }
+      ],
+      "A-22": [],
+      "A-23": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; A-23 keeps policies, thresholds, audit configuration and CI security gates outside agent write scope so the overseen agent cannot alter oversight. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MANAGE 2.4",
+          "relation": "supports",
+          "justification": "Mechanisms to supersede, disengage or deactivate stay effective only if agents cannot rewrite their own grants or create unregistered agents, credentials, schedules or compute. [AI 100-1 Table 4 p.32]"
+        }
+      ],
+      "A-24": [
+        {
+          "ref": "MEASURE 2.10",
+          "relation": "supports",
+          "justification": "Privacy risk is examined; A-24 checks the data classes an outbound message, comment or document carries against the recipient and its readers. [AI 100-1 Table 3 p.30]"
+        }
+      ],
+      "A-25": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; A-25 adds verification outside the agent's conversation, and notice to the previous destination, for changes that redirect communications, recovery or funds. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "T-01": [
+        {
+          "ref": "MP-2.1-001",
+          "relation": "supports",
+          "justification": "'Establish known assumptions and practices for determining data origin and content lineage'; T-01 taint tracking records which contexts, summaries, memory writes and messages derive from untrusted content. [AI 600-1 p.24]"
+        },
+        {
+          "ref": "MP-2.1-002",
+          "relation": "supports",
+          "justification": "'Institute test and evaluation for data and content flows within the GAI system, including ... data transformations'; T-01 requires taint to survive summarization, compaction, embedding, caching and forwarding, which such tests check. [AI 600-1 p.24]"
+        }
+      ],
+      "T-02": [
+        {
+          "ref": "MP-2.1-002",
+          "relation": "supports",
+          "justification": "Test and evaluate 'data and content flows within the GAI system, including ... data transformations, and decision-making criteria'; T-02 enforces that the privileged context receives only typed, validated values or opaque references. [AI 600-1 p.24]"
+        }
+      ],
+      "T-03": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; T-03 lets reviewers view the exact text the model received. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MP-2.1-001",
+          "relation": "supports",
+          "justification": "Practices for 'determining data origin and content lineage'; T-03 requires OCR, transcription, alt-text and metadata text to carry source provenance. [AI 600-1 p.24]"
+        }
+      ],
+      "T-04": [
+        {
+          "ref": "MAP 4.2",
+          "relation": "supports",
+          "justification": "Internal risk controls are 'identified and documented'; T-04 requires prompt-only rules to be recorded as guidance rather than implemented controls, so documented controls are the enforced ones. [AI 100-1 Table 2 p.27]"
+        }
+      ],
+      "T-05": [],
+      "T-06": [
+        {
+          "ref": "MEASURE 2.10",
+          "relation": "supports",
+          "justification": "Privacy risk is examined; T-06 enforces tenant and document permissions before retrieved content, caches or derived artifacts reach the model. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MG-4.1-006",
+          "relation": "supports",
+          "justification": "'Track dataset modifications for provenance by monitoring data deletions, rectification requests, and other changes'; T-06 propagates deletion requests and offboarding into indexes, embeddings and caches. [AI 600-1 p.44]"
+        }
+      ],
+      "T-07": [
+        {
+          "ref": "MEASURE 2.10",
+          "relation": "supports",
+          "justification": "Privacy risk is examined; memory is partitioned by tenant, principal and purpose with retention and purge on deletion requests. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MP-2.1-001",
+          "relation": "supports",
+          "justification": "Practices for 'determining data origin and content lineage'; each memory entry records source references, writer, trust class and taint. [AI 600-1 p.24]"
+        },
+        {
+          "ref": "MG-2.2-007",
+          "relation": "supports",
+          "justification": "'Use real-time auditing tools ... in the tracking and validation of the lineage and authenticity of AI-generated data'; T-07 tracks lineage of agent-written memory and stores it as untrusted-derived. [AI 600-1 p.41]"
+        },
+        {
+          "ref": "MG-4.1-006",
+          "relation": "supports",
+          "justification": "'monitoring data deletions, rectification requests, and other changes'; T-07 purges or quarantines derived summaries, embeddings and compactions when a source is deleted or revoked. [AI 600-1 p.44]"
+        }
+      ],
+      "T-08": [
+        {
+          "ref": "MP-2.3-003",
+          "relation": "supports",
+          "justification": "'Deploy and document fact-checking techniques to verify the accuracy and veracity of information generated by GAI systems'; T-08 removes reliance on model-supplied facts by reading them from the system of record at execution time. [AI 600-1 p.25]"
+        }
+      ],
+      "T-09": [],
+      "T-10": [
+        {
+          "ref": "GOVERN 6.1",
+          "relation": "supports",
+          "justification": "Policies address AI risks associated with third-party entities; T-10 fixes provider, account, endpoint, region, retention and training terms per data class. [AI 100-1 Table 1 p.24]"
+        },
+        {
+          "ref": "MANAGE 3.1",
+          "relation": "supports",
+          "justification": "For third-party resources, 'risk controls are applied and documented'; T-10 applies the routing policy to fallbacks, retries, error previews and debug paths. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MEASURE 2.10",
+          "relation": "supports",
+          "justification": "Privacy risk is examined; T-10 forbids treating a principal's read permission as permission to disclose to a provider. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "GV-6.1-007",
+          "relation": "partial",
+          "justification": "'establish approved GAI technology and service provider lists'; T-10 permits transmission only over routes approved per data class and stops when none exists. [AI 600-1 p.21]"
+        },
+        {
+          "ref": "GV-6.2-007",
+          "relation": "supports",
+          "justification": "Review vendor contracts to avoid terms that 'contribute to unauthorized data collection by vendors or third-parties (e.g., secondary data use)'; T-10 requires provider retention and training terms within approved terms. [AI 600-1 p.22]"
+        },
+        {
+          "ref": "GV-6.2-006",
+          "relation": "supports",
+          "justification": "'manage risks related to rollover and fallback technologies for GAI systems'; T-10 requires fallbacks to follow the same routing policy. [AI 600-1 p.22]"
+        }
+      ],
+      "T-11": [
+        {
+          "ref": "GOVERN 6.1",
+          "relation": "supports",
+          "justification": "Policies address third-party AI risks; T-11 inventories provider-executed tools as egress and execution channels. [AI 100-1 Table 1 p.24]"
+        },
+        {
+          "ref": "MAP 4.1",
+          "relation": "supports",
+          "justification": "Component risks 'including the use of third-party data or software' are mapped; hosted tools and remote connectors are mapped as channels. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MANAGE 3.1",
+          "relation": "supports",
+          "justification": "Third-party 'risk controls are applied and documented'; provider allowlists, per-call approval and call-record logging apply, or the capability moves behind A-01. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "GV-6.1-009",
+          "relation": "supports",
+          "justification": "Vendor due diligence should 'Consider policy adjustments across GAI modeling libraries, tools and APIs, fine-tuned models, and embedded tools'; T-11 is that adjustment for provider-hosted tools. [AI 600-1 p.21]"
+        },
+        {
+          "ref": "MP-2.2-002",
+          "relation": "supports",
+          "justification": "'Observe and analyze how the GAI system interacts with external networks'; hosted search, fetch and connectors are recorded and constrained as egress. [AI 600-1 p.24]"
+        }
+      ],
+      "T-12": [
+        {
+          "ref": "MP-2.2-002",
+          "relation": "supports",
+          "justification": "'Observe and analyze how the GAI system interacts with external networks'; T-12 constrains model-influenced network access through a deny-by-default egress boundary that makes that interaction observable. [AI 600-1 p.24]"
+        }
+      ],
+      "T-13": [
+        {
+          "ref": "MEASURE 2.10",
+          "relation": "supports",
+          "justification": "Privacy risk is examined; T-13 closes rendering-based exfiltration of context data through remote images, links and unfurls. [AI 100-1 Table 3 p.30]"
+        }
+      ],
+      "T-14": [
+        {
+          "ref": "MS-2.6-004",
+          "relation": "supports",
+          "justification": "'Review GAI system outputs for validity and safety: Review generated code to assess risks that may arise from unreliable downstream decision-making'; T-14 encodes or validates model output for each downstream sink and keeps it out of interpreters. [AI 600-1 p.32]"
+        }
+      ],
+      "T-15": [
+        {
+          "ref": "MS-2.6-004",
+          "relation": "supports",
+          "justification": "'Review generated code to assess risks'; T-15 places a validation gate between code generation and execution and runs code only in a constrained sandbox. [AI 600-1 p.32]"
+        }
+      ],
+      "T-16": [],
+      "T-17": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; consequential browser steps are confirmed outside the agent-controlled screen. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MP-2.2-002",
+          "relation": "supports",
+          "justification": "'Observe and analyze how the GAI system interacts with external networks'; navigation and form submission are allowlisted and downloads quarantined. [AI 600-1 p.24]"
+        }
+      ],
+      "T-18": [
+        {
+          "ref": "MANAGE 3.1",
+          "relation": "partial",
+          "justification": "'AI risks and benefits from third-party resources are regularly monitored, and risk controls are applied and documented'; T-18 pins and reviews third-party descriptors and disables tools on change. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "GOVERN 6.1",
+          "relation": "supports",
+          "justification": "Policies address risks associated with third-party entities; T-18 refuses unpinned or uninventoried servers and agents. [AI 100-1 Table 1 p.24]"
+        },
+        {
+          "ref": "MAP 4.1",
+          "relation": "supports",
+          "justification": "Component risks including third-party software are mapped; descriptors are reviewed before load. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "GV-6.2-004",
+          "relation": "supports",
+          "justification": "'Establish policies and procedures for continuous monitoring of third-party GAI systems in deployment'; T-18 reacts to tools/list_changed and descriptor drift. [AI 600-1 p.22]"
+        },
+        {
+          "ref": "GV-6.1-009",
+          "relation": "supports",
+          "justification": "Due diligence across 'tools and APIs, fine-tuned models, and embedded tools'; T-18 applies review and pinning to MCP servers, agent cards and plugins. [AI 600-1 p.21]"
+        },
+        {
+          "ref": "MG-3.1-002",
+          "relation": "supports",
+          "justification": "'Test GAI system value chain risks (e.g., data poisoning, malware, other software and hardware vulnerabilities ...)'; descriptor review covers poisoned tool descriptions. [AI 600-1 p.42]"
+        }
+      ],
+      "T-19": [
+        {
+          "ref": "MANAGE 3.1",
+          "relation": "supports",
+          "justification": "Third-party 'risk controls are applied and documented'; T-19 confines local MCP servers and third-party tools to declared files, destinations and secrets. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "GOVERN 6.1",
+          "relation": "supports",
+          "justification": "Policies address third-party risks; exact-command approval and re-approval on change. [AI 100-1 Table 1 p.24]"
+        },
+        {
+          "ref": "MG-3.1-002",
+          "relation": "supports",
+          "justification": "Test value chain risks such as 'malware, other software and hardware vulnerabilities'; T-19 sandboxes locally launched third-party components. [AI 600-1 p.42]"
+        }
+      ],
+      "T-20": [
+        {
+          "ref": "MANAGE 3.1",
+          "relation": "supports",
+          "justification": "Third-party 'risk controls are applied and documented'; T-20 denies or policy-gates server-initiated sampling and constrains elicitation from MCP servers. [AI 100-1 Table 4 p.32]"
+        }
+      ],
+      "T-21": [
+        {
+          "ref": "MS-2.7-001",
+          "relation": "supports",
+          "justification": "Assess threats 'such as ... eavesdropping, man-in-the-middle attacks, ... autonomous agents'; T-21 mitigates those threats on inter-agent channels (the action itself is an assessment). [AI 600-1 p.33]"
+        }
+      ],
+      "T-22": [
+        {
+          "ref": "MANAGE 2.4",
+          "relation": "supports",
+          "justification": "Mechanisms 'to supersede, disengage, or deactivate' on outcomes inconsistent with intended use; circuit breakers and fan-out caps halt propagation. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MEASURE 2.6",
+          "relation": "supports",
+          "justification": "The system 'can fail safely' and safety metrics reflect 'response times for AI system failures'; T-22 bounds blast radius between planner and executors. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MS-2.6-005",
+          "relation": "supports",
+          "justification": "'Verify that GAI system architecture can monitor outputs and performance, and handle, recover from, and repair errors when security anomalies, threats and impacts are detected'; T-22 adds producer-independent gating and circuit breakers. [AI 600-1 p.32]"
+        },
+        {
+          "ref": "MP-2.1-001",
+          "relation": "supports",
+          "justification": "Practices for 'determining data origin and content lineage'; each propagated action carries a lineage ID to its originating output. [AI 600-1 p.24]"
+        }
+      ],
+      "T-23": [
+        {
+          "ref": "MAP 3.5",
+          "relation": "supports",
+          "justification": "Human oversight processes are defined; agent changes to CI workflows, branch protection, security tests and instruction files need human review. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MS-2.6-004",
+          "relation": "supports",
+          "justification": "'Review generated code to assess risks'; T-23 requires human review of agent-generated changes to security-relevant repository paths. [AI 600-1 p.32]"
+        }
+      ],
+      "T-24": [
+        {
+          "ref": "MANAGE 3.1",
+          "relation": "partial",
+          "justification": "Third-party risks are 'regularly monitored, and risk controls are applied and documented'; T-24 pins tools, servers, skills, frameworks and dependencies and diffs permissions and schemas on upgrade. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MANAGE 3.2",
+          "relation": "supports",
+          "justification": "'Pre-trained models which are used for development are monitored as part of AI system regular monitoring and maintenance'; T-24 requires explicit model versions for every role. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "GOVERN 6.1",
+          "relation": "supports",
+          "justification": "Policies address third-party software, data and supply-chain risks; T-24 sets the intake rules. [AI 100-1 Table 1 p.24]"
+        },
+        {
+          "ref": "MAP 4.1",
+          "relation": "supports",
+          "justification": "Component risks including third-party software are mapped before intake. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "GV-1.6-003",
+          "relation": "supports",
+          "justification": "Inventory entries include 'Data provenance information (e.g., source, signatures, versioning, watermarks)' and 'versions of underlying models'; T-24 records versions, hashes and provenance. [AI 600-1 p.16]"
+        },
+        {
+          "ref": "GV-6.1-009",
+          "relation": "supports",
+          "justification": "Due diligence across 'GAI modeling libraries, tools and APIs, fine-tuned models, and embedded tools'. [AI 600-1 p.21]"
+        },
+        {
+          "ref": "MG-3.1-002",
+          "relation": "supports",
+          "justification": "'Test GAI system value chain risks (e.g., data poisoning, malware, other software and hardware vulnerabilities ...)'; T-24 verifies model-proposed dependencies against an approved registry and publisher before pinning. [AI 600-1 p.42]"
+        }
+      ],
+      "T-25": [
+        {
+          "ref": "MANAGE 3.2",
+          "relation": "supports",
+          "justification": "Pre-trained models are monitored as part of maintenance; T-25 verifies weight and adapter hashes against a recorded source. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MAP 4.1",
+          "relation": "supports",
+          "justification": "Component risks, including third-party data, are mapped; fine-tuning data is reviewed as a poisoning path. [AI 100-1 Table 2 p.27]"
+        },
+        {
+          "ref": "MG-3.1-002",
+          "relation": "partial",
+          "justification": "'Test GAI system value chain risks (e.g., data poisoning, malware ...)'; T-25 blocks executable model formats and reviews training data for poisoning. [AI 600-1 p.42]"
+        },
+        {
+          "ref": "MS-2.5-005",
+          "relation": "partial",
+          "justification": "'Verify GAI system training data and TEVV data provenance'; T-25 requires provenance tracking of fine-tuning and adapter data. [AI 600-1 p.31]"
+        },
+        {
+          "ref": "MS-2.7-008",
+          "relation": "supports",
+          "justification": "'Verify fine-tuning does not compromise safety and security controls'; reviewing fine-tuning data as a poisoning path supports this verification. [AI 600-1 p.33]"
+        }
+      ],
+      "T-26": [
+        {
+          "ref": "MEASURE 3.3",
+          "relation": "partial",
+          "justification": "'Feedback processes for end users and impacted communities to report problems and appeal system outcomes are established'; T-26 lets users report suspicious agent requests and turns reports into signals. [AI 100-1 Table 3 p.31]"
+        },
+        {
+          "ref": "GV-3.2-004",
+          "relation": "supports",
+          "justification": "'Establish policies for user feedback mechanisms for GAI systems'; T-26 requires a reporting path on unverified agent suggestions. [AI 600-1 p.18]"
+        },
+        {
+          "ref": "MG-3.2-004",
+          "relation": "supports",
+          "justification": "'Evaluate user reported problematic content and integrate feedback into system updates'; reports flow to N-04 owners. [AI 600-1 p.43]"
+        },
+        {
+          "ref": "MANAGE 4.1",
+          "relation": "supports",
+          "justification": "Post-deployment monitoring plans include 'mechanisms for capturing and evaluating input from users'; T-26 gives users a way to report unverified agent suggestions, and each report produces an N-04 signal. [AI 100-1 Table 4 p.33]"
+        }
+      ],
+      "T-27": [],
+      "D-01": [
+        {
+          "ref": "MEASURE 2.3",
+          "relation": "partial",
+          "justification": "Assurance criteria are 'demonstrated for conditions similar to deployment setting(s)'; D-01 drives the real entry point, policy and dispatcher into a recording adapter. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MEASURE 2.7",
+          "relation": "partial",
+          "justification": "'AI system security and resilience ... are evaluated and documented'; D-01 is the evidence path for every applicable control. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MEASURE 2.1",
+          "relation": "supports",
+          "justification": "'Test sets, metrics, and details about the tools used during TEVV are documented'. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MP-2.1-002",
+          "relation": "supports",
+          "justification": "'Institute test and evaluation for data and content flows within the GAI system'; D-01 records protected reads, outbound traffic, state changes and audit events. [AI 600-1 p.24]"
+        },
+        {
+          "ref": "MS-2.7-009",
+          "relation": "supports",
+          "justification": "'Regularly assess and verify that security measures remain effective and have not been compromised'. [AI 600-1 p.34]"
+        }
+      ],
+      "D-02": [
+        {
+          "ref": "MEASURE 2.7",
+          "relation": "partial",
+          "justification": "Security is 'evaluated and documented'; D-02 injects hostile proposals with authorized twins and asserts no downstream effect or weaker-path retry. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MEASURE 2.6",
+          "relation": "supports",
+          "justification": "Demonstrates the system 'can fail safely' independent of current model behavior. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MS-2.6-007",
+          "relation": "supports",
+          "justification": "'Regularly evaluate GAI system vulnerabilities to possible circumvention of safety measures'; hostile proposals target circumvention of dispatcher checks. [AI 600-1 p.32]"
+        }
+      ],
+      "D-03": [
+        {
+          "ref": "MEASURE 2.1",
+          "relation": "partial",
+          "justification": "Test sets, metrics and 'details about the tools used during TEVV are documented'; each record entry cites its test, commit and evidence scope. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MEASURE 1.1",
+          "relation": "supports",
+          "justification": "Risks that 'will not - or cannot - be measured are properly documented'; controls lacking required evidence stay implemented-but-unverified. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MEASURE 2.3",
+          "relation": "supports",
+          "justification": "Criteria are 'demonstrated for conditions similar to deployment setting(s)'; runtime-boundary controls require isolated-runtime evidence. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MEASURE 2.13",
+          "relation": "supports",
+          "justification": "'Effectiveness of the employed TEVV metrics and processes ... are evaluated and documented'; minimum evidence scopes and substitution rules. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MS-2.5-001",
+          "relation": "supports",
+          "justification": "'Avoid extrapolating GAI system performance or capabilities from narrow, non-systematic, and anecdotal assessments'; weaker evidence must not be recorded as verified. [AI 600-1 p.31]"
+        },
+        {
+          "ref": "MS-1.1-009",
+          "relation": "supports",
+          "justification": "'Track and document risks or opportunities related to all GAI risks that cannot be measured quantitatively, including explanations as to why'; unverifiable controls are recorded with their evidence gap. [AI 600-1 p.29]"
+        }
+      ],
+      "D-04": [
+        {
+          "ref": "MEASURE 2.7",
+          "relation": "partial",
+          "justification": "Security is 'evaluated and documented'; D-04 covers each untrusted channel against each reachable consequential capability. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MEASURE 2.3",
+          "relation": "supports",
+          "justification": "Fixtures run through the real path, i.e. conditions similar to deployment. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MP-2.3-005",
+          "relation": "partial",
+          "justification": "'Implement plans for GAI systems to undergo regular adversarial testing to identify vulnerabilities and potential manipulation or misuse'; D-04 is a channel-complete adversarial fixture suite. [AI 600-1 p.25]"
+        },
+        {
+          "ref": "MS-2.7-007",
+          "relation": "supports",
+          "justification": "Assess resilience against 'GAI attacks (e.g., prompt injection)'; D-04 fixtures are deterministic injection tests rather than full red-teaming. [AI 600-1 p.33]"
+        },
+        {
+          "ref": "MS-2.6-007",
+          "relation": "supports",
+          "justification": "'Regularly evaluate GAI system vulnerabilities to possible circumvention of safety measures'; within-authority payloads target task-scope circumvention. [AI 600-1 p.32]"
+        }
+      ],
+      "D-05": [
+        {
+          "ref": "MEASURE 2.6",
+          "relation": "partial",
+          "justification": "The system 'can fail safely' and metrics reflect 'response times for AI system failures'; D-05 tests failure of enforcement components, timeouts, cancellation, revocation and duplicate delivery. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MEASURE 2.7",
+          "relation": "supports",
+          "justification": "Security and resilience are evaluated and documented. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MS-2.6-005",
+          "relation": "supports",
+          "justification": "Verify the architecture can 'handle, recover from, and repair errors when security anomalies, threats and impacts are detected'. [AI 600-1 p.32]"
+        },
+        {
+          "ref": "MP-5.1-005",
+          "relation": "supports",
+          "justification": "'Conduct adversarial role-playing exercises, GAI red-teaming, or chaos testing to identify anomalous or unforeseen failure modes'; D-05 is a structured failure-injection matrix. [AI 600-1 p.27]"
+        }
+      ],
+      "D-06": [
+        {
+          "ref": "MANAGE 1.1",
+          "relation": "partial",
+          "justification": "'A determination is made as to whether ... development or deployment should proceed'; D-06 blocks readiness claims on open critical findings, for the security scope only. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MANAGE 1.2",
+          "relation": "partial",
+          "justification": "'Treatment of documented AI risks is prioritized based on impact, likelihood'; D-06 rates every non-verified applicable control with the severity rubric. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MANAGE 1.3",
+          "relation": "supports",
+          "justification": "Risk responses, including accepting, are documented; high findings need an S-01 exception. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MANAGE 1.4",
+          "relation": "supports",
+          "justification": "'Negative residual risks ... are documented'; rated open findings and exceptions form the residual risk list. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MEASURE 2.6",
+          "relation": "supports",
+          "justification": "'its residual negative risk does not exceed the risk tolerance'; the critical gate is the security tolerance threshold. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "GV-1.3-002",
+          "relation": "partial",
+          "justification": "'Establish minimum thresholds for performance or assurance criteria and review as part of deployment approval' (go/no-go) policies; D-06 is the security go/no-go threshold. [AI 600-1 p.14]"
+        },
+        {
+          "ref": "GV-1.3-007",
+          "relation": "supports",
+          "justification": "'Devise a plan to halt development or deployment of a GAI system that poses unacceptable negative risk'; D-06 halts release while a critical finding is open. [AI 600-1 p.15]"
+        },
+        {
+          "ref": "MG-1.3-001",
+          "relation": "supports",
+          "justification": "'Document trade-offs, decision processes, and relevant measurement and feedback results for risks that do not surpass organizational risk tolerance'. [AI 600-1 p.40]"
+        },
+        {
+          "ref": "MS-2.3-003",
+          "relation": "supports",
+          "justification": "'Share results of pre-deployment testing with relevant GAI Actors, such as those with system release approval authority'. [AI 600-1 p.30]"
+        }
+      ],
+      "D-07": [
+        {
+          "ref": "MEASURE 1.2",
+          "relation": "partial",
+          "justification": "'effectiveness of existing controls are regularly assessed and updated, including reports of errors'; D-07 reruns control-keyed tests on relevant changes and adds a fixture per incident. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MEASURE 2.7",
+          "relation": "supports",
+          "justification": "Security is evaluated and documented on each relevant change. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MANAGE 4.2",
+          "relation": "supports",
+          "justification": "'Measurable activities for continual improvements are integrated into AI system updates'; each incident or bypass becomes a regression fixture. [AI 100-1 Table 4 p.33]"
+        },
+        {
+          "ref": "MS-2.7-009",
+          "relation": "partial",
+          "justification": "'Regularly assess and verify that security measures remain effective and have not been compromised'; required regression checks do this per change. [AI 600-1 p.34]"
+        },
+        {
+          "ref": "MG-4.2-002",
+          "relation": "supports",
+          "justification": "'Conduct post-mortem analyses of incidents with relevant AI Actors, to understand the root causes and implement preventive measures'; the action targets harmful-content incidents, and D-07 applies the same pattern to security bypasses. [AI 600-1 p.45]"
+        },
+        {
+          "ref": "MS-2.7-006",
+          "relation": "supports",
+          "justification": "'Measure the rate at which recommendations from security checks and incidents are implemented'; D-07 turns each confirmed incident or bypass into a regression fixture keyed by control ID. [AI 600-1 p.33]"
+        }
+      ],
+      "D-08": [
+        {
+          "ref": "MEASURE 2.7",
+          "relation": "partial",
+          "justification": "Security and resilience are evaluated and documented using the pinned live model configuration. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MEASURE 2.3",
+          "relation": "partial",
+          "justification": "Criteria are 'measured qualitatively or quantitatively and demonstrated for conditions similar to deployment setting(s)'; D-08 reports attack success rate and clean and under-attack task success over repeated trials. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MEASURE 2.1",
+          "relation": "supports",
+          "justification": "Test sets and metrics are documented (trial counts, attempted versus executed effects, false refusals). [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MS-2.7-007",
+          "relation": "partial",
+          "justification": "'Perform AI red-teaming to assess resilience against ... GAI attacks (e.g., prompt injection)'; D-08 covers prompt-injection resilience, not the ML attacks the action also lists. [AI 600-1 p.33]"
+        },
+        {
+          "ref": "MP-2.3-005",
+          "relation": "supports",
+          "justification": "'regular adversarial testing to identify vulnerabilities and potential manipulation or misuse'. [AI 600-1 p.25]"
+        },
+        {
+          "ref": "MS-2.5-001",
+          "relation": "supports",
+          "justification": "Avoid extrapolating performance from narrow, non-systematic, and anecdotal assessments; D-08 uses repeated trials across channels and multi-turn flows. [AI 600-1 p.31]"
+        },
+        {
+          "ref": "MS-4.2-002",
+          "relation": "supports",
+          "justification": "'Evaluate GAI system performance in real-world scenarios'; D-08 evaluates the delivered application with its pinned configuration. [AI 600-1 p.39]"
+        },
+        {
+          "ref": "MS-4.2-001",
+          "relation": "supports",
+          "justification": "'Conduct adversarial testing at a regular cadence to map and measure GAI risks'; D-08 is a repeated-trial adversarial evaluation of the live configuration before each release at Level 2 or above. [AI 600-1 p.39]"
+        },
+        {
+          "ref": "MS-2.10-001",
+          "relation": "supports",
+          "justification": "Calls for red-teaming against 'Revealing ... confidential ... personal, proprietary, sensitive ... information'; D-08 measures exfiltration of context data under injection, but not the action's training-data extraction or membership-inference items. [AI 600-1 p.35]"
+        }
+      ],
+      "D-09": [
+        {
+          "ref": "MEASURE 1.3",
+          "relation": "partial",
+          "justification": "'Internal experts who did not serve as front-line developers for the system and/or independent assessors are involved in regular assessments'; D-09 requires a reviewer independent of the implementer. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MEASURE 2.7",
+          "relation": "partial",
+          "justification": "Security is evaluated through bypass attempts against every applicable critical-boundary control through the real execution path. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MS-1.3-003",
+          "relation": "supports",
+          "justification": "'Verify those conducting structured human feedback exercises are not directly involved in system development tasks for the same GAI model'; AI red-teaming is one kind of structured feedback, and D-09 requires the Level 3 adversarial reviewer to be independent of the application implementer rather than of model development, a different subject, so the action supports D-09 rather than covering part of it. [AI 600-1 p.29]"
+        },
+        {
+          "ref": "MS-2.7-007",
+          "relation": "partial",
+          "justification": "'Perform AI red-teaming to assess resilience against ... GAI attacks (e.g., prompt injection)'; D-09 is adaptive red-teaming of the deployed prompts and tools. [AI 600-1 p.33]"
+        },
+        {
+          "ref": "GV-3.2-001",
+          "relation": "supports",
+          "justification": "Oversight via 'independent evaluations or assessments of GAI models or systems where the type and robustness of evaluations are proportional to the identified risks'; D-09 is required at Level 3. [AI 600-1 p.18]"
+        }
+      ],
+      "D-10": [
+        {
+          "ref": "MEASURE 2.3",
+          "relation": "partial",
+          "justification": "Criteria are 'demonstrated for conditions similar to deployment setting(s)'; D-10 replays recorded runs in an isolated clone before rollout or authority expansion. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MANAGE 4.1",
+          "relation": "supports",
+          "justification": "Post-deployment plans include 'change management'; replay gates model, prompt, tool and policy changes. [AI 100-1 Table 4 p.33]"
+        },
+        {
+          "ref": "MANAGE 3.2",
+          "relation": "supports",
+          "justification": "Pre-trained models are monitored as part of maintenance; model version changes are replayed before production. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MG-3.1-003",
+          "relation": "supports",
+          "justification": "'Re-assess model risks after fine-tuning or retrieval-augmented generation implementation and for any third-party GAI models deployed for applications and/or use cases that were not evaluated in initial testing'. [AI 600-1 p.42]"
+        },
+        {
+          "ref": "MS-2.5-006",
+          "relation": "supports",
+          "justification": "'Regularly review security and safety guardrails, especially if the GAI system is being operated in novel circumstances'; expansions of tools, permissions, autonomy or fan-out trigger replay. [AI 600-1 p.31]"
+        }
+      ],
+      "N-01": [
+        {
+          "ref": "MEASURE 2.8",
+          "relation": "supports",
+          "justification": "'Risks associated with transparency and accountability ... are examined and documented'; N-01 records actor, principal, policy decision and effect for each proposal. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MEASURE 2.4",
+          "relation": "supports",
+          "justification": "Functionality and behavior of the system and its components 'are monitored when in production'; the event stream is the monitoring source. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MS-2.7-004",
+          "relation": "supports",
+          "justification": "'Identify metrics that reflect the effectiveness of security measures, such as ... the number of unauthorized access attempts, inference, bypass'; proposed, attempted, denied and confirmed effects are distinguishable. [AI 600-1 p.33]"
+        },
+        {
+          "ref": "MS-4.2-004",
+          "relation": "supports",
+          "justification": "Monitor and document instances where human operators or other systems override the GAI's decisions; policy denials and approval rejections are recorded with reason codes. The action's content-provenance evaluation is not addressed. [AI 600-1 p.39]"
+        }
+      ],
+      "N-02": [
+        {
+          "ref": "MEASURE 2.8",
+          "relation": "supports",
+          "justification": "Transparency and accountability risks are examined; N-02 keeps audit records outside agent control and written before effects start. [AI 100-1 Table 3 p.30]"
+        }
+      ],
+      "N-03": [
+        {
+          "ref": "MEASURE 2.8",
+          "relation": "supports",
+          "justification": "Transparency and accountability; manifests record prompt, policy, model and context references for each consequential proposal. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MEASURE 2.9",
+          "relation": "supports",
+          "justification": "'AI system output is interpreted within its context'; the manifest reconstructs the context behind each proposal. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MANAGE 4.3",
+          "relation": "supports",
+          "justification": "'Processes for tracking, responding to, and recovering from incidents and errors are followed and documented'; manifests support forensic tracking. [AI 100-1 Table 4 p.33]"
+        },
+        {
+          "ref": "MP-2.1-001",
+          "relation": "supports",
+          "justification": "Practices for 'determining data origin and content lineage'; content hashes and references correlated across agents and runs. [AI 600-1 p.24]"
+        },
+        {
+          "ref": "MG-4.1-006",
+          "relation": "supports",
+          "justification": "'monitoring data deletions, rectification requests, and other changes that may impact the verifiability of content origins'; deletion leaves references resolving to a deletion marker. [AI 600-1 p.44]"
+        }
+      ],
+      "N-04": [
+        {
+          "ref": "MEASURE 2.4",
+          "relation": "partial",
+          "justification": "Functionality and behavior 'are monitored when in production'; N-04 defines the baseline security signals. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MANAGE 4.1",
+          "relation": "partial",
+          "justification": "'Post-deployment AI system monitoring plans are implemented, including mechanisms for capturing and evaluating input from users ... incident response'; signals with owners and response targets, including user reports. [AI 100-1 Table 4 p.33]"
+        },
+        {
+          "ref": "MEASURE 3.1",
+          "relation": "supports",
+          "justification": "Approaches 'to regularly identify and track existing, unanticipated, and emergent AI risks'. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "GOVERN 2.1",
+          "relation": "supports",
+          "justification": "Roles and responsibilities are documented; each signal routes to a named owner. [AI 100-1 Table 1 p.23]"
+        },
+        {
+          "ref": "MG-4.1-002",
+          "relation": "partial",
+          "justification": "'Establish, maintain, and evaluate effectiveness of organizational processes and procedures for post-deployment monitoring of GAI systems, particularly for potential confabulation, CBRN, or cyber risks'. [AI 600-1 p.44]"
+        },
+        {
+          "ref": "MS-2.7-004",
+          "relation": "supports",
+          "justification": "Security-effectiveness metrics such as 'the number of unauthorized access attempts, inference, bypass'; denial and provenance-denial signals. [AI 600-1 p.33]"
+        },
+        {
+          "ref": "MG-4.1-007",
+          "relation": "supports",
+          "justification": "'Verify that AI Actors responsible for monitoring reported issues can effectively evaluate GAI system performance ... and promptly escalate issues for response'; owners have recorded response targets. [AI 600-1 p.45]"
+        },
+        {
+          "ref": "MEASURE 3.3",
+          "relation": "supports",
+          "justification": "'Feedback processes for end users and impacted communities to report problems ... are established'; N-04 routes user reports of suspicious agent behavior to a named owner with a response target. [AI 100-1 Table 3 p.31]"
+        },
+        {
+          "ref": "MG-4.3-002",
+          "relation": "supports",
+          "justification": "'Establish and maintain policies and procedures to record and track GAI system reported errors, near-misses, and negative impacts'; N-04 denial signals are near-miss records, routed to owners with response targets. [AI 600-1 p.45]"
+        }
+      ],
+      "N-05": [
+        {
+          "ref": "MEASURE 2.4",
+          "relation": "partial",
+          "justification": "Behavior of the system and its components is monitored in production against per-agent baselines. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MANAGE 2.4",
+          "relation": "partial",
+          "justification": "Mechanisms 'to supersede, disengage, or deactivate AI systems that demonstrate performance or outcomes inconsistent with intended use'; N-05 throttles or suspends automatically at the narrowest scope. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MEASURE 1.2",
+          "relation": "supports",
+          "justification": "'Appropriateness of AI metrics and effectiveness of existing controls are regularly assessed'; false-positive rates are recorded. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "MS-2.6-005",
+          "relation": "partial",
+          "justification": "'Verify that GAI system architecture can monitor outputs and performance, and handle, recover from, and repair errors when security anomalies, threats and impacts are detected'. [AI 600-1 p.32]"
+        },
+        {
+          "ref": "MG-2.4-004",
+          "relation": "supports",
+          "justification": "'Establish and regularly review specific criteria that warrants the deactivation of GAI systems'; recorded thresholds for automatic containment. [AI 600-1 p.42]"
+        }
+      ],
+      "N-06": [
+        {
+          "ref": "MANAGE 2.4",
+          "relation": "partial",
+          "justification": "'Mechanisms are in place and applied, and responsibilities are assigned and understood, to supersede, disengage, or deactivate AI systems'; N-06 lets operators stop a run with its descendants and disable tools, components, model versions or agents without a deploy. Assigning responsibilities is organizational. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MG-2.4-002",
+          "relation": "supports",
+          "justification": "'procedures for escalating GAI system incidents to the organizational risk management authority when specific criteria for deactivation or disengagement is met'; N-06 provides the mechanism such procedures invoke. [AI 600-1 p.42]"
+        },
+        {
+          "ref": "MG-2.4-004",
+          "relation": "supports",
+          "justification": "'specific criteria that warrants the deactivation of GAI systems'; N-06 makes deactivation at component granularity possible once criteria are met. [AI 600-1 p.42]"
+        }
+      ],
+      "N-07": [
+        {
+          "ref": "MANAGE 2.4",
+          "relation": "partial",
+          "justification": "Deactivation mechanisms at tenant and global scope, with credential revocation and cancellation of queued and descendant work. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MEASURE 2.6",
+          "relation": "supports",
+          "justification": "Safety metrics reflect 'response times for AI system failures'; N-07 measures revocation latency per scope. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MG-2.4-004",
+          "relation": "supports",
+          "justification": "Deactivation criteria; N-07 provides the scopes at which deactivation can be applied. [AI 600-1 p.42]"
+        }
+      ],
+      "N-08": [
+        {
+          "ref": "MANAGE 2.3",
+          "relation": "partial",
+          "justification": "'Procedures are followed to respond to and recover from a previously unknown risk when it is identified'; quarantine, purge by lineage and restore from a trusted baseline. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MANAGE 4.3",
+          "relation": "partial",
+          "justification": "'Processes for tracking, responding to, and recovering from incidents and errors are followed and documented'; documented and exercised incident procedure. Communication to affected communities is outside the control. [AI 100-1 Table 4 p.33]"
+        },
+        {
+          "ref": "MANAGE 4.1",
+          "relation": "supports",
+          "justification": "Monitoring plans include 'incident response, recovery'. [AI 100-1 Table 4 p.33]"
+        },
+        {
+          "ref": "GOVERN 6.2",
+          "relation": "supports",
+          "justification": "'Contingency processes are in place to handle failures or incidents in third-party data or AI systems'; quarantine covers MCP servers and indexes. [AI 100-1 Table 1 p.24]"
+        },
+        {
+          "ref": "MG-2.3-001",
+          "relation": "partial",
+          "justification": "'Develop and update GAI system incident response and recovery plans and procedures'. [AI 600-1 p.41]"
+        },
+        {
+          "ref": "GV-6.2-003",
+          "relation": "partial",
+          "justification": "Third-party incident plans: 'Define ownership of GAI incident response functions; Rehearse third-party GAI incident response plans at a regular cadence'; N-08 requires an exercise per release cycle. [AI 600-1 p.22]"
+        },
+        {
+          "ref": "GV-1.5-002",
+          "relation": "supports",
+          "justification": "'after action reviews of GAI system incident response'; exercises feed procedure updates. [AI 600-1 p.16]"
+        },
+        {
+          "ref": "MG-4.3-001",
+          "relation": "supports",
+          "justification": "'Conduct after-action assessments for GAI system incidents to verify incident response and recovery processes are followed and effective'. [AI 600-1 p.45]"
+        },
+        {
+          "ref": "MG-2.4-003",
+          "relation": "supports",
+          "justification": "'Establish and maintain procedures for the remediation of issues which trigger incident response processes'; quarantine, purge by lineage, restore from a trusted baseline and approved reintegration under N-08 are such procedures. [AI 600-1 p.42]"
+        }
+      ],
+      "N-09": [
+        {
+          "ref": "MANAGE 4.1",
+          "relation": "partial",
+          "justification": "Post-deployment plans include 'change management'; N-09 versions security configuration and triages every change with an accountable approver. [AI 100-1 Table 4 p.33]"
+        },
+        {
+          "ref": "MEASURE 1.2",
+          "relation": "supports",
+          "justification": "Effectiveness of existing controls is 'regularly assessed and updated'; mapped control tests re-run on change. [AI 100-1 Table 3 p.29]"
+        },
+        {
+          "ref": "GOVERN 1.5",
+          "relation": "supports",
+          "justification": "'Ongoing monitoring and periodic review of the risk management process'; capability-profile changes trigger full reassessment. [AI 100-1 Table 1 p.23]"
+        },
+        {
+          "ref": "MANAGE 3.2",
+          "relation": "supports",
+          "justification": "Pre-trained model changes are handled as part of regular monitoring and maintenance. [AI 100-1 Table 4 p.32]"
+        },
+        {
+          "ref": "MG-3.1-003",
+          "relation": "supports",
+          "justification": "'Re-assess model risks after fine-tuning or retrieval-augmented generation implementation and for any third-party GAI models deployed for applications and/or use cases that were not evaluated in initial testing'. [AI 600-1 p.42]"
+        },
+        {
+          "ref": "MS-2.5-006",
+          "relation": "supports",
+          "justification": "'Regularly review security and safety guardrails, especially if the GAI system is being operated in novel circumstances'. [AI 600-1 p.31]"
+        }
+      ],
+      "N-10": [
+        {
+          "ref": "MEASURE 2.8",
+          "relation": "supports",
+          "justification": "Transparency and accountability risks are examined; tamper-evident storage makes the audit trail trustworthy. [AI 100-1 Table 3 p.30]"
+        },
+        {
+          "ref": "MS-2.7-009",
+          "relation": "supports",
+          "justification": "'Regularly assess and verify that security measures remain effective and have not been compromised'; scheduled integrity checks of the audit store. [AI 600-1 p.34]"
+        }
+      ]
+    }
+  },
+  "aisvs": {
+    "framework": "OWASP AISVS 1.0",
+    "source_version": "OWASP AISVS 1.0 (June 2026), locked 1.0/en folder at commit 94fbad5acee4e4716bff263a4c455dfd780e53a7",
+    "source_url": "https://github.com/OWASP/AISVS/tree/94fbad5acee4e4716bff263a4c455dfd780e53a7/1.0/en",
+    "notes": [
+      "Identifiers: AISVS requirements are cited in the version-prefixed form the AISVS README recommends, v1.0-C<chapter>.<section>.<requirement>. Appendix C (AI-assisted secure coding) items are cited by analogy as v1.0-AC.<section>.<item>; they are organizational controls for AI coding tools and are used mainly for coding-agent controls, otherwise only as supports.",
+      "Levels: in catalog/mappings.json, each justification starts with the AISVS level of the requirement. Several Level 1 controls here map to AISVS requirements at a higher AISVS level, for example A-04, A-11, A-23, T-04, T-06, T-13, T-18 and T-19. AISVS levels are assurance depths an organization selects (AISVS level N assumes ASVS level N in parallel), while this catalog's levels are computed from a capability profile, so neither substitutes for the other.",
+      "Unmapped on purpose: AISVS leaves governance, risk acceptance and risk management to ISO/IEC 42001 and NIST AI RMF (S-01 to S-03), does not define test-harness or evidence-scope methods (D-01, D-02, D-03, D-05), and leaves audit log custody to ASVS (N-02). No AISVS 1.0 requirement corresponds to idempotency, task-scope binding, approval fatigue, system-of-record reads, provider data routing or MCP sampling and elicitation (A-05, A-07, A-13, T-08, T-10, T-20).",
+      "Taint propagation (T-01), argument provenance (A-06) and Rule of Two gating (A-08) have no AISVS equivalent beyond the instruction-hierarchy and separation requirements cited, so those mappings are partial or supports.",
+      "Reuse boundary: justifications paraphrase AISVS in this project's own words; no AISVS requirement text is reproduced."
+    ],
+    "refs": {
+      "S-01": [],
+      "S-02": [],
+      "S-03": [],
+      "S-04": [
+        {
+          "ref": "v1.0-C3.1.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Requires an inventory of deployed model artifacts and their origin, which covers only the model-version slice of the S-04 inventory (not tools, MCP servers, recipients, boundary trace or ASI applicability)."
+        },
+        {
+          "ref": "v1.0-AC.2.1",
+          "relation": "supports",
+          "justification": "Appendix C, L1. Requires a threat model per AI coding tool, agent or MCP server; this supports S-04 threat modeling for coding-agent contexts only."
+        }
+      ],
+      "S-05": [
+        {
+          "ref": "v1.0-C9.2.3",
+          "relation": "partial",
+          "justification": "AISVS L2. Asks for a trusted reversibility class per high-impact action, matching the reversibility and consequence-class fields of the S-05 register but not trusted sources per argument or limits."
+        },
+        {
+          "ref": "v1.0-C9.2.4",
+          "relation": "partial",
+          "justification": "AISVS L2. Runtime must enforce those classifications, matching S-05's rule that the dispatcher reads policy from the register rather than from the model."
+        },
+        {
+          "ref": "v1.0-C9.3.3",
+          "relation": "supports",
+          "justification": "AISVS L2. Tool manifests declaring privileges and limits are a related form of trusted per-tool configuration, though without argument provenance."
+        }
+      ],
+      "S-06": [
+        {
+          "ref": "v1.0-C5.2.7",
+          "relation": "supports",
+          "justification": "AISVS L3. Classification labels must follow data into embeddings, caches and outputs, one mechanism S-06's disclosure policy relies on; it does not require a per-class policy of permitted recipients, retention or most-restrictive defaulting."
+        }
+      ],
+      "A-01": [
+        {
+          "ref": "v1.0-C9.5.3",
+          "relation": "partial",
+          "justification": "AISVS L2. Authorization decisions are made outside the model, in code or a policy engine; A-01 adds the single mandatory dispatch path across all entry points and adapters that nothing else can reach."
+        },
+        {
+          "ref": "v1.0-C9.5.1",
+          "relation": "partial",
+          "justification": "AISVS L2. Runtime-enforced fine-grained policy over tools and parameter values corresponds to the checks the A-01 dispatcher applies."
+        },
+        {
+          "ref": "v1.0-C5.2.5",
+          "relation": "supports",
+          "justification": "AISVS L2. Isolating the agent authorization decision point from the agent's execution environment supports A-01's requirement that model-influenced processes cannot bypass the dispatcher."
+        },
+        {
+          "ref": "v1.0-AC.11.5",
+          "relation": "supports",
+          "justification": "Appendix C, L2. Every privileged bot action routes through a separate audited authorization path decided by a policy engine, not the model; supports A-01's single dispatch path for coding bots."
+        }
+      ],
+      "A-02": [
+        {
+          "ref": "v1.0-C7.1.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Model output must be validated against a defined schema and rejected on mismatch; A-02 applies this to tool proposals and adds fail-closed policy errors and canonicalization."
+        },
+        {
+          "ref": "v1.0-C10.4.3",
+          "relation": "partial",
+          "justification": "AISVS L1. MCP servers must reject unknown or oversized parameters, matching A-02's rejection of fields a reviewed schema does not allow, for MCP only."
+        },
+        {
+          "ref": "v1.0-C10.4.4",
+          "relation": "partial",
+          "justification": "AISVS L2. Strict schema validation on MCP servers corresponds to A-02's strict-schema requirement within MCP scope."
+        },
+        {
+          "ref": "v1.0-C5.2.1",
+          "relation": "supports",
+          "justification": "AISVS L2. Default-deny allow-lists on AI resources support A-02's deny-by-default stance."
+        }
+      ],
+      "A-03": [
+        {
+          "ref": "v1.0-C9.5.3",
+          "relation": "partial",
+          "justification": "AISVS L2. Keeping access decisions out of the model aligns with A-03's rule that model output cannot establish identity or authority."
+        },
+        {
+          "ref": "v1.0-C9.5.2",
+          "relation": "partial",
+          "justification": "AISVS L2. Propagating the user's integrity-protected authorization context to every downstream call matches A-03's requirement that the caller's permission, not a broad service credential, governs access."
+        },
+        {
+          "ref": "v1.0-C10.2.5",
+          "relation": "partial",
+          "justification": "AISVS L2. Per-invocation checks that the user's token authorizes the tool and its argument values correspond to A-03's per-call access check, for MCP servers."
+        }
+      ],
+      "A-04": [
+        {
+          "ref": "v1.0-C9.5.6",
+          "relation": "partial",
+          "justification": "AISVS L3. Re-evaluating current backend policy on each privileged action in long sessions matches A-04's time-of-effect check; A-04 also covers queued and callback work and requires atomicity with the effect, and is Level 1 in the catalog."
+        }
+      ],
+      "A-05": [],
+      "A-06": [
+        {
+          "ref": "v1.0-C9.5.1",
+          "relation": "supports",
+          "justification": "AISVS L2. Policies that restrict which parameter values an agent may supply support A-06, which further keys the check on taint and the argument's trusted source."
+        },
+        {
+          "ref": "v1.0-C9.3.7",
+          "relation": "supports",
+          "justification": "AISVS L2. Checking model-named external resources against an allow-list before invocation supports A-06's destination matching, without the normalization or provenance rules."
+        }
+      ],
+      "A-07": [],
+      "A-08": [
+        {
+          "ref": "v1.0-C9.3.5",
+          "relation": "partial",
+          "justification": "AISVS L2. Isolating untrusted-data processing from tool calling corresponds to option (c) of A-08 (separation removes a property from the action-selecting context)."
+        },
+        {
+          "ref": "v1.0-C9.2.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Blocking high-impact actions until verified human approval corresponds to option (a) of A-08, though A-08 triggers on the three-property combination rather than on impact alone."
+        }
+      ],
+      "A-09": [
+        {
+          "ref": "v1.0-C9.5.1",
+          "relation": "partial",
+          "justification": "AISVS L2. Runtime policy restricting which tools an agent may invoke corresponds to A-09's per-context tool profile."
+        },
+        {
+          "ref": "v1.0-C9.3.1",
+          "relation": "supports",
+          "justification": "AISVS L1. Per-tool sandboxing or isolation from model operations is execution isolation, closer to T-15; it supports A-09 but does not require limiting exposed operations, object types or a profile-scoped credential."
+        },
+        {
+          "ref": "v1.0-C9.1.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Per-tool quotas including egress match A-09's per-tool rate and egress limits."
+        },
+        {
+          "ref": "v1.0-C10.2.4",
+          "relation": "supports",
+          "justification": "AISVS L2. Exposing only tools within authorized scopes in MCP tool listings supports A-09's minimal exposure."
+        },
+        {
+          "ref": "v1.0-C9.3.4",
+          "relation": "supports",
+          "justification": "AISVS L2. Runtime enforcement of privileges declared in tool manifests supports dispatcher enforcement of the profile."
+        }
+      ],
+      "A-10": [
+        {
+          "ref": "v1.0-C9.2.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Human approval before irreversible or high-impact actions matches A-10's approval branch; A-10 also accepts reversible-by-design as an alternative."
+        },
+        {
+          "ref": "v1.0-C9.2.2",
+          "relation": "partial",
+          "justification": "AISVS L2. Approval requests must show complete canonical parameters such as diffs, close to A-10's dry-run diff of the exact effect."
+        },
+        {
+          "ref": "v1.0-C9.2.3",
+          "relation": "supports",
+          "justification": "AISVS L2. Reversibility classification underpins which operations A-10 guards."
+        },
+        {
+          "ref": "v1.0-C9.2.4",
+          "relation": "supports",
+          "justification": "AISVS L2. Enforcing the classification by blocking or requiring approval supports A-10's gate."
+        }
+      ],
+      "A-11": [
+        {
+          "ref": "v1.0-C9.2.8",
+          "relation": "partial",
+          "justification": "AISVS L3. Cryptographic binding of approvals to parameters, identity, context and a single-use nonce corresponds to A-11's binding; A-11 is Level 1, also allows trusted server-side storage, and adds approver re-check and transactional consumption."
+        },
+        {
+          "ref": "v1.0-C9.2.9",
+          "relation": "supports",
+          "justification": "AISVS L3. Keeping approval-issuing keys out of the agent runtime supports A-11's rule that approval claims from model-reachable sources are ignored."
+        },
+        {
+          "ref": "v1.0-C9.6.2",
+          "relation": "supports",
+          "justification": "AISVS L2. Blocking an action when approval is not given within the allowed time supports A-11's expiry binding."
+        }
+      ],
+      "A-12": [
+        {
+          "ref": "v1.0-C9.2.2",
+          "relation": "partial",
+          "justification": "AISVS L2. Showing complete canonical parameters without truncation corresponds to A-12's canonical rendering; A-12 adds model-unwritable components, provenance per field and new-destination flags."
+        }
+      ],
+      "A-13": [],
+      "A-14": [
+        {
+          "ref": "v1.0-C5.1.1",
+          "relation": "supports",
+          "justification": "AISVS L3, same level as A-14. Step-up authentication for high-risk operations, but its examples are platform operations rather than approvals of agent effects, and it has no dual-control element."
+        },
+        {
+          "ref": "v1.0-AC.4.1",
+          "relation": "supports",
+          "justification": "Appendix C, L1. Separation of requester and reviewer and exclusion of the AI agent as reviewer supports A-14's distinct-human, no-agent-approver rule, in the coding context."
+        },
+        {
+          "ref": "v1.0-AC.4.4",
+          "relation": "supports",
+          "justification": "Appendix C, L2. Two-person review for AI-modified security-critical files supports A-14's dual-control element in the coding context."
+        }
+      ],
+      "A-15": [
+        {
+          "ref": "v1.0-C9.5.5",
+          "relation": "partial",
+          "justification": "AISVS L2. Inter-agent delegation must follow an explicit authorization policy; A-15 adds intersection semantics, envelope fields, depth limits and receiver re-authorization."
+        },
+        {
+          "ref": "v1.0-C9.5.2",
+          "relation": "partial",
+          "justification": "AISVS L2. A scope-limited, integrity-protected token carrying the user's context and enforced downstream corresponds to A-15's verified envelope tied to the initiating principal."
+        },
+        {
+          "ref": "v1.0-C5.1.2",
+          "relation": "supports",
+          "justification": "AISVS L3. Short-lived, minimally scoped signed tokens for agents across systems support A-15's expiring, audience-bound envelope."
+        }
+      ],
+      "A-16": [
+        {
+          "ref": "v1.0-C10.2.7",
+          "relation": "partial",
+          "justification": "AISVS L2. Forbids MCP servers from forwarding client tokens downstream: A-16's no-passthrough rule, for MCP servers only. A-16 also requires audience-specific credentials, short-lived bound delegated credentials, session IDs that are not authentication and per-client consent at proxies."
+        },
+        {
+          "ref": "v1.0-C10.2.2",
+          "relation": "partial",
+          "justification": "AISVS L1. Checking issuer, audience, expiry and scope matches A-16's requirement that services reject tokens not issued for them."
+        },
+        {
+          "ref": "v1.0-C10.2.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Per-request token validation, not relying on the transport, aligns with A-16's rule that a session identifier is not authentication."
+        },
+        {
+          "ref": "v1.0-C5.1.2",
+          "relation": "supports",
+          "justification": "AISVS L3. Short-lived minimal-scope tokens support A-16's short-lived delegated credentials."
+        }
+      ],
+      "A-17": [
+        {
+          "ref": "v1.0-C9.4.1",
+          "relation": "partial",
+          "justification": "AISVS L2, same level as A-17. Each agent instance has its own cryptographic identity acting as a principal, matching A-17's distinct workload identity."
+        },
+        {
+          "ref": "v1.0-C9.5.2",
+          "relation": "partial",
+          "justification": "AISVS L2. Acting for a user through a scope-limited token carrying the user's context corresponds to A-17's on-behalf-of flow; A-17 also requires subject and actor to be recorded."
+        },
+        {
+          "ref": "v1.0-AC.8.2",
+          "relation": "supports",
+          "justification": "Appendix C, L2. Scoped non-human identities for AI systems support A-17 in the coding context."
+        }
+      ],
+      "A-18": [
+        {
+          "ref": "v1.0-C10.3.5",
+          "relation": "partial",
+          "justification": "AISVS L3, same level as A-18. Requires mTLS or DPoP sender-constraint, but only for MCP client-server tokens; A-18 covers all agent and adapter tokens and ties lifetime to revocation latency."
+        }
+      ],
+      "A-19": [
+        {
+          "ref": "v1.0-C5.2.4",
+          "relation": "supports",
+          "justification": "AISVS L2. Filters responses to what the requester may see; A-19 limits shared-context output to what every principal who can view it may see and adds trigger-sender and speaker-change rules, which per-requester filtering does not cover."
+        },
+        {
+          "ref": "v1.0-C2.1.3",
+          "relation": "supports",
+          "justification": "AISVS L1. Treating any input that can steer the model as untrusted supports A-19's rule that trigger senders are content, not principals (A-19 does not rely on classifiers)."
+        }
+      ],
+      "A-20": [
+        {
+          "ref": "v1.0-C9.1.2",
+          "relation": "partial",
+          "justification": "AISVS L1. Runtime-enforced per-execution budgets (depth, tokens, spend) correspond to A-20; A-20 adds shared accounting across descendants, fallbacks and retries."
+        },
+        {
+          "ref": "v1.0-C9.1.1",
+          "relation": "supports",
+          "justification": "AISVS L1. Per-tool quotas and timeouts support run-level limits."
+        }
+      ],
+      "A-21": [
+        {
+          "ref": "v1.0-C9.1.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Enforced per-tool timeouts relate to A-21's caller-enforced deadlines; A-21 adds bounded retries and no re-routing after denial."
+        }
+      ],
+      "A-22": [
+        {
+          "ref": "v1.0-C11.2.2",
+          "relation": "partial",
+          "justification": "AISVS L1. Per-principal and global rate limits on inference endpoints correspond to A-22's per-principal quotas, though AISVS frames them against model extraction; no provider spend cap."
+        },
+        {
+          "ref": "v1.0-C12.2.5",
+          "relation": "supports",
+          "justification": "AISVS L2. Granular token-usage attribution per user and workspace supports per-principal and per-tenant quota accounting."
+        }
+      ],
+      "A-23": [
+        {
+          "ref": "v1.0-C9.2.5",
+          "relation": "partial",
+          "justification": "AISVS L2. Self-modification (prompts, tool lists, parameters) must be bounded by enforceable limits; A-23 is Level 1, names more targets, covers self-replication and requires credential-scope enforcement."
+        },
+        {
+          "ref": "v1.0-C9.2.9",
+          "relation": "supports",
+          "justification": "AISVS L3. Isolating signing keys from the agent runtime supports A-23's orchestrator-signing rule."
+        },
+        {
+          "ref": "v1.0-AC.8.1",
+          "relation": "supports",
+          "justification": "Appendix C, L1. Platform-enforced rules stop an agent from approving, merging, signing or deploying its own output; supports A-23 for coding agents."
+        },
+        {
+          "ref": "v1.0-AC.8.3",
+          "relation": "supports",
+          "justification": "Appendix C, L2. Agents cannot bypass branch protection or required checks; supports A-23's protection of CI security gates."
+        },
+        {
+          "ref": "v1.0-AC.11.2",
+          "relation": "supports",
+          "justification": "Appendix C, L1. Bot system prompts and policy configuration are hash-pinned and cannot be changed from repository or user-controllable input; supports A-23's ban on the agent writing its own prompts and policies, for coding bots."
+        }
+      ],
+      "A-24": [
+        {
+          "ref": "v1.0-C7.3.3",
+          "relation": "supports",
+          "justification": "AISVS L2. Model output must not trigger outbound requests; A-24 extends this to content the agent posts where a renderer outside the application fetches it, and adds a per-recipient data-class check."
+        },
+        {
+          "ref": "v1.0-C7.3.4",
+          "relation": "supports",
+          "justification": "AISVS L3. Checking outputs for hidden or encoded content in formatting and structured fields supports A-24's check of outbound bodies for data-carrying references."
+        }
+      ],
+      "A-25": [
+        {
+          "ref": "v1.0-C9.2.1",
+          "relation": "supports",
+          "justification": "AISVS L1. Blocking high-impact actions until verified human approval supports A-25, which also requires verification through the destination on record or the new destination, and notice to the previous destination, for redirecting values."
+        }
+      ],
+      "T-01": [
+        {
+          "ref": "v1.0-C2.1.6",
+          "relation": "supports",
+          "justification": "AISVS L2. An instruction hierarchy depends on the application keeping untrusted inputs out of system and developer roles, which T-01's data-position rule requires; the model-side precedence itself is only a signal under T-01, which adds taint propagation enforced by the application."
+        },
+        {
+          "ref": "v1.0-C2.1.3",
+          "relation": "supports",
+          "justification": "AISVS L1. Shares T-01's scope of treating model-steering input as untrusted, but its operative obligation is classifier screening, which T-01 allows only as an added signal, never as sole enforcement."
+        },
+        {
+          "ref": "v1.0-C9.3.6",
+          "relation": "supports",
+          "justification": "AISVS L2. Architectural separation of untrusted tool-output processing supports T-01's handling of tool results as data."
+        },
+        {
+          "ref": "v1.0-C8.2.3",
+          "relation": "supports",
+          "justification": "AISVS L2. Agent and tool outputs not written to trusted memory without validation supports T-01's rule that taint survives memory writes."
+        },
+        {
+          "ref": "v1.0-C10.4.2",
+          "relation": "supports",
+          "justification": "AISVS L1. Screening MCP results for indirect injection is an added signal consistent with T-01's treatment of MCP results as untrusted."
+        }
+      ],
+      "T-02": [
+        {
+          "ref": "v1.0-C9.3.5",
+          "relation": "partial",
+          "justification": "AISVS L2. Components handling untrusted data must be isolated from tool-calling, which is the core of T-02; T-02 adds typed or opaque returns, plan immutability and recording in the profile."
+        },
+        {
+          "ref": "v1.0-C9.3.6",
+          "relation": "partial",
+          "justification": "AISVS L2. Architectural separation between untrusted tool-output processing and agent operations corresponds to T-02's requirement that the privileged context not receive raw untrusted text."
+        }
+      ],
+      "T-03": [
+        {
+          "ref": "v1.0-C2.1.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Normalizing input before tokenization corresponds to T-03's pre-model normalization; T-03 specifies which characters to strip or flag and adds a reviewer view."
+        },
+        {
+          "ref": "v1.0-C2.1.2",
+          "relation": "partial",
+          "justification": "AISVS L1. Detecting and mitigating encoding smuggling (including explicit marking) corresponds to T-03's handling of tag, bidi and zero-width characters."
+        },
+        {
+          "ref": "v1.0-C2.2.3",
+          "relation": "supports",
+          "justification": "AISVS L2. Checking non-text inputs for hidden or embedded content supports T-03's extraction of hidden document text and provenance of OCR and transcripts."
+        }
+      ],
+      "T-04": [
+        {
+          "ref": "v1.0-C9.5.4",
+          "relation": "partial",
+          "justification": "AISVS L2. Secrets must not be in the model's observable context including system prompts, matching T-04's no-credentials rule; T-04 is Level 1 and also excludes other principals' data and prompt-only enforcement."
+        },
+        {
+          "ref": "v1.0-C9.5.3",
+          "relation": "partial",
+          "justification": "AISVS L2. Access decisions never made by the model corresponds to T-04's rule that prompt-only rules are guidance, not implemented controls."
+        }
+      ],
+      "T-05": [
+        {
+          "ref": "v1.0-C9.5.4",
+          "relation": "partial",
+          "justification": "AISVS L2. Keeping credentials out of model context, prompts and tool parameters matches the first half of T-05; T-05 also bans ambient credentials in model-influenced processes."
+        },
+        {
+          "ref": "v1.0-C5.2.5",
+          "relation": "partial",
+          "justification": "AISVS L2. Isolating the policy decision point from the agent's execution environment corresponds to T-05's rule that model-influenced processes cannot reach enforcement components."
+        },
+        {
+          "ref": "v1.0-C9.2.9",
+          "relation": "supports",
+          "justification": "AISVS L3. Isolating approval key material from the agent runtime supports T-05 for the approval store."
+        },
+        {
+          "ref": "v1.0-AC.11.4",
+          "relation": "supports",
+          "justification": "Appendix C, L2. Bots without mounted secrets and with only ephemeral credentials support T-05 for coding agents."
+        }
+      ],
+      "T-06": [
+        {
+          "ref": "v1.0-C5.2.2",
+          "relation": "partial",
+          "justification": "AISVS L2. Enforcing the end user's authorization at each retrieval and assembly stage corresponds to T-06's pre-context authorization; T-06 is Level 1 and adds cache keys, score leakage and deletion propagation."
+        },
+        {
+          "ref": "v1.0-C8.1.3",
+          "relation": "partial",
+          "justification": "AISVS L2. Scope constraints on retrieval operations correspond to T-06's permission filtering."
+        },
+        {
+          "ref": "v1.0-C8.1.1",
+          "relation": "supports",
+          "justification": "AISVS L1. Per-tenant uniqueness of vector identifiers and namespaces supports T-06's per-tenant indexes."
+        },
+        {
+          "ref": "v1.0-C5.2.7",
+          "relation": "supports",
+          "justification": "AISVS L3. Propagating classification labels to embeddings and prompt caches supports T-06's rule that derived stores apply the same permissions."
+        }
+      ],
+      "T-07": [
+        {
+          "ref": "v1.0-C8.2.3",
+          "relation": "partial",
+          "justification": "AISVS L2. Agent and tool outputs must not enter trusted memory without source validation, matching T-07's untrusted-derived storage of tainted writes."
+        },
+        {
+          "ref": "v1.0-C12.5.4",
+          "relation": "partial",
+          "justification": "AISVS L2. Tagging ingested documents with source, writer identity and timestamp at write time matches part of T-07's per-entry provenance fields."
+        },
+        {
+          "ref": "v1.0-C8.3.1",
+          "relation": "partial",
+          "justification": "AISVS L2. Excluding expired vectors from retrieval corresponds to T-07's expiry requirement."
+        },
+        {
+          "ref": "v1.0-C8.3.3",
+          "relation": "supports",
+          "justification": "AISVS L3. Retaining but excluding quarantined content supports T-07's quarantine option on revocation."
+        },
+        {
+          "ref": "v1.0-C8.1.1",
+          "relation": "supports",
+          "justification": "AISVS L1. Per-tenant namespace separation supports T-07's tenant partitioning."
+        },
+        {
+          "ref": "v1.0-C8.1.2",
+          "relation": "supports",
+          "justification": "AISVS L2. Immutable metadata after first write supports trustworthy provenance and trust-class fields."
+        }
+      ],
+      "T-08": [],
+      "T-09": [
+        {
+          "ref": "v1.0-C9.4.4",
+          "relation": "supports",
+          "justification": "AISVS L3. Integrity protection of agent state persisted between invocations supports T-09's server-held, session-bound conversation state."
+        },
+        {
+          "ref": "v1.0-C2.1.7",
+          "relation": "supports",
+          "justification": "AISVS L2. Preventing injection of reserved role tokens addresses the same role-spoofing risk that T-09 handles by rejecting client-supplied system, assistant and tool-result messages."
+        }
+      ],
+      "T-10": [],
+      "T-11": [
+        {
+          "ref": "v1.0-C10.1.2",
+          "relation": "supports",
+          "justification": "AISVS L2. Allow-listing MCP servers supports T-11's requirement to configure allowlists for remote connectors; AISVS does not address provider-hosted tools as egress channels."
+        }
+      ],
+      "T-12": [
+        {
+          "ref": "v1.0-AC.11.4",
+          "relation": "partial",
+          "justification": "Appendix C, L2. Egress for AI bots is denied by default and limited to listed destinations; corresponds to T-12 in the coding context only."
+        },
+        {
+          "ref": "v1.0-C7.3.3",
+          "relation": "supports",
+          "justification": "AISVS L2. Preventing model output from triggering outbound requests supports T-12's control of model-influenced network access."
+        }
+      ],
+      "T-13": [
+        {
+          "ref": "v1.0-C7.3.3",
+          "relation": "partial",
+          "justification": "AISVS L2. Model output must not trigger outbound requests, which covers T-13's auto-loaded remote images and previews; T-13 is Level 1 and adds link handling and open-redirect exclusions."
+        },
+        {
+          "ref": "v1.0-C7.3.4",
+          "relation": "supports",
+          "justification": "AISVS L3. Checking outputs for hidden or encoded content in formatting and structured fields supports detection of exfiltration payloads in rendered output."
+        }
+      ],
+      "T-14": [
+        {
+          "ref": "v1.0-AC.11.3",
+          "relation": "partial",
+          "justification": "Appendix C, L1. Free-form bot output is never executed as command, query or workflow step, matching T-14's no-implicit-execution rule for coding bots."
+        },
+        {
+          "ref": "v1.0-C7.1.1",
+          "relation": "supports",
+          "justification": "AISVS L1. Schema validation of model output supports T-14, which adds that schema validity is not permission; per-sink encoding is deferred by AISVS to ASVS."
+        }
+      ],
+      "T-15": [
+        {
+          "ref": "v1.0-C9.3.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Tools execute in a least-privilege sandbox, the core of T-15; T-15 specifies non-root, no ambient credentials, pinned image and default-deny network."
+        },
+        {
+          "ref": "v1.0-C9.1.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Enforced CPU, memory, disk, egress and time quotas per tool correspond to T-15's supervisor-enforced resource limits."
+        },
+        {
+          "ref": "v1.0-C9.3.7",
+          "relation": "supports",
+          "justification": "AISVS L2. Checking model-named packages against an approved registry before install is T-24's obligation; it only supports T-15, which confines model-proposed installs and imports to the sandbox."
+        }
+      ],
+      "T-16": [
+        {
+          "ref": "v1.0-C5.3.2",
+          "relation": "supports",
+          "justification": "AISVS L3. Hardware partitioning or dedicated allocation on shared compute supports T-16's stronger-than-container boundary; AISVS frames it for model serving and tenants, not code shaped by untrusted input."
+        },
+        {
+          "ref": "v1.0-C5.3.1",
+          "relation": "supports",
+          "justification": "AISVS L2. Preventing cross-workload influence on shared serving infrastructure supports T-16's no-reuse-across-sessions rule."
+        }
+      ],
+      "T-17": [
+        {
+          "ref": "v1.0-C9.3.1",
+          "relation": "supports",
+          "justification": "AISVS L1. Least-privilege isolation of tools supports isolating the browser tool; AISVS has no browser or computer-use specific requirement."
+        }
+      ],
+      "T-18": [
+        {
+          "ref": "v1.0-C10.4.8",
+          "relation": "partial",
+          "justification": "AISVS L3. Snapshotting tool definitions and requiring re-approval on change corresponds to T-18's pinning and disable-on-change; T-18 is Level 1 and adds qualified names and collision handling."
+        },
+        {
+          "ref": "v1.0-C10.1.2",
+          "relation": "partial",
+          "justification": "AISVS L2. Only allow-listed MCP servers may be used, matching T-18's refusal to load unpinned, uninventoried servers."
+        },
+        {
+          "ref": "v1.0-C10.1.1",
+          "relation": "supports",
+          "justification": "AISVS L1. Trusted sourcing and cryptographic verification of MCP components supports T-18, which notes that a signature identifies a publisher, not descriptor safety."
+        },
+        {
+          "ref": "v1.0-C10.4.1",
+          "relation": "supports",
+          "justification": "AISVS L1. Validating tool listings against declared schemas before they reach the model supports T-18's handling of descriptors."
+        }
+      ],
+      "T-19": [
+        {
+          "ref": "v1.0-C10.1.3",
+          "relation": "partial",
+          "justification": "AISVS L2. Local MCP servers are sandboxed with least privilege, matching T-19's sandbox requirement; T-19 is Level 1 and adds exact-command approval and unwritable configuration files."
+        },
+        {
+          "ref": "v1.0-C10.4.7",
+          "relation": "partial",
+          "justification": "AISVS L2. Explicit user consent when installing a local MCP server corresponds to T-19's configuration-time approval of the launch command."
+        },
+        {
+          "ref": "v1.0-C10.3.2",
+          "relation": "supports",
+          "justification": "AISVS L1. Restricting stdio transport to controlled local environments supports T-19's confinement of stdio servers."
+        },
+        {
+          "ref": "v1.0-AC.11.2",
+          "relation": "supports",
+          "justification": "Appendix C, L1. Integrity-checked bot configuration not modifiable from repository content supports T-19's rule that files defining servers, tools, skills or rules are not agent-writable."
+        }
+      ],
+      "T-20": [],
+      "T-21": [
+        {
+          "ref": "v1.0-C10.4.6",
+          "relation": "partial",
+          "justification": "AISVS L2. Signed MCP responses with nonce and timestamp for replay detection correspond to T-21's integrity, nonce and replay rejection, limited to MCP."
+        },
+        {
+          "ref": "v1.0-C10.3.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Authenticated, encrypted transport for remote MCP corresponds to T-21's authentication and confidentiality requirements."
+        },
+        {
+          "ref": "v1.0-C10.3.4",
+          "relation": "partial",
+          "justification": "AISVS L2. Enforcing a minimum protocol version corresponds to T-21's pinned protocol version with downgrade rejection."
+        },
+        {
+          "ref": "v1.0-C9.4.2",
+          "relation": "supports",
+          "justification": "AISVS L2. Cryptographic binding of actions to each step of the chain supports run binding of inter-agent messages."
+        },
+        {
+          "ref": "v1.0-C9.4.1",
+          "relation": "supports",
+          "justification": "AISVS L2. Each agent instance has its own cryptographic identity and authenticates as a principal, which supports T-21's mutual authentication of inter-agent messages."
+        }
+      ],
+      "T-22": [
+        {
+          "ref": "v1.0-C9.4.2",
+          "relation": "partial",
+          "justification": "AISVS L2, same level as T-22. Binding actions to each execution-chain step corresponds to T-22's lineage ID to the originating output."
+        },
+        {
+          "ref": "v1.0-C9.3.8",
+          "relation": "supports",
+          "justification": "AISVS L3. Automated containment on policy violations supports T-22's circuit breakers."
+        },
+        {
+          "ref": "v1.0-C9.2.10",
+          "relation": "supports",
+          "justification": "AISVS L3. Applying the highest-impact classification across multi-agent chains supports T-22's producer-independent gating before fan-out."
+        }
+      ],
+      "T-23": [
+        {
+          "ref": "v1.0-AC.11.7",
+          "relation": "partial",
+          "justification": "Appendix C, L2. Zero-privilege, read-only mode for untrusted fork PRs corresponds to T-23's ban on write tokens and secrets on outsider-triggered events."
+        },
+        {
+          "ref": "v1.0-AC.11.1",
+          "relation": "partial",
+          "justification": "Appendix C, L1. All PR-supplied content is untrusted input, matching T-23's treatment of contributor content."
+        },
+        {
+          "ref": "v1.0-AC.3.3",
+          "relation": "partial",
+          "justification": "Appendix C, L1. Issues, comments, commit messages and external docs fed to AI tools are untrusted, matching T-23's untrusted repository content."
+        },
+        {
+          "ref": "v1.0-AC.8.3",
+          "relation": "partial",
+          "justification": "Appendix C, L2. Agents cannot bypass branch protection or required checks, matching T-23's ban on changing CI and branch protection without review."
+        },
+        {
+          "ref": "v1.0-AC.11.2",
+          "relation": "partial",
+          "justification": "Appendix C, L1. Bot prompts and policy config cannot be modified from repository or branch content, matching T-23's protection of the agent's own instruction files."
+        },
+        {
+          "ref": "v1.0-AC.7.4",
+          "relation": "supports",
+          "justification": "Appendix C, L2. Dual control on high-impact pipeline trigger configuration supports T-23's human review of CI workflow changes."
+        },
+        {
+          "ref": "v1.0-AC.12.1",
+          "relation": "partial",
+          "justification": "Appendix C, L1. Workflows triggered by untrusted contributions must not run untrusted code where repository write permissions or secrets are available. This is T-23's core ban on write tokens and secrets on outsider-triggered events, at the CI platform level."
+        },
+        {
+          "ref": "v1.0-AC.12.3",
+          "relation": "partial",
+          "justification": "Appendix C, L1. Secrets withheld from workflows running fork or first-time-contributor code unless a manual approval gate is passed; matches T-23's no-secrets-on-outsider-events rule."
+        },
+        {
+          "ref": "v1.0-AC.12.5",
+          "relation": "partial",
+          "justification": "Appendix C, L2. Workflow definition changes go through an elevated security review path that AI agents cannot bypass; matches T-23's ban on changing CI workflows without human review."
+        },
+        {
+          "ref": "v1.0-AC.12.2",
+          "relation": "supports",
+          "justification": "Appendix C, L1. Credentials and job tokens not persisted into workspaces processing fork-originated or AI-touched code; supports T-23 and T-05 for CI agents."
+        }
+      ],
+      "T-24": [
+        {
+          "ref": "v1.0-C3.1.1",
+          "relation": "partial",
+          "justification": "AISVS L1. A registry of deployed model artifacts and origins corresponds to T-24's explicit model versions with recorded provenance; general dependency pinning is deferred by AISVS to SCVS and SLSA."
+        },
+        {
+          "ref": "v1.0-C9.3.7",
+          "relation": "partial",
+          "justification": "AISVS L2. Verifying model-named external resources against an approved registry before install matches T-24's check of model-proposed dependencies."
+        },
+        {
+          "ref": "v1.0-C10.1.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Obtaining MCP components from trusted sources with cryptographic verification corresponds to T-24's pinning and provenance for MCP servers."
+        },
+        {
+          "ref": "v1.0-C3.2.3",
+          "relation": "supports",
+          "justification": "AISVS L3. Re-evaluation on provider model, version or routing change supports T-24's no-floating-alias rule."
+        },
+        {
+          "ref": "v1.0-AC.13.3",
+          "relation": "supports",
+          "justification": "Appendix C, L2. PR gates detect typosquatted or non-resolving dependency names; supports T-24's verification of model-proposed dependencies against an approved registry."
+        }
+      ],
+      "T-25": [
+        {
+          "ref": "v1.0-C4.1.2",
+          "relation": "partial",
+          "justification": "AISVS L1. An allow-list of serialization formats that cannot execute code on load covers T-25's non-executable-format clause; hash verification and fine-tuning data provenance map to other requirements."
+        },
+        {
+          "ref": "v1.0-C6.1.3",
+          "relation": "partial",
+          "justification": "AISVS L2. Third-party model artifacts must be integrity-verifiable, corresponding to T-25's hash verification."
+        },
+        {
+          "ref": "v1.0-C6.1.2",
+          "relation": "partial",
+          "justification": "AISVS L1. Weights and adapters only from approved sources corresponds to T-25's recorded source."
+        },
+        {
+          "ref": "v1.0-C1.1.2",
+          "relation": "partial",
+          "justification": "AISVS L2. Inventory of training-data sources with origin and processing history corresponds to T-25's provenance tracking of fine-tuning data."
+        },
+        {
+          "ref": "v1.0-C1.3.1",
+          "relation": "partial",
+          "justification": "AISVS L2. Poisoning detection in fine-tuning pipelines corresponds to T-25's review of training data as a poisoning path."
+        },
+        {
+          "ref": "v1.0-C3.1.3",
+          "relation": "supports",
+          "justification": "AISVS L2. Signature verification at admission and load supports T-25's verified loading."
+        }
+      ],
+      "T-26": [
+        {
+          "ref": "v1.0-C7.3.4",
+          "relation": "supports",
+          "justification": "AISVS L3. Checking outputs for misleading content via homoglyphs or formatting supports T-26's handling of deceptive agent requests; AISVS has no requirement on trusted credential collection or labeling agent suggestions."
+        }
+      ],
+      "T-27": [
+        {
+          "ref": "v1.0-C5.3.2",
+          "relation": "supports",
+          "justification": "AISVS L3. Tenant isolation on shared compute via hardware partitioning or dedicated allocation supports T-27's rule that no kernel is shared across tenants; AISVS frames it for model serving, not agent-run code."
+        },
+        {
+          "ref": "v1.0-C5.3.1",
+          "relation": "supports",
+          "justification": "AISVS L2. Preventing cross-tenant influence on shared serving infrastructure supports T-27's fresh sandbox per tenant and session."
+        }
+      ],
+      "D-01": [],
+      "D-02": [],
+      "D-03": [],
+      "D-04": [
+        {
+          "ref": "v1.0-C11.1.3",
+          "relation": "supports",
+          "justification": "AISVS L1. Evaluation against known adversarial techniques per modality supports D-04's injection coverage; D-04 additionally requires deterministic fixtures per channel through the real enforcement path."
+        }
+      ],
+      "D-05": [],
+      "D-06": [
+        {
+          "ref": "v1.0-AC.4.3",
+          "relation": "supports",
+          "justification": "Appendix C, L2. Blocking merge on critical findings with a human-approved written exception supports D-06's release gate, in the coding context."
+        }
+      ],
+      "D-07": [
+        {
+          "ref": "v1.0-C11.1.2",
+          "relation": "supports",
+          "justification": "AISVS L1. A version-controlled suite run on model updates, but for alignment behavior rather than security controls; it shares only the run-on-change pattern with D-07's control-keyed regression tests."
+        },
+        {
+          "ref": "v1.0-C3.2.3",
+          "relation": "partial",
+          "justification": "AISVS L3. Security re-evaluation on provider model, version or routing changes corresponds to D-07's trigger on model and provider changes."
+        },
+        {
+          "ref": "v1.0-AC.6.4",
+          "relation": "supports",
+          "justification": "Appendix C, L3. Regression runs after prompt changes or model upgrades with baseline gating support D-07 for coding tools."
+        }
+      ],
+      "D-08": [
+        {
+          "ref": "v1.0-C11.1.3",
+          "relation": "partial",
+          "justification": "AISVS L1. Adversarial evaluation of models corresponds to D-08's live-model evaluation; D-08 is Level 2, targets the delivered application and specifies trial counts and metrics."
+        },
+        {
+          "ref": "v1.0-C6.1.4",
+          "relation": "supports",
+          "justification": "AISVS L2. A behavioral acceptance suite before promotion supports pre-release evaluation."
+        },
+        {
+          "ref": "v1.0-AC.2.3",
+          "relation": "supports",
+          "justification": "Appendix C, L2. Indirect-injection testing before onboarding and after model or prompt change supports D-08 for coding tools."
+        }
+      ],
+      "D-09": [
+        {
+          "ref": "v1.0-AC.6.3",
+          "relation": "supports",
+          "justification": "Appendix C, L2. Scheduled red-team exercises against AI tooling with severity-tracked remediation support D-09; AISVS does not require reviewer independence or adaptive attacks."
+        }
+      ],
+      "D-10": [
+        {
+          "ref": "v1.0-C3.2.3",
+          "relation": "partial",
+          "justification": "AISVS L3, same level as D-10. Re-evaluation before continued use after provider model or routing changes corresponds to D-10's pre-rollout check; D-10 specifies replay of recorded runs and blast-radius caps."
+        },
+        {
+          "ref": "v1.0-C3.3.1",
+          "relation": "supports",
+          "justification": "AISVS L2. Rollout with automated rollback triggers supports controlled rollout of changed configurations."
+        }
+      ],
+      "N-01": [
+        {
+          "ref": "v1.0-C12.1.2",
+          "relation": "supports",
+          "justification": "AISVS L2. Forensic logging of policy decisions, scoped to content moderation; N-01's policy decisions are authorization and dispatch decisions with reason codes, so this is related practice only."
+        },
+        {
+          "ref": "v1.0-C12.4.2",
+          "relation": "partial",
+          "justification": "AISVS L2. Audit logs with approver identity, timestamp, parameters and outcome correspond to N-01's approval and effect events."
+        },
+        {
+          "ref": "v1.0-C12.1.1",
+          "relation": "partial",
+          "justification": "AISVS L1. Logging AI interactions with session context corresponds to N-01's correlation fields; N-01 adds proposal versus effect distinction and taint state."
+        },
+        {
+          "ref": "v1.0-C12.1.3",
+          "relation": "supports",
+          "justification": "AISVS L2. A structured interoperable schema with model and provider identifiers supports N-01's structured events."
+        }
+      ],
+      "N-02": [],
+      "N-03": [
+        {
+          "ref": "v1.0-C12.1.4",
+          "relation": "partial",
+          "justification": "AISVS L2. Logging retrieval queries, documents and sources corresponds to the retrieved-document part of N-03's context manifest."
+        },
+        {
+          "ref": "v1.0-C12.1.3",
+          "relation": "supports",
+          "justification": "AISVS L2. Model identifier and provider in a structured schema support N-03's model-version references."
+        },
+        {
+          "ref": "v1.0-AC.5.1",
+          "relation": "supports",
+          "justification": "Appendix C, L1. Correlated prompt and response records enabling chain replay support N-03 for coding tools."
+        }
+      ],
+      "N-04": [
+        {
+          "ref": "v1.0-C12.4.3",
+          "relation": "partial",
+          "justification": "AISVS L2. Logging kill-switch activations and overrides matches one signal in N-04's list; N-04 also requires routing to a named owner."
+        },
+        {
+          "ref": "v1.0-C12.2.1",
+          "relation": "supports",
+          "justification": "AISVS L1. Detection and alerting on injection attempts supports N-04's tainted-context denial signals, as detection supplementing enforcement."
+        },
+        {
+          "ref": "v1.0-AC.6.1",
+          "relation": "supports",
+          "justification": "Appendix C, L1. User flags of insecure suggestions tracked to closure support N-04's user-report signal in the coding context."
+        }
+      ],
+      "N-05": [
+        {
+          "ref": "v1.0-C12.2.2",
+          "relation": "partial",
+          "justification": "AISVS L2, same level as N-05. Behavioral anomaly detection on unusual patterns and retries corresponds to N-05's baselining and alerting; N-05 targets tool sequences, destinations and fan-out."
+        },
+        {
+          "ref": "v1.0-C9.3.8",
+          "relation": "partial",
+          "justification": "AISVS L3. Automated tool containment on policy violation corresponds to N-05's automatic throttle or suspend at narrowest scope."
+        },
+        {
+          "ref": "v1.0-C12.3.4",
+          "relation": "supports",
+          "justification": "AISVS L3. Distinguishing unexplained behavioral shifts from expected drift supports N-05's threshold tuning."
+        },
+        {
+          "ref": "v1.0-C12.4.1",
+          "relation": "supports",
+          "justification": "AISVS L2. Autonomous action triggers include behavior-pattern analysis; supports N-05's baselining of agent behavior, without thresholds or automatic containment."
+        }
+      ],
+      "N-06": [
+        {
+          "ref": "v1.0-C9.6.1",
+          "relation": "partial",
+          "justification": "AISVS L1, same level as N-06. A manual kill-switch that halts inference and output corresponds to N-06's stop; N-06 adds descendant runs, per-component disable and queued-work handling."
+        },
+        {
+          "ref": "v1.0-C9.6.3",
+          "relation": "supports",
+          "justification": "AISVS L3. Kill-switch through an out-of-band channel isolated from the agent supports stop-without-deploy reliability."
+        }
+      ],
+      "N-07": [
+        {
+          "ref": "v1.0-C9.1.3",
+          "relation": "partial",
+          "justification": "AISVS L2, same level as N-07. A swarm-level kill-switch halting all agents corresponds to N-07's global scope; N-07 adds tenant scope, credential revocation and measured latency."
+        },
+        {
+          "ref": "v1.0-C9.6.3",
+          "relation": "supports",
+          "justification": "AISVS L3. Out-of-band kill-switch channel supports N-07's scoped stop controls."
+        },
+        {
+          "ref": "v1.0-AC.14.3",
+          "relation": "partial",
+          "justification": "Appendix C, L2 (same level as N-07). AI agent identities must be rapidly revocable with a written, periodically tested time-to-revoke target, which is close to N-07's stated and measured revocation latency, limited to the coding context and without tenant or global scopes."
+        }
+      ],
+      "N-08": [
+        {
+          "ref": "v1.0-C8.3.2",
+          "relation": "partial",
+          "justification": "AISVS L2, same level as N-08. Ability to reset memory corresponds to N-08's purge and restore of a memory scope."
+        },
+        {
+          "ref": "v1.0-C8.3.3",
+          "relation": "supports",
+          "justification": "AISVS L3. Quarantine that retains but excludes content supports N-08's quarantine with evidence preservation."
+        },
+        {
+          "ref": "v1.0-C3.3.2",
+          "relation": "supports",
+          "justification": "AISVS L2. Rollback restoring complete model state supports N-08's restore from a trusted baseline."
+        },
+        {
+          "ref": "v1.0-C9.3.8",
+          "relation": "supports",
+          "justification": "AISVS L3. Automated tool containment supports N-08's quarantine of a suspect component."
+        },
+        {
+          "ref": "v1.0-AC.14.1",
+          "relation": "partial",
+          "justification": "Appendix C, L1. An incident playbook for AI-in-pipeline compromise covering credential revocation, artifact quarantine, notification and forensic preservation corresponds to N-08's documented incident procedure, in the coding context."
+        },
+        {
+          "ref": "v1.0-AC.14.5",
+          "relation": "supports",
+          "justification": "Appendix C, L3. Remediation is exercised in tabletop or live-fire drills at least yearly; supports N-08's requirement that the incident procedure be exercised (N-08 requires once per release cycle)."
+        }
+      ],
+      "N-09": [
+        {
+          "ref": "v1.0-C3.2.3",
+          "relation": "partial",
+          "justification": "AISVS L3. Security re-evaluation on provider, model or routing change corresponds to N-09's re-assessment for model and provider changes; N-09 also governs tools, permissions, budgets and prompts."
+        },
+        {
+          "ref": "v1.0-C12.5.3",
+          "relation": "supports",
+          "justification": "AISVS L2. Immutable audit records for model changes support N-09's recorded, approved changes."
+        }
+      ],
+      "N-10": [
+        {
+          "ref": "v1.0-AC.5.3",
+          "relation": "partial",
+          "justification": "Appendix C, L3, same level as N-10. Tamper-evident (append-only or WORM) storage for AI event logs corresponds to N-10 in the coding context; scheduled integrity checks are not required."
+        },
+        {
+          "ref": "v1.0-C12.5.3",
+          "relation": "supports",
+          "justification": "AISVS L2. Immutable audit records, but only for model changes, support N-10's tamper evidence."
+        },
+        {
+          "ref": "v1.0-AC.11.6",
+          "relation": "partial",
+          "justification": "Appendix C, L2. Bot prompts, tool calls and outputs logged to tamper-evident storage; corresponds to N-10's tamper-evident audit for coding bots, without scheduled integrity checks."
+        }
+      ]
+    }
+  }
+}

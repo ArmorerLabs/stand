@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2160" height="1500" viewBox="0 0 2160 1500" role="img" aria-labelledby="title" aria-describedby="description">
+<title id="title">STAND: Five pillars for secure agentic applications</title>
+<desc id="description">Header: STAND, Secure, Trustworthy Agents by Non-negotiable Design, a security engineering framework. Title: Secure agents, built on five pillars. Five equal-height pillars, numbered 01 to 05 and lettered S, T, A, N and D to spell STAND, hold up a roof labeled Secure Agentic Applications and stand on a shared foundation labeled Security Enforced in Application Code: permissions, approvals and limits. Each pillar asks one question. Pillar 01, letter S, Scope and Stewardship, asks: What could go wrong, and who owns it? It has 6 controls. Pillar 02, letter T, Trust and Isolation, asks: What must stay separate and trustworthy? It has 27 controls. Pillar 03, letter A, Authority and Access, asks: Who may do what, and under which limits? It has 25 controls. Pillar 04, letter N, Notice and Neutralize, asks: Can we see, stop, and improve behavior? It has 10 controls. Pillar 05, letter D, Demonstrated Defenses, asks: Can we show that the controls work? It has 10 controls. Central principle: the model proposes, the application enforces. Informed by AIUC-1, ISO/IEC 42001 and NIST AI RMF. Risk taxonomy: the OWASP Top 10 for Agentic Applications. The pillars are STAND's own engineering pillars; the framework mappings are engineering mappings, not certification.</desc>
+<!-- Type: Geist (sans) and IBM Plex Mono (labels), both SIL OFL 1.1, are named but not embedded; install both to edit or render this file as designed. The PNG is rendered with them. Colour: flat fills on the work green; facets, chamfers and slashes use the 2:1 slope. -->
+<defs>
+  <filter id="plate" x="-5%" y="-100%" width="110%" height="300%"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<g font-family="Geist, Inter, 'Helvetica Neue', Arial, sans-serif">
+<!-- Ground and facets: flat fills; every edge is horizontal, vertical or on the 2:1 slope. -->
+<rect width="2160" height="1500" fill="#0E7A5F"/>
+<path fill="#FFFFFF" opacity=".05" d="M0 0H600L0 1200Z"/>
+<path fill="#0B3E38" opacity=".32" d="M0 640 430 1500H0Z"/>
+<path fill="#2FB48A" opacity=".16" d="M1150 0H1240L640 1200H550Z"/>
+<path fill="#0B3E38" opacity=".30" d="M1660 0H2160V1000Z"/>
+<path fill="#2FB48A" d="M1400 0h18L1158 520h-18Z"/>
+<path fill="#FFFFFF" opacity=".6" d="M1432 0h7L1179 520h-7Z"/>
+<path fill="#0B3E38" opacity=".55" d="M1456 0h12L1208 520h-12Z"/>
+<!-- Header -->
+<polygon points="113.0,66 125.0,66 108,100 96,100" fill="#2FB48A"/>
+  <text x="132" y="100" font-size="44" font-weight="600" fill="#FFFFFF" letter-spacing="-0.9">STAND</text>
+  <text x="300" y="97" font-size="24" font-weight="400" fill="#FFFFFF">Secure, Trustworthy Agents by Non-negotiable Design</text>
+  <text x="2064" y="96" font-size="22" font-weight="500" fill="#FFFFFF" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">Security engineering framework</text>
+<path d="M96 132H2064" stroke="#FFFFFF" stroke-opacity=".24" stroke-width="1.5"/>
+  <text x="90" y="252" font-size="96" font-weight="600" fill="#FFFFFF" letter-spacing="-1.9">Secure agents,</text>
+  <text x="90" y="352" font-size="96" font-weight="600" fill="#A7DDC0" letter-spacing="-1.9">built on five pillars.</text>
+<polygon points="1480,190 2050,190 2064,218 2064,360 1480,360" fill="#052E22" fill-opacity=".34"/>
+  <text x="1520" y="238" font-size="22" font-weight="500" fill="#A7DDC0" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">Central principle</text>
+  <text x="1520" y="290" font-size="36" font-weight="500" fill="#A7DDC0" letter-spacing="-0.5">The model proposes.</text>
+  <text x="1520" y="334" font-size="36" font-weight="600" fill="#FFFFFF" letter-spacing="-0.5">The application enforces.</text>
+<!-- Foundation shadow -->
+<rect x="130" y="1238" width="1900" height="40" fill="#021C14" opacity=".45" filter="url(#plate)"/>
+<!-- Pillars -->
+<g><!-- 01 S -->
+  <rect x="142" y="566" width="340" height="24" fill="#D5E9DF"/>
+  <rect x="152" y="590" width="320" height="530" fill="#FFFFFF"/>
+  <rect x="452" y="590" width="20" height="530" fill="#EEF6F1"/>
+  <rect x="142" y="1120" width="340" height="24" fill="#D5E9DF"/>
+  <text x="182" y="644" font-size="22" font-weight="500" fill="#5C7469" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">01</text>
+  <text x="432" y="644" font-size="22" font-weight="500" fill="#0E7A5F" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">6 controls</text>
+  <text x="176" y="852" font-size="214" font-weight="600" fill="#0E7A5F" letter-spacing="-4">S</text>
+  <polygon points="188.0,882 238.0,882 232,894 182,894" fill="#2FB48A"/>
+  <text x="182" y="960" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Scope &amp;</text>
+  <text x="182" y="1002" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Stewardship</text>
+  <text x="182" y="1054" font-size="22" font-weight="400" fill="#466358">What could go wrong,</text>
+  <text x="182" y="1086" font-size="22" font-weight="400" fill="#466358">and who owns it?</text>
+</g>
+<g><!-- 02 T -->
+  <rect x="526" y="566" width="340" height="24" fill="#D5E9DF"/>
+  <rect x="536" y="590" width="320" height="530" fill="#FFFFFF"/>
+  <rect x="836" y="590" width="20" height="530" fill="#EEF6F1"/>
+  <rect x="526" y="1120" width="340" height="24" fill="#D5E9DF"/>
+  <text x="566" y="644" font-size="22" font-weight="500" fill="#5C7469" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">02</text>
+  <text x="816" y="644" font-size="22" font-weight="500" fill="#0E7A5F" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">27 controls</text>
+  <text x="560" y="852" font-size="214" font-weight="600" fill="#0E7A5F" letter-spacing="-4">T</text>
+  <polygon points="572.0,882 622.0,882 616,894 566,894" fill="#2FB48A"/>
+  <text x="566" y="960" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Trust &amp;</text>
+  <text x="566" y="1002" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Isolation</text>
+  <text x="566" y="1054" font-size="22" font-weight="400" fill="#466358">What must stay separate</text>
+  <text x="566" y="1086" font-size="22" font-weight="400" fill="#466358">and trustworthy?</text>
+</g>
+<g><!-- 03 A -->
+  <rect x="910" y="566" width="340" height="24" fill="#D5E9DF"/>
+  <rect x="920" y="590" width="320" height="530" fill="#FFFFFF"/>
+  <rect x="1220" y="590" width="20" height="530" fill="#EEF6F1"/>
+  <rect x="910" y="1120" width="340" height="24" fill="#D5E9DF"/>
+  <text x="950" y="644" font-size="22" font-weight="500" fill="#5C7469" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">03</text>
+  <text x="1200" y="644" font-size="22" font-weight="500" fill="#0E7A5F" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">25 controls</text>
+  <text x="944" y="852" font-size="214" font-weight="600" fill="#0E7A5F" letter-spacing="-4">A</text>
+  <polygon points="956.0,882 1006.0,882 1000,894 950,894" fill="#2FB48A"/>
+  <text x="950" y="960" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Authority &amp;</text>
+  <text x="950" y="1002" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Access</text>
+  <text x="950" y="1054" font-size="22" font-weight="400" fill="#466358">Who may do what,</text>
+  <text x="950" y="1086" font-size="22" font-weight="400" fill="#466358">and under which limits?</text>
+</g>
+<g><!-- 04 N -->
+  <rect x="1294" y="566" width="340" height="24" fill="#D5E9DF"/>
+  <rect x="1304" y="590" width="320" height="530" fill="#FFFFFF"/>
+  <rect x="1604" y="590" width="20" height="530" fill="#EEF6F1"/>
+  <rect x="1294" y="1120" width="340" height="24" fill="#D5E9DF"/>
+  <text x="1334" y="644" font-size="22" font-weight="500" fill="#5C7469" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">04</text>
+  <text x="1584" y="644" font-size="22" font-weight="500" fill="#0E7A5F" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">10 controls</text>
+  <text x="1328" y="852" font-size="214" font-weight="600" fill="#0E7A5F" letter-spacing="-4">N</text>
+  <polygon points="1340.0,882 1390.0,882 1384,894 1334,894" fill="#2FB48A"/>
+  <text x="1334" y="960" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Notice &amp;</text>
+  <text x="1334" y="1002" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Neutralize</text>
+  <text x="1334" y="1054" font-size="22" font-weight="400" fill="#466358">Can we see, stop,</text>
+  <text x="1334" y="1086" font-size="22" font-weight="400" fill="#466358">and improve behavior?</text>
+</g>
+<g><!-- 05 D -->
+  <rect x="1678" y="566" width="340" height="24" fill="#D5E9DF"/>
+  <rect x="1688" y="590" width="320" height="530" fill="#FFFFFF"/>
+  <rect x="1988" y="590" width="20" height="530" fill="#EEF6F1"/>
+  <rect x="1678" y="1120" width="340" height="24" fill="#D5E9DF"/>
+  <text x="1718" y="644" font-size="22" font-weight="500" fill="#5C7469" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">05</text>
+  <text x="1968" y="644" font-size="22" font-weight="500" fill="#0E7A5F" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">10 controls</text>
+  <text x="1712" y="852" font-size="214" font-weight="600" fill="#0E7A5F" letter-spacing="-4">D</text>
+  <polygon points="1724.0,882 1774.0,882 1768,894 1718,894" fill="#2FB48A"/>
+  <text x="1718" y="960" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Demonstrated</text>
+  <text x="1718" y="1002" font-size="34" font-weight="600" fill="#08251C" letter-spacing="-0.7">Defenses</text>
+  <text x="1718" y="1054" font-size="22" font-weight="400" fill="#466358">Can we show that</text>
+  <text x="1718" y="1086" font-size="22" font-weight="400" fill="#466358">the controls work?</text>
+</g>
+<!-- Roof: Secure Agentic Applications -->
+<polygon points="96,430 2042,430 2064,474 2064,566 96,566" fill="#0B3E38"/>
+<polygon points="96,430 2053,430 2064,452 2064,452 96,452" fill="#052E22"/>
+<rect x="96" y="560" width="1968" height="6" fill="#2FB48A"/>
+  <text x="1080" y="514" font-size="50" font-weight="600" fill="#FFFFFF" text-anchor="middle" letter-spacing="-0.8">Secure Agentic Applications</text>
+<!-- Foundation: Security Enforced in Application Code -->
+<polygon points="72,1236 2088,1236 2088,1244 2078,1264 72,1264" fill="#052E22"/>
+<polygon points="96,1144 2064,1144 2064,1196 2044,1236 96,1236" fill="#0B3E38"/>
+<rect x="96" y="1144" width="1968" height="6" fill="#2FB48A"/>
+  <text x="144" y="1204" font-size="36" font-weight="600" fill="#FFFFFF" letter-spacing="-0.6">Security Enforced in Application Code</text>
+  <text x="2004" y="1201" font-size="22" font-weight="500" fill="#A7DDC0" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">Permissions / Approvals / Limits</text>
+<!-- Footer: sources and limits -->
+<path d="M96 1318H2064" stroke="#FFFFFF" stroke-opacity=".24" stroke-width="1.5"/>
+  <text x="96" y="1387" font-size="22" font-weight="500" fill="#FFFFFF" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">Informed by</text>
+  <polygon points="270,1356 373,1356 379,1368 379,1400 270,1400" fill="#052E22" fill-opacity=".34"/>
+  <text x="285" y="1386" font-size="22" font-weight="500" fill="#FFFFFF" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">AIUC-1</text>
+  <polygon points="389,1356 585,1356 591,1368 591,1400 389,1400" fill="#052E22" fill-opacity=".34"/>
+  <text x="404" y="1386" font-size="22" font-weight="500" fill="#FFFFFF" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">ISO/IEC 42001</text>
+  <polygon points="601,1356 770,1356 776,1368 776,1400 601,1400" fill="#052E22" fill-opacity=".34"/>
+  <text x="616" y="1386" font-size="22" font-weight="500" fill="#FFFFFF" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">NIST AI RMF</text>
+  <polygon points="1770,1356 2058,1356 2064,1368 2064,1400 1770,1400" fill="#052E22" fill-opacity=".34"/>
+  <text x="1785" y="1386" font-size="22" font-weight="500" fill="#FFFFFF" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">OWASP Agentic Top 10</text>
+  <text x="1752" y="1387" font-size="22" font-weight="500" fill="#FFFFFF" text-anchor="end" font-family="'IBM Plex Mono', 'DejaVu Sans Mono', ui-monospace, monospace">Risk taxonomy</text>
+  <text x="96" y="1452" font-size="22" font-weight="400" fill="#FFFFFF">STAND's own engineering pillars. Engineering mappings, not certification.</text>
+  <text x="2064" y="1452" font-size="22" font-weight="400" fill="#FFFFFF" text-anchor="end">Artwork: CC BY-SA 4.0</text>
+</g>
+</svg>

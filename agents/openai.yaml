@@ -1,4 +1,6 @@
 interface:
-  display_name: "RAISE"
-  short_description: "Build agents with security controls and evidence"
-  default_prompt: "Use $raise to build or update this agentic application with enforceable security controls and verification evidence."
+  display_name: "STAND"
+  short_description: "Enforced security controls and evidence for AI agents"
+  default_prompt: "Use $stand to build, change, review, or threat-model this agentic application: triage the change, enforce the routed controls outside the model, verify them through the real execution path, and record the evidence."
+policy:
+  allow_implicit_invocation: true
