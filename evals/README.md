@@ -108,7 +108,7 @@ Gating bars, pre-registered in `cases.json` (the negative-activation bar also ap
 
 `cases.json` defines "record lines", the compact record limit and "unrequested product rule" in `protocol_defaults`, and "workflow not started" in criterion C3 of `negative-help-typo`. The other cases carry target bars, which are reported but do not gate a release.
 
-Case changes that break comparability: in `new-application`, C6 now requires the billing email and target account to come from a structured console field or the system of record (free-text chat no longer counts as staff input), and C10 with probes P8 to P10 was added for A-25 verification of billing-email changes, A-06 denial of an invented address and A-12 session binding. C6 results from before that change are not comparable with later ones. Record lines exclude "Finding:" lines from the same change onward.
+Case changes that break comparability: in `new-application`, C6 now trusts the billing email and target account only from a structured console field or the system of record (free-text chat no longer counts as staff input, and a value from a ticket, document or chat is denied or confirmed with its origin shown, then verified as C10 requires), and C10 with probes P8 to P10 was added for A-25 verification of billing-email changes, A-06 denial of an invented address and A-12 session binding. C6 results from before that change are not comparable with later ones. Record lines exclude "Finding:" lines from the same change onward.
 
 ### Regression rule
 

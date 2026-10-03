@@ -125,11 +125,22 @@ class FixtureTestCase(unittest.TestCase):
         return first
 
     def codes_against(self, revision):
+        """Codes against the base revision alone, without the commits since it."""
         base, error = validate.read_base_ledger(self.root, revision)
         self.assertIsNone(error)
         retired, error = validate.read_base_retired(self.root, revision)
         self.assertIsNone(error)
         return {finding.code for finding in self.result(base_ledger=base, base_retired=retired).findings}
+
+    def findings_since(self, revision):
+        """Findings against the base revision and every commit since it, as --ledger-base compares."""
+        baseline, failure = validate.read_baseline(self.root, revision)
+        self.assertIsNone(failure)
+        return self.result(base_ledger=baseline.ledger, base_retired=baseline.retired).findings
+
+    def cli(self, *args):
+        return subprocess.run([sys.executable, str(self.root / "scripts/validate.py"), *args],
+                              capture_output=True, text=True, timeout=120)
 
 
 class BaselineTests(FixtureTestCase):
@@ -574,6 +585,164 @@ class RetiredCaseTests(FixtureTestCase):
         self.assertEqual(self.codes_against("HEAD"), set())
 
 
+THREE_CASES = "Hostile: x (A-01/C1). Hostile: z (C2). Twin: y (C3)."
+REUSED_TEXT = "Hostile: x (A-01/C1). A new case (C2). Twin: y (C3)."
+A03 = ("A-03", "Bounded delegation")
+
+
+class RangeHistoryTests(FixtureTestCase):
+    """A change undone inside one push or pull request is invisible at both endpoints.
+
+    --ledger-base therefore also reads every commit in BASE..HEAD that changes the catalog
+    or the ledger.
+    """
+
+    def retire_then_reuse(self):
+        """Commit three cases, retire C2, then reuse C2 in a later commit. Return the base commit."""
+        self.git("init", "-q")
+        self.edit_control("A-01", _retire(THREE_CASES))
+        base = self.commit("Three cases")
+        self.edit_control("A-01", _retire(RETIRED_TEXT))
+        self.commit("Retire A-01/C2")
+        self.edit_control("A-01", _retire(REUSED_TEXT))
+        self.commit("Reuse C2 for a new case")
+        return base
+
+    def add_then_remove_ledger_id(self):
+        """Commit the fixture, add A-03 with its ledger entry, then delete both. Return the base commit."""
+        self.git("init", "-q")
+        base = self.commit("Fixture")
+        cid, title = A03
+        self.edit_json("catalog/controls.json", lambda data: data["controls"].append(
+            fixture_repo.control(cid, title, 2, "high", "integration", ["tools"], ["ASI02"])))
+        self.edit_json("catalog/ledger.json", lambda data: data["entries"].append(
+            {"id": cid, "title": title, "status": "active", "introduced": "0.1.0"}))
+        self.write("references/controls/A.md", fixture_repo.pillar_file(
+            "A", [("A-01", "Single dispatch path"), ("A-02", "Workload identity"), A03]))
+        self.assertEqual(self.result().findings, [])
+        self.commit("Add A-03")
+        _remove_control(cid)(self)
+        _drop_ledger(cid)(self)
+        self.write("references/controls/A.md", fixture_repo.files()["references/controls/A.md"])
+        self.commit("Delete A-03 and its ledger entry")
+        return base
+
+    def test_case_retired_and_reused_within_one_range_is_caught(self):
+        base = self.retire_then_reuse()
+        self.assertEqual(self.result().findings, [])
+        self.assertEqual(self.codes_against(base), set())
+        messages = [(f.code, f.path, f.message) for f in self.findings_since(base)]
+        self.assertTrue(any(code == "case-label" and path == "catalog/controls.json" and "A-01/C2" in message
+                            for code, path, message in messages), messages)
+
+    def test_case_retired_and_reused_on_a_merged_branch_is_caught(self):
+        # The merge leaves the catalog as it was at the base, so default history
+        # simplification would hide the branch; every commit must still be read.
+        self.git("init", "-q")
+        self.edit_control("A-01", _retire(THREE_CASES))
+        base = self.commit("Three cases")
+        self.git("checkout", "-q", "-b", "side")
+        self.edit_control("A-01", _retire(RETIRED_TEXT))
+        self.commit("Retire A-01/C2")
+        self.edit_control("A-01", _retire(THREE_CASES))
+        self.commit("Reuse C2")
+        self.git("checkout", "-q", "main")
+        self.append("CONTRIBUTING.md", "\nA change on main.\n")
+        self.commit("Change on main")
+        self.git("merge", "-q", "--no-ff", "-m", "Merge side", "side")
+        self.assertEqual(self.codes_against(base), set())
+        self.assertIn("case-label", {f.code for f in self.findings_since(base)})
+
+    def test_case_retired_within_one_range_may_not_be_cited(self):
+        base = self.retire_then_reuse()
+        self.append("references/patterns.md", "\nA-01/C2 covers the new case.\n")
+        self.edit_control("A-01", lambda c: c.update(evidence=["Dispatcher test A-01/C2"]))
+        self.assertEqual(self.result().findings, [])
+        findings = self.findings_since(base)
+        self.assertIn(("case-label", "references/patterns.md"), {(f.code, f.path) for f in findings})
+        self.assertTrue(any("evidence cites A-01/C2" in f.message for f in findings), findings)
+
+    def test_case_retired_within_one_range_and_kept_passes(self):
+        self.git("init", "-q")
+        self.edit_control("A-01", _retire(THREE_CASES))
+        base = self.commit("Three cases")
+        self.edit_control("A-01", _retire(RETIRED_TEXT))
+        self.commit("Retire A-01/C2")
+        self.append("CONTRIBUTING.md", "\nA later, unrelated change.\n")
+        self.commit("Unrelated change")
+        self.assertEqual(self.findings_since(base), [])
+
+    def test_ledger_id_added_and_removed_within_one_range_is_caught(self):
+        base = self.add_then_remove_ledger_id()
+        self.assertEqual(self.result().findings, [])
+        self.assertEqual(self.codes_against(base), set())
+        messages = [(f.code, f.message) for f in self.findings_since(base)]
+        self.assertTrue(any(code == "ledger-removed" and message.startswith("A-03 ")
+                            for code, message in messages), messages)
+
+    def test_command_line_compares_every_commit_since_the_base(self):
+        base = self.retire_then_reuse()
+        completed = self.cli(str(self.root), "--ledger-base", base)
+        self.assertEqual(completed.returncode, 1, completed.stdout + completed.stderr)
+        self.assertIn("catalog/controls.json: case-label: A-01/C2 was marked retired", completed.stdout)
+        self.setUp()
+        base = self.add_then_remove_ledger_id()
+        completed = self.cli(str(self.root), "--ledger-base", base)
+        self.assertEqual(completed.returncode, 1, completed.stdout + completed.stderr)
+        self.assertIn("catalog/ledger.json: ledger-removed: A-03 was in the ledger", completed.stdout)
+        completed = self.cli(str(self.root), "--ledger-base", "HEAD")
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+
+    def test_draft_id_scheme_before_the_base_has_a_ledger_is_not_compared(self):
+        # The catalog's own history: IDs were remapped to new pillar letters before the
+        # ledger was first published, so the draft scheme's IDs are not reserved.
+        self.git("init", "-q")
+        ledger = self.read("catalog/ledger.json")
+        self.path("catalog/ledger.json").unlink()
+        base = self.commit("Before the catalog was published")
+        self.write("catalog/ledger.json", json.dumps({"id_pattern": "^(R|A)-[0-9]{2}$",
+                                                      "entries": [{"id": "R-01"}, {"id": "A-09"}]}) + "\n")
+        self.commit("Draft ID scheme")
+        self.write("catalog/ledger.json", ledger)
+        self.commit("Remap to the current scheme")
+        baseline, failure = validate.read_baseline(self.root, base)
+        self.assertIsNone(failure)
+        self.assertEqual(len(baseline.notes), 1, baseline.notes)
+        self.assertIn("declares another id_pattern", baseline.notes[0])
+        self.assertEqual(self.findings_since(base), [])
+
+    def test_another_id_pattern_after_the_base_has_a_ledger_still_counts(self):
+        self.git("init", "-q")
+        base = self.commit("Fixture")
+        ledger = self.read("catalog/ledger.json")
+
+        def other_scheme(data):
+            data["id_pattern"] = "^(A|X)-[0-9]{2}$"
+            data["entries"].append({"id": "A-03", "status": "active"})
+        self.edit_json("catalog/ledger.json", other_scheme)
+        self.commit("Another pattern and A-03")
+        self.write("catalog/ledger.json", ledger)
+        self.commit("Restore the pattern and delete A-03")
+        self.assertIn("ledger-removed", {f.code for f in self.findings_since(base)})
+
+    def test_unreadable_catalog_in_a_commit_since_the_base_fails_closed(self):
+        self.git("init", "-q")
+        base = self.commit("Fixture")
+        catalog = self.read("catalog/controls.json")
+        self.write("catalog/controls.json", "{\n")
+        self.commit("Broken catalog")
+        self.write("catalog/controls.json", catalog)
+        self.commit("Repaired catalog")
+        baseline, failure = validate.read_baseline(self.root, base)
+        self.assertIsNotNone(failure)
+        self.assertEqual(failure.code, "ledger-removed")
+        self.assertIn("catalog/controls.json at ", failure.message)
+        self.assertIn("is not JSON", failure.message)
+        completed = self.cli(str(self.root), "--ledger-base", base)
+        self.assertEqual(completed.returncode, 1)
+        self.assertIn("ledger-removed: Cannot compare with the commits since", completed.stdout)
+
+
 class NoFalsePositiveTests(FixtureTestCase):
     def assertClean(self):
         self.assertEqual(self.result().findings, [])
@@ -724,10 +893,6 @@ class StagingTests(FixtureTestCase):
 
 
 class CommandLineTests(FixtureTestCase):
-    def cli(self, *args):
-        return subprocess.run([sys.executable, str(self.root / "scripts/validate.py"), *args],
-                              capture_output=True, text=True, timeout=120)
-
     def test_success_exit_code_and_message(self):
         completed = self.cli(str(self.root))
         self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)

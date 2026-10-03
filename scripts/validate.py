@@ -12,7 +12,8 @@ Usage:
   python3 scripts/validate.py [ROOT]            validate the repository
   python3 scripts/validate.py --stage DIR       copy the bundle to DIR (or DIR/<name>) and validate it alone
   python3 scripts/validate.py --ledger-base REV also reject ledger entries removed and retired
-                                                case numbers reused since REV
+                                                case numbers dropped, reused or cited since REV,
+                                                counting every commit in REV..HEAD
 
 Exit codes: 0 without findings, 1 with findings, 2 for usage or staging errors.
 """
@@ -1299,13 +1300,35 @@ def check_case_labels(rep: Reporter, path: Path, controls: list) -> tuple[dict[s
 
 
 def check_retired_cases(rep: Reporter, path: Path, catalog: Catalog, base: dict[str, set[int]]) -> None:
-    """A case number retired at the base revision stays retired, so it is never reused."""
+    """A case number marked retired at the base revision or in any commit since stays reserved.
+
+    Its marker stays in the verification text, and the number is never reused or cited.
+    The numbers are then added to the catalog's retired set, so the document citation
+    check also rejects them.
+    """
+    reserved: dict[str, set[int]] = {}
     for cid, numbers in sorted(base.items()):
         if catalog.lifecycle.get(cid, "active") != "active" or cid not in catalog.cases:
             continue
+        reserved[cid] = set(numbers)
         for number in sorted(numbers - catalog.retired.get(cid, set())):
-            rep.report("case-label", path, f"{cid}/C{number} was retired at the base revision; keep its marker "
-                       f"(C{number}: retired) and never reuse the number")
+            rep.report("case-label", path, f"{cid}/C{number} was marked retired at the base revision or in a "
+                       f"commit since; keep its marker (C{number}: retired) and never reuse or cite the number")
+    for control in catalog.controls:
+        if not isinstance(control.get("id"), str) or control.get("lifecycle", "active") != "active":
+            continue
+        evidence = control.get("evidence")
+        for item in evidence if isinstance(evidence, list) else [evidence]:
+            item = item if isinstance(item, str) else ""
+            for match in TEST_ID.finditer(item):
+                if item[match.end():].startswith(".."):
+                    continue
+                owner, number = match.group(1).split("/C")
+                if int(number) in reserved.get(owner, set()) - catalog.retired.get(owner, set()):
+                    rep.report("case-label", path, f"{control['id']}: evidence cites {match.group(1)}, a case "
+                               "retired at the base revision or in a commit since")
+    for cid, numbers in reserved.items():
+        catalog.retired.setdefault(cid, set()).update(numbers)
 
 
 def check_case_citations(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
@@ -1524,19 +1547,24 @@ def check_ledger(rep: Reporter, root: Path, catalog: Catalog | None, base: list[
             rep.report("ledger-removed", path, f"{cid} is in the ledger but missing from the catalog; keep withdrawn controls as tombstones")
     if base is not None:
         for cid in sorted(set(base) - seen):
-            rep.report("ledger-removed", path, f"{cid} was removed from the ledger since the base revision")
+            rep.report("ledger-removed", path, f"{cid} was in the ledger at the base revision or in a commit "
+                       "since and is missing now; never delete a ledger entry")
+
+
+def git_run(root: Path, *args: str, **options) -> subprocess.CompletedProcess:
+    """Run git in root with captured output (text unless text=False is given) and a timeout."""
+    options.setdefault("text", True)
+    return subprocess.run(["git", "-C", str(root), *args], capture_output=True, timeout=60, **options)
 
 
 def read_base_file(root: Path, revision: str, relative: str) -> tuple[str | None, str | None]:
     """Read a file at a git revision. Return (text or None when absent, error)."""
-    def git(*args: str) -> subprocess.CompletedProcess:
-        return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, timeout=60)
     try:
-        if git("rev-parse", "--verify", "--quiet", f"{revision}^{{commit}}").returncode != 0:
+        if git_run(root, "rev-parse", "--verify", "--quiet", f"{revision}^{{commit}}").returncode != 0:
             return None, f"cannot resolve git revision {revision!r}"
-        if git("cat-file", "-e", f"{revision}:{relative}").returncode != 0:
+        if git_run(root, "cat-file", "-e", f"{revision}:{relative}").returncode != 0:
             return None, None
-        shown = git("show", f"{revision}:{relative}")
+        shown = git_run(root, "show", f"{revision}:{relative}")
     except (OSError, subprocess.SubprocessError) as error:
         return None, f"cannot run git: {error}"
     if shown.returncode != 0:
@@ -1569,9 +1597,151 @@ def read_base_retired(root: Path, revision: str) -> tuple[dict[str, set[int]] | 
         return None, f"base catalog is not JSON: {error}"
     if controls is None:
         return None, "base catalog has an unrecognized structure"
+    return retired_numbers(controls), None
+
+
+def retired_numbers(controls: list) -> dict[str, set[int]]:
+    """Return the case numbers that carry a retired marker in each control's verification text."""
     return {control["id"]: {int(match.group(2)) for match in RETIRED_CASE.finditer(control["verification"])}
             for control in controls if isinstance(control, dict) and isinstance(control.get("id"), str)
-            and isinstance(control.get("verification"), str)}, None
+            and isinstance(control.get("verification"), str)}
+
+
+@dataclass
+class History:
+    """Ledger IDs and retired case numbers committed after a base revision."""
+    ledger: set[str] | None = None
+    retired: dict[str, set[int]] | None = None
+    skipped: list[str] = field(default_factory=list)
+
+
+def read_blobs(root: Path, names: list[str]) -> tuple[list[bytes | None] | None, str | None]:
+    """Read objects named like REV:PATH with one git process. Return (contents, None for absent ones)."""
+    request = "".join(f"{name}\n" for name in names).encode()
+    try:
+        batch = git_run(root, "cat-file", "--batch", input=request, text=False)
+    except (OSError, subprocess.SubprocessError) as error:
+        return None, f"cannot run git: {error}"
+    if batch.returncode != 0:
+        return None, batch.stderr.decode(errors="replace").strip() or "git cat-file failed"
+    output, offset, blobs = batch.stdout, 0, []
+    for name in names:
+        end = output.find(b"\n", offset)
+        header = output[offset:end].split() if end >= 0 else []
+        if header == [name.encode(), b"missing"]:
+            blobs.append(None)
+            offset = end + 1
+            continue
+        if len(header) != 3 or header[1] != b"blob" or not header[2].isdigit():
+            return None, f"unexpected git cat-file output for {name}"
+        start = end + 1
+        offset = start + int(header[2]) + 1
+        if offset > len(output):
+            return None, f"truncated git cat-file output for {name}"
+        blobs.append(output[start:offset - 1])
+    return blobs, None
+
+
+def read_history(root: Path, revision: str, base_has_ledger: bool) -> tuple[History | None, str | None]:
+    """Collect the ledger IDs and retired case numbers of every commit in REV..HEAD that changes either file.
+
+    Comparing only the two endpoints misses a number retired in one commit and reused in a
+    later one, and an ID added in one commit and deleted in a later one. Only commits that
+    change the catalog or the ledger are read (one rev-list and one cat-file process).
+    While the base has no ledger, the catalog is not yet published there, so a commit whose
+    ledger declares a different id_pattern belongs to an earlier draft ID scheme and is
+    skipped (reported in History.skipped). Once the base has a ledger, every commit counts.
+    """
+    try:
+        resolved = git_run(root, "rev-parse", "--verify", "--quiet", f"{revision}^{{commit}}")
+        if resolved.returncode != 0:
+            return None, f"cannot resolve git revision {revision!r}"
+        # --full-history: a merge that leaves a file as it was must not hide the branch's commits.
+        listed = git_run(root, "rev-list", "--full-history", f"{resolved.stdout.strip()}..HEAD", "--", CATALOG, LEDGER)
+    except (OSError, subprocess.SubprocessError) as error:
+        return None, f"cannot run git: {error}"
+    if listed.returncode != 0:
+        return None, listed.stderr.strip() or "git rev-list failed"
+    commits = listed.stdout.split()
+    history = History()
+    if not commits:
+        return history, None
+    blobs, error = read_blobs(root, [f"{commit}:{relative}" for commit in commits for relative in (LEDGER, CATALOG)])
+    if blobs is None:
+        return None, error
+    parsed: dict[bytes, object] = {}
+
+    def load(commit: str, relative: str, blob: bytes) -> tuple[object, str | None]:
+        if blob not in parsed:
+            try:
+                parsed[blob] = json.loads(blob.decode("utf-8"))
+            except (UnicodeError, json.JSONDecodeError) as error:
+                return None, f"{relative} at {commit[:12]} is not JSON: {error}"
+        return parsed[blob], None
+
+    for index, commit in enumerate(commits):
+        ledger_blob, catalog_blob = blobs[2 * index], blobs[2 * index + 1]
+        if ledger_blob is not None:
+            data, error = load(commit, LEDGER, ledger_blob)
+            if error:
+                return None, error
+            ids = ledger_ids(data)
+            if ids is None:
+                return None, f"{LEDGER} at {commit[:12]} has an unrecognized structure"
+            declared = data.get("id_pattern") if isinstance(data, dict) else None
+            if not base_has_ledger and declared is not None and declared != CONTROL_ID_FULL.pattern:
+                history.skipped.append(commit)
+                continue
+            history.ledger = (history.ledger or set()) | set(ids)
+        if catalog_blob is not None:
+            data, error = load(commit, CATALOG, catalog_blob)
+            if error:
+                return None, error
+            controls = catalog_controls(data)
+            if controls is None:
+                return None, f"{CATALOG} at {commit[:12]} has an unrecognized structure"
+            history.retired = history.retired or {}
+            for cid, numbers in retired_numbers(controls).items():
+                history.retired.setdefault(cid, set()).update(numbers)
+    return history, None
+
+
+@dataclass
+class Baseline:
+    """What --ledger-base compares the working tree with: every ledger ID and retired case
+    number at the base revision or in a commit since. None means nothing to compare."""
+    ledger: list[str] | None = None
+    retired: dict[str, set[int]] | None = None
+    notes: list[str] = field(default_factory=list)
+
+
+def read_baseline(root: Path, revision: str) -> tuple[Baseline, Finding | None]:
+    """Read the base revision and the commits since it. Return (baseline, finding when unreadable)."""
+    baseline = Baseline()
+    ledger, error = read_base_ledger(root, revision)
+    if error:
+        return baseline, Finding("ledger-removed", LEDGER, f"Cannot compare with the base ledger: {error}")
+    baseline.ledger = ledger
+    retired, error = read_base_retired(root, revision)
+    if error:
+        return baseline, Finding("case-label", CATALOG, f"Cannot compare with the base catalog: {error}")
+    baseline.retired = retired
+    history, error = read_history(root, revision, base_has_ledger=ledger is not None)
+    if history is None:
+        return baseline, Finding("ledger-removed", LEDGER, f"Cannot compare with the commits since {revision}: {error}")
+    for commit in history.skipped:
+        baseline.notes.append(f"{LEDGER} at {commit[:12]} declares another id_pattern before {revision} has a "
+                              "ledger; that draft ID scheme is not compared")
+    if history.ledger is not None:
+        baseline.ledger = sorted(set(ledger or ()) | history.ledger)
+    elif ledger is None:
+        baseline.notes.append(f"no {LEDGER} at {revision} or in a commit since; skipping the removal comparison")
+    if history.retired is not None:
+        merged = {cid: set(numbers) for cid, numbers in (retired or {}).items()}
+        for cid, numbers in history.retired.items():
+            merged.setdefault(cid, set()).update(numbers)
+        baseline.retired = merged
+    return baseline, None
 
 
 def check_mappings(rep: Reporter, root: Path, catalog: Catalog | None) -> None:
@@ -2206,8 +2376,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="copy the skill bundle into DIR, or into DIR/<name> when DIR is not named after the skill "
                              "(DIR absent or empty), and validate it on its own")
     parser.add_argument("--ledger-base", metavar="REV",
-                        help="git revision whose catalog ledger entries must all still be present and whose "
-                             "retired case numbers must stay retired")
+                        help="git revision; every ledger entry present at it or in any commit since must still "
+                             "be present, and every case number marked retired there must stay retired")
     args = parser.parse_args(argv)
     root = args.root.resolve()
 
@@ -2221,21 +2391,16 @@ def main(argv: list[str] | None = None) -> int:
         return print_result(result, f"Staged skill bundle at {staged} passed on its own.",
                             "Staged bundle validation failed")
 
-    base = retired = None
+    baseline = Baseline()
     if args.ledger_base:
-        base, error = read_base_ledger(root, args.ledger_base)
-        if error:
-            result = run(root)
-            result.findings.append(Finding("ledger-removed", LEDGER, f"Cannot compare with the base ledger: {error}"))
+        baseline, failure = read_baseline(root, args.ledger_base)
+        for note in baseline.notes:
+            print(f"note: {note}")
+        if failure:
+            result = run(root, base_ledger=baseline.ledger, base_retired=baseline.retired)
+            result.findings.append(failure)
             return print_result(result, "", "Repository validation failed")
-        if base is None:
-            print(f"note: no {LEDGER} at {args.ledger_base}; skipping the removal comparison")
-        retired, error = read_base_retired(root, args.ledger_base)
-        if error:
-            result = run(root, base_ledger=base)
-            result.findings.append(Finding("case-label", CATALOG, f"Cannot compare with the base catalog: {error}"))
-            return print_result(result, "", "Repository validation failed")
-    result = run(root, base_ledger=base, base_retired=retired)
+    result = run(root, base_ledger=baseline.ledger, base_retired=baseline.retired)
     return print_result(result, "Repository layout, skill metadata, catalog, links and portability checks passed.",
                         "Repository validation failed")
 
