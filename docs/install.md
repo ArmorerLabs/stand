@@ -38,9 +38,9 @@ python3 scripts/validate.py
 
 | Host | Scope | Destination | Invoke |
 | --- | --- | --- | --- |
-| Claude Code | Personal, all your projects | `~/.claude/skills/stand` | `/stand` |
+| Claude Code | User-scoped, all your projects | `~/.claude/skills/stand` | `/stand` |
 | Claude Code | One project | `.claude/skills/stand` in the project | `/stand` |
-| Codex | User, all your repositories | `$HOME/.agents/skills/stand` | `$stand` |
+| Codex | User-scoped, all your repositories | `$HOME/.agents/skills/stand` | `$stand` |
 | Codex | One repository | `.agents/skills/stand` at the repository root | `$stand` |
 | Other Agent Skills hosts | One repository | `.agents/skills/stand` in the repository | see below |
 
@@ -61,7 +61,7 @@ A team that uses Claude Code together with Codex or another `.agents/skills` hos
 **Hosts without skill discovery.** Load the skill explicitly. For any coding agent that can read local files, give it a concrete request such as:
 
 ```text
-Read SKILL.md in the installed skill folder and apply it to this task.
+Read SKILL.md in this stand repository branch, and apply it to this task.
 Add a support agent that searches tenant documents and proposes account changes.
 Implement the relevant controls, test the execution paths, and record remaining risks.
 ```
@@ -70,7 +70,7 @@ The Markdown workflow is portable; integrations must be verified for the agent a
 
 ## 3. Copy the bundle
 
-Run this from the root of the reviewed checkout. Set `skill_destination` to one destination from the table. The command refuses to overwrite an existing installation, including a symbolic link at the destination:
+From the root of the reviewed, up-to-date checkout, copy the skill files into the configured skills directory. Set `skill_destination` to one destination from the table; the example uses the user-scoped Claude Code directory. The command refuses to overwrite an existing installation, including a symbolic link at the destination:
 
 ```bash
 skill_destination="$HOME/.claude/skills/stand"
@@ -117,7 +117,7 @@ The staged check covers the bundle in the reviewed checkout; the loop above conf
 Then check the host:
 
 1. Open the host in the target project, list its skills (`/skills` in Claude Code and Codex, `/skills list` in Copilot CLI and Gemini CLI), and confirm that `stand` appears with its description.
-2. Invoke it on a small agentic task in a scratch repository, for example `/stand` in Claude Code or `$stand` in Codex followed by "Add a document-search agent with tenant isolation and scoped tools." The response names a triage tier (NONE, SCOPED or FULL), a capability profile with a computed level, and control IDs such as A-01 or I-06.
+2. Invoke it on a small agentic task in a scratch repository, for example `/stand` in Claude Code or `$stand` in Codex followed by "Add a document-search agent with tenant isolation and scoped tools." The response names a triage tier (NONE, SCOPED or FULL), a capability profile with a computed level, and control IDs such as A-01 or T-06.
 3. Ask for a cosmetic change, such as fixing a typo in a README. Either the skill is not activated, or it classifies the task as NONE; in both cases no security assessment starts.
 
 A successful check shows only that the host loads the skill and follows its triage. Skill activation, passing this repository's checks, and enforced application security are separate properties.

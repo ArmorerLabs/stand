@@ -6,7 +6,7 @@ The normative source is catalog/controls.json (with catalog/ledger.json and
 catalog/mappings.json). This script writes, and with --check verifies:
 
     references/controls/index.md
-    references/controls/R.md, A.md, I.md, S.md, E.md
+    references/controls/S.md, T.md, A.md, N.md, D.md
     references/mappings.md
 
 Rendering is deterministic and uses only the Python standard library.
@@ -27,7 +27,7 @@ CONTROLS_DIR = "references/controls"
 MAPPINGS_MD = "references/mappings.md"
 FRAMEWORKS = ("aiuc1", "nist", "aisvs")
 FRAMEWORK_LABELS = {"aiuc1": "AIUC-1", "nist": "NIST", "aisvs": "AISVS"}
-ID_PATTERN = re.compile(r"^(R|A|I|S|E)-[0-9]{2}$")
+ID_PATTERN = re.compile(r"^(S|T|A|N|D)-[0-9]{2}$")
 CONTROL_FIELDS = (
     "id", "pillar", "title", "level", "applies_when", "failure_severity", "min_evidence_scope",
     "critical_boundary", "asi", "statement", "rationale", "verification", "evidence", "mappings",

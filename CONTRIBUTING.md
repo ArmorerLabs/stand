@@ -24,14 +24,14 @@ The catalog is the normative source:
 - `catalog/ledger.json` lists every ID ever assigned.
 - `catalog/mappings.json` holds mapping justifications and source versions.
 
-The generated files are never edited by hand: `references/controls/index.md`, the per-pillar files `references/controls/R.md`, `A.md`, `I.md`, `S.md` and `E.md`, and `references/mappings.md`. Edit the catalog, run `python3 scripts/render_catalog.py`, and commit the regenerated files together with the source change. CI fails if they drift.
+The generated files are never edited by hand: `references/controls/index.md`, the per-pillar files `references/controls/S.md`, `T.md`, `A.md`, `N.md` and `D.md`, and `references/mappings.md`. Edit the catalog, run `python3 scripts/render_catalog.py`, and commit the regenerated files together with the source change. CI fails if they drift.
 
 IDs follow the scheme in [references/profile-and-levels.md](references/profile-and-levels.md): a pillar letter, a hyphen and two digits, for example A-06. Cite controls by the bare ID.
 
 - Never reuse or renumber an ID, including the ID of a withdrawn control.
 - A new control takes the next unused serial in its pillar and is added to the ledger in the same change. Never delete a ledger entry.
 - A change of subject, a split or a merge withdraws the old ID and issues a new one. The withdrawn control stays in the catalog as a tombstone that names the version that withdrew it and its successors. Deprecate an ID for at least one minor release before withdrawing it, so that claims can migrate.
-- Label each hostile case and twin in a control's verification text as `(<ID>/T1)`, then `(T2)` and so on, and update any `<ID>/T1..Tn` range in its evidence. After a release, never renumber a case: a new case takes the next unused number, even after the twin, and a retired case's number stays unused. The validator checks the labels and every cited case number.
+- Label each hostile case and twin in a control's verification text as `(<ID>/C1)`, then `(C2)` and so on, and update any `<ID>/C1..Cn` range in its evidence. After a release, never renumber a case: a new case takes the next unused number, even after the twin. To retire a case, delete its text and leave `(C<n>: retired)` in its place in the verification text, so the number stays reserved and is never reused. The marker still counts in the `<ID>/C1..Cn` range, but evidence never cites a retired case. The validator checks the labels and every cited case number.
 
 Classify each change:
 

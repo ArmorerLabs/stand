@@ -13,6 +13,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -87,6 +88,48 @@ class FixtureTestCase(unittest.TestCase):
 
     def stage(self, name=fixture_repo.SKILL_NAME):
         return validate.stage_bundle(self.root, self.base / "stage" / name)
+
+    # Git history helpers (a throwaway repository inside the temporary directory) ---
+
+    def git(self, *args):
+        if shutil.which("git") is None:
+            self.skipTest("git unavailable")
+        env = dict(os.environ, GIT_CEILING_DIRECTORIES=str(self.base), GIT_CONFIG_NOSYSTEM="1",
+                   GIT_CONFIG_GLOBAL=os.devnull)
+        completed = subprocess.run(
+            ["git", "-C", str(self.root), "-c", "user.name=Fixture", "-c", "user.email=fixture@example.com",
+             "-c", "commit.gpgsign=false", "-c", "init.defaultBranch=main", *args],
+            capture_output=True, text=True, timeout=60, env=env)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        return completed.stdout.strip()
+
+    def commit(self, message):
+        self.git("add", "-A")
+        self.git("commit", "-q", "-m", message)
+        return self.git("rev-parse", "HEAD")
+
+    def remove_highest_serial(self):
+        """Remove A-02 with its ledger entry and heading: consistent in-tree, caught only against a base."""
+        _remove_control("A-02")(self)
+        _drop_ledger("A-02")(self)
+        self.write("references/controls/A.md", fixture_repo.pillar_file("A", [("A-01", "Single dispatch path")]))
+
+    def history_with_early_removal(self):
+        """Commit the fixture, then a removal, then an unrelated change. Return the first commit."""
+        self.git("init", "-q")
+        first = self.commit("Fixture")
+        self.remove_highest_serial()
+        self.commit("Remove a control and its ledger entry")
+        self.append("CONTRIBUTING.md", "\nA later, unrelated change.\n")
+        self.commit("Unrelated change")
+        return first
+
+    def codes_against(self, revision):
+        base, error = validate.read_base_ledger(self.root, revision)
+        self.assertIsNone(error)
+        retired, error = validate.read_base_retired(self.root, revision)
+        self.assertIsNone(error)
+        return {finding.code for finding in self.result(base_ledger=base, base_retired=retired).findings}
 
 
 class BaselineTests(FixtureTestCase):
@@ -244,8 +287,8 @@ CASES = [
     ("ASI rows out of order", "coverage", _owasp_rows(_swap_rows)),
     ("stray ASI identifier", "asi-id", lambda t: t.append("docs/pillars.md", f"\n{STRAY_ASI} is a new risk.\n")),
     ("one-digit ASI identifier", "asi-id", lambda t: t.append("docs/pillars.md", f"\nSee {SHORT_ASI}.\n")),
-    ("catalog ASI out of range", "asi-id", lambda t: t.edit_control("R-01", lambda c: c["asi"].append(STRAY_ASI))),
-    ("duplicate catalog ASI", "asi-id", lambda t: t.edit_control("R-01", lambda c: c["asi"].append("ASI01"))),
+    ("catalog ASI out of range", "asi-id", lambda t: t.edit_control("S-01", lambda c: c["asi"].append(STRAY_ASI))),
+    ("duplicate catalog ASI", "asi-id", lambda t: t.edit_control("S-01", lambda c: c["asi"].append("ASI01"))),
     ("wrong title in prose", "asi-title", lambda t: t.append("README.md", "\nASI01: Prompt Injection matters.\n")),
     ("'and' form of a title", "asi-title",
      lambda t: t.append("README.md", "\n- **ASI02: Tool Misuse and Exploitation**\n")),
@@ -263,10 +306,10 @@ CASES = [
     ("stated scope mismatch", "catalog-field",
      lambda t: t.edit_control("A-01", lambda c: c.update(verification="Hostile case. Minimum evidence scope: unit."))),
     ("withdrawn without successor", "catalog-field",
-     lambda t: t.edit_control("E-01", lambda c: c.update(lifecycle="withdrawn"))),
+     lambda t: t.edit_control("N-01", lambda c: c.update(lifecycle="withdrawn"))),
     ("lowercase ID", "catalog-id", lambda t: t.edit_control("A-01", lambda c: c.update(id="a-01"))),
     ("one-digit serial", "catalog-id", lambda t: t.edit_control("A-01", lambda c: c.update(id="A-1"))),
-    ("pillar mismatch", "catalog-id", lambda t: t.edit_control("A-01", lambda c: c.update(pillar="I"))),
+    ("pillar mismatch", "catalog-id", lambda t: t.edit_control("A-01", lambda c: c.update(pillar="T"))),
     ("duplicate ID", "catalog-id", lambda t: t.edit_control("A-02", lambda c: c.update(id="A-01"))),
     ("level out of range", "catalog-enum", lambda t: t.edit_control("A-02", lambda c: c.update(level=4))),
     ("boolean level", "catalog-enum", lambda t: t.edit_control("A-02", lambda c: c.update(level=True))),
@@ -278,7 +321,12 @@ CASES = [
     ("evidence scope order", "catalog-enum",
      lambda t: t.edit_json("catalog/controls.json", lambda d: d["evidence_scope_enum"].reverse())),
     ("pillar name drift", "catalog-enum",
-     lambda t: t.edit_json("catalog/controls.json", lambda d: d["pillars"][0].update(name="Risk"))),
+     lambda t: t.edit_json("catalog/controls.json", lambda d: d["pillars"][0].update(name="Risk & Responsibility"))),
+    ("pillars out of STAND order", "catalog-enum",
+     lambda t: t.edit_json("catalog/controls.json", lambda d: d["pillars"].reverse())),
+    ("unknown pillar letter", "catalog-field", lambda t: t.edit_control("A-01", lambda c: c.update(pillar="R"))),
+    ("control ID with a former pillar letter", "catalog-id",
+     lambda t: t.edit_control("N-01", lambda c: c.update(id="E-01", pillar="E"))),
     ("unknown applies_when token", "applies-when", lambda t: t.edit_control("A-01", lambda c: c.update(applies_when=["toolz"]))),
     ("all joined with plus", "applies-when", lambda t: t.edit_control("A-01", lambda c: c.update(applies_when=["all+tools"]))),
     ("dangling plus", "applies-when", lambda t: t.edit_control("A-01", lambda c: c.update(applies_when=["tools+"]))),
@@ -290,14 +338,14 @@ CASES = [
     ("SKILL.md list misses a member", "critical-boundary",
      lambda t: t.replace("SKILL.md", "- One enforcement path (A-01).\n", "")),
     ("conformance list adds a non-member", "critical-boundary",
-     lambda t: t.replace("references/conformance.md", "A-01, I-01", "A-01, I-01, S-01")),
+     lambda t: t.replace("references/conformance.md", "A-01, T-01", "A-01, T-01, D-01")),
     ("markers missing", "critical-boundary",
      lambda t: t.replace("references/conformance.md", "<!-- critical-boundary:end -->", "")),
     ("catalog flag inconsistent", "critical-boundary",
-     lambda t: t.edit_control("S-01", lambda c: c.update(critical_boundary=True))),
+     lambda t: t.edit_control("D-01", lambda c: c.update(critical_boundary=True))),
     # Ledger
     ("ledger ID grammar", "ledger", lambda t: t.edit_json("catalog/ledger.json", lambda d: d["entries"].append({"id": "X-01"}))),
-    ("ledger duplicate", "ledger", lambda t: t.edit_json("catalog/ledger.json", lambda d: d["entries"].append({"id": "R-01"}))),
+    ("ledger duplicate", "ledger", lambda t: t.edit_json("catalog/ledger.json", lambda d: d["entries"].append({"id": "S-01"}))),
     ("ledger shape", "ledger", lambda t: t.write("catalog/ledger.json", '{"entries": [1]}\n')),
     ("ledger pattern drift", "ledger", lambda t: t.edit_json("catalog/ledger.json", lambda d: d.update(id_pattern="^[A-Z]-\\d+$"))),
     ("ledger status values drift", "ledger",
@@ -307,7 +355,7 @@ CASES = [
     ("ledger status differs from lifecycle", "ledger",
      lambda t: t.edit_json("catalog/ledger.json", lambda d: d["entries"][0].update(status="deprecated"))),
     ("ledger misses a catalog ID", "ledger-missing", _drop_ledger("A-02")),
-    ("control removed without tombstone", "ledger-removed", _remove_control("S-01")),
+    ("control removed without tombstone", "ledger-removed", _remove_control("D-01")),
     ("ledger serial gap", "ledger-removed", _drop_ledger("A-01")),
     # Mappings
     ("unknown relation in catalog", "mapping",
@@ -361,21 +409,26 @@ CASES = [
      lambda t: t.edit_control("A-01", lambda c: c.update(rationale="See the publication, PDF p.13."))),
     ("record example only in SKILL.md", "record-example",
      lambda t: t.append("SKILL.md", "\n```text\nChange: CH-1, x\nA-01: implemented-and-verified, integration, "
-                        "A-01/T1 twin pass\n```\n")),
+                        "A-01/C1 twin pass\n```\n")),
     ("verification text without case labels", "case-label",
      lambda t: t.edit_control("A-01", lambda c: c.update(verification="Hostile: bypass it. Twin: it passes."))),
     ("case labels out of order", "case-label",
-     lambda t: t.edit_control("A-01", lambda c: c.update(verification="Hostile: x (A-01/T2). Twin: y (T1)."))),
+     lambda t: t.edit_control("A-01", lambda c: c.update(verification="Hostile: x (A-01/C2). Twin: y (C1)."))),
     ("evidence range differs from the case labels", "case-label",
-     lambda t: t.edit_control("A-01", lambda c: c.update(evidence=["Dispatcher tests A-01/T1..T5"]))),
+     lambda t: t.edit_control("A-01", lambda c: c.update(evidence=["Dispatcher tests A-01/C1..C5"]))),
     ("cited case number beyond the catalog", "case-label",
-     lambda t: t.append("references/patterns.md", "\nA-01/T7: an extra case.\n")),
+     lambda t: t.append("references/patterns.md", "\nA-01/C7: an extra case.\n")),
     ("changelog summary count drift", "changelog-summary",
      lambda t: t.append("CHANGELOG.md", "\n- Control catalog 0.1.0 with 99 controls across the five pillars: "
                         "Authority & Access A-01 to A-09.\n- Levels 1 to 3 (9, 9 and 9 controls).\n")),
     ("README catalog count drift", "readme-summary",
-     lambda t: t.append("README.md", "\nIt holds 99 controls (R 1, A 2, I 3, S 4, E 5), with 9 at Level 1, 9 at Level 2, "
+     lambda t: t.append("README.md", "\nIt holds 99 controls (S 1, T 2, A 3, N 4, D 5), with 9 at Level 1, 9 at Level 2, "
                         "9 at Level 3.\n")),
+    ("README counts in the former pillar order", "readme-summary",
+     lambda t: t.append("README.md", "\nIt holds 6 controls (R 1, A 2, I 1, S 1, E 1).\n")),
+    ("lowercase control ID with a new pillar letter", "id-form", lambda t: t.append("README.md", "\nSee t-01.\n")),
+    ("unhyphenated control ID with a new pillar letter", "id-form",
+     lambda t: t.append("README.md", "\nSee N01 for audit.\n")),
     ("pillar ASI table drift", "pillar-table",
      lambda t: t.append("docs/pillars.md", "\n| Pillar | Controls (L1/L2/L3) | ASI01 | ASI02 |\n| --- | --- | --- | --- |\n"
                         "| A | 3 (2/1/0) | 0 | 1 |\n")),
@@ -388,7 +441,7 @@ CASES = [
     ("routing row misses a tagged critical control", "routing",
      lambda t: (t.edit_control("A-01", lambda c: c.update(applies_when=["tools", "mcp"])),
                 t.append("SKILL.md", "\n| Trigger location | Control IDs |\n| --- | --- |\n"
-                         "| MCP client, server or proxy | I-01 |\n"))),
+                         "| MCP client, server or proxy | T-01 |\n"))),
     ("control heading drift", "control-heading",
      lambda t: t.replace("references/controls/A.md", "### A-02 Workload identity", "### A-02: Workload identity")),
     # Generated views, versions and workflows
@@ -421,8 +474,104 @@ class FindingCodeTests(FixtureTestCase):
         self.assertEqual(emitted - covered, set())
 
     def test_ledger_entry_removed_since_base_revision(self):
-        base = [entry["id"] for entry in fixture_repo.ledger()["entries"]] + ["R-02"]
+        base = [entry["id"] for entry in fixture_repo.ledger()["entries"]] + ["S-02"]
         self.assertIn("ledger-removed", self.codes(base_ledger=base))
+
+    def test_removal_in_an_earlier_commit_is_caught_against_the_push_base(self):
+        # Greptile P1: the parent of HEAD already lacks A-02, so only the push's previous head
+        # (or the pull request's base commit) reveals the removal.
+        first = self.history_with_early_removal()
+        self.assertEqual(self.codes_against("HEAD^1"), set())
+        self.assertIn("ledger-removed", self.codes_against(first))
+
+
+def _retire(verification, evidence=None):
+    def change(control):
+        control["verification"] = verification
+        if evidence is not None:
+            control["evidence"] = evidence
+    return change
+
+
+RETIRED_TEXT = "Hostile: bypass it (A-01/C1). A removed case (C2: retired). Twin: it passes (C3)."
+
+
+class RetiredCaseTests(FixtureTestCase):
+    """Greptile P2: a retired case keeps its number, so removing a case after a release passes."""
+
+    def assertCode(self, code):
+        self.assertIn(code, self.codes())
+
+    def assertClean(self):
+        self.assertEqual(self.result().findings, [])
+
+    def test_retired_marker_keeps_the_run_contiguous(self):
+        self.edit_control("A-01", _retire(RETIRED_TEXT, ["Dispatcher tests A-01/C1..C3"]))
+        self.assertClean()
+
+    def test_retired_marker_may_follow_the_twin(self):
+        self.edit_control("A-01", _retire("Hostile: x (A-01/C1). Twin: y (C3). Retired: (C2: retired)."))
+        self.assertClean()
+
+    def test_retired_first_case_carries_the_control_id(self):
+        self.edit_control("A-01", _retire("Old case (A-01/C1: retired). Hostile: x (C2). Twin: y (C3)."))
+        self.assertClean()
+
+    def test_gap_without_marker_fails(self):
+        self.edit_control("A-01", _retire("Hostile: x (A-01/C1). Twin: y (C3)."))
+        self.assertCode("case-label")
+
+    def test_retired_number_cannot_be_reused(self):
+        self.edit_control("A-01", _retire("Hostile: x (A-01/C1). Old (C2: retired). Twin: y (C2)."))
+        self.assertCode("case-label")
+
+    def test_number_retired_twice_fails(self):
+        self.edit_control("A-01", _retire("Hostile: x (A-01/C1). (C2: retired). (C2: retired). Twin: y (C3)."))
+        self.assertCode("case-label")
+
+    def test_marker_for_another_control_fails(self):
+        self.edit_control("A-01", _retire("Hostile: x (A-01/C1). (A-02/C2: retired). Twin: y (C3)."))
+        self.assertCode("case-label")
+
+    def test_retired_case_counts_toward_the_evidence_range(self):
+        self.edit_control("A-01", _retire(RETIRED_TEXT, ["Dispatcher tests A-01/C1..C2"]))
+        self.assertCode("case-label")
+
+    def test_evidence_may_not_cite_a_retired_case(self):
+        self.edit_control("A-01", _retire(RETIRED_TEXT, ["Dispatcher test A-01/C2"]))
+        self.assertCode("case-label")
+
+    def test_evidence_may_not_cite_a_case_beyond_the_catalog(self):
+        self.edit_control("A-01", _retire(RETIRED_TEXT, ["Dispatcher test A-01/C4"]))
+        self.assertCode("case-label")
+
+    def test_documents_may_not_cite_a_retired_case(self):
+        self.edit_control("A-01", _retire(RETIRED_TEXT))
+        self.append("references/patterns.md", "\nA-01/C2: the removed case.\n")
+        self.assertCode("case-label")
+
+    def test_documents_may_cite_live_cases_and_show_the_marker(self):
+        self.edit_control("A-01", _retire(RETIRED_TEXT))
+        self.append("references/patterns.md", "\nA-01/C1 and A-01/C3 (twin). The verification text keeps "
+                    "(A-01/C2: retired).\n")
+        self.assertClean()
+
+    def test_retired_number_stays_retired_since_the_base_revision(self):
+        self.edit_control("A-01", _retire(RETIRED_TEXT))
+        self.assertEqual(self.result(base_retired={"A-01": {2}}).findings, [])
+        self.edit_control("A-01", _retire("Hostile: x (A-01/C1). Reused (C2). Twin: y (C3)."))
+        self.assertIn("case-label", {f.code for f in self.result(base_retired={"A-01": {2}}).findings})
+
+    def test_dropping_the_marker_is_caught_against_a_git_base(self):
+        self.git("init", "-q")
+        self.edit_control("A-01", _retire(RETIRED_TEXT))
+        first = self.commit("Retire A-01/C2")
+        self.assertEqual(validate.read_base_retired(self.root, first), ({**{c["id"]: set() for c in
+                         fixture_repo.catalog()["controls"]}, "A-01": {2}}, None))
+        self.edit_control("A-01", _retire("Hostile: x (A-01/C1). Reused (C2). Twin: y (C3)."))
+        self.commit("Reuse the number")
+        self.assertIn("case-label", self.codes_against(first))
+        self.assertEqual(self.codes_against("HEAD"), set())
 
 
 class NoFalsePositiveTests(FixtureTestCase):
@@ -473,8 +622,15 @@ class NoFalsePositiveTests(FixtureTestCase):
         self.append("README.md", "\n[custom](references/frameworks.md#custom-anchor)\n")
         self.assertClean()
 
+    def test_case_labels_and_similar_tokens_are_not_control_ids(self):
+        self.append("references/patterns.md",
+                    "\nCases A-01/C1, A-01/C2 (twin) and the range A-01/C1..C2. Labels (C1), (C10) and C12 in "
+                    "prose. AIUC-1 D004, A003.2 and B006.1; OWASP A01:2021; pillar files S.md, T.md, A.md, "
+                    "N.md and D.md; Amazon S3 and T-shirt sizes.\n")
+        self.assertClean()
+
     def test_control_id_ranges_expand_in_critical_blocks(self):
-        self.assertEqual(validate.expand_ids("A-01 to A-03, I-01"), {"A-01", "A-02", "A-03", "I-01"})
+        self.assertEqual(validate.expand_ids("A-01 to A-03, T-01"), {"A-01", "A-02", "A-03", "T-01"})
 
     def test_enum_tables_and_lists_are_accepted(self):
         scopes = fixture_repo.SCOPES.split(", ")
@@ -492,8 +648,8 @@ class NoFalsePositiveTests(FixtureTestCase):
 
     def test_withdrawn_tombstone_is_accepted(self):
         def withdraw(data):
-            control = self.control(data, "E-01")
-            control.update(lifecycle="withdrawn", withdrawn_in="0.2.0", superseded_by=["S-01"])
+            control = self.control(data, "N-01")
+            control.update(lifecycle="withdrawn", withdrawn_in="0.2.0", superseded_by=["D-01"])
         self.edit_json("catalog/controls.json", withdraw)
         self.edit_json("catalog/ledger.json", lambda d: d["entries"][-1].update(status="withdrawn"))
         self.assertClean()
@@ -629,10 +785,84 @@ class CommandLineTests(FixtureTestCase):
         self.assertIn("ledger-removed: Cannot compare with the base ledger", completed.stdout)
 
 
+def workflow_step(name):
+    """Return the run script of a named step in the real validate workflow."""
+    lines = (REPOSITORY / ".github/workflows/validate.yml").read_text(encoding="utf-8").split("\n")
+    start = lines.index(f"      - name: {name}")
+    run = next(i for i in range(start, len(lines)) if lines[i] == "        run: |")
+    body = []
+    for line in lines[run + 1:]:
+        if line and not line.startswith(" " * 10):
+            break
+        body.append(line[10:])
+    return "\n".join(body)
+
+
+class WorkflowTests(FixtureTestCase):
+    """The workflow compares the ledger with the base of the whole push or pull request."""
+
+    def select(self, event, before="", pr_base=""):
+        if shutil.which("bash") is None:
+            self.skipTest("bash unavailable")
+        output = self.base / "github-output"
+        output.write_text("", encoding="utf-8")
+        env = dict(os.environ, EVENT_NAME=event, PUSH_BEFORE=before, PR_BASE=pr_base, GITHUB_OUTPUT=str(output),
+                   GIT_CEILING_DIRECTORIES=str(self.base))
+        completed = subprocess.run(["bash", "-e", "-c", workflow_step("Select the ledger base revision")],
+                                   cwd=self.root, capture_output=True, text=True, timeout=60, env=env)
+        found = re.search(r"^revision=(.*)$", output.read_text(encoding="utf-8"), re.MULTILINE)
+        return completed.returncode, found.group(1) if found else None
+
+    def test_workflow_does_not_compare_only_with_the_parent_commit(self):
+        text = (REPOSITORY / ".github/workflows/validate.yml").read_text(encoding="utf-8")
+        self.assertIn("github.event.before", text)
+        self.assertIn("github.event.pull_request.base.sha", text)
+        self.assertIn("fetch-depth: 0", text)
+        self.assertNotIn("--ledger-base HEAD^1", text)
+
+    def test_push_compares_with_the_previous_head(self):
+        first = self.history_with_early_removal()
+        code, revision = self.select("push", before=first)
+        self.assertEqual((code, revision), (0, first))
+        self.assertIn("ledger-removed", self.codes_against(revision))
+
+    def test_pull_request_compares_with_the_base_commit(self):
+        first = self.history_with_early_removal()
+        self.assertEqual(self.select("pull_request", before="", pr_base=first), (0, first))
+
+    def test_new_branch_skips_the_comparison(self):
+        self.git("init", "-q")
+        self.commit("Fixture")
+        self.assertEqual(self.select("push", before="0" * 40), (0, ""))
+
+    def test_manual_run_compares_with_the_parent(self):
+        self.git("init", "-q")
+        first = self.commit("Fixture")
+        self.append("CONTRIBUTING.md", "\nMore.\n")
+        self.commit("Change")
+        self.assertEqual(self.select("workflow_dispatch"), (0, first))
+
+    def test_unreachable_base_fails_closed(self):
+        self.git("init", "-q")
+        self.commit("Fixture")
+        code, revision = self.select("push", before="a" * 40)
+        self.assertNotEqual(code, 0)
+        self.assertIsNone(revision)
+
+    def test_malformed_base_fails(self):
+        self.git("init", "-q")
+        self.commit("Fixture")
+        code, revision = self.select("push", before="HEAD~3; echo injected")
+        self.assertNotEqual(code, 0)
+        self.assertIsNone(revision)
+
+
 class ParserTests(unittest.TestCase):
     def test_slugify_matches_github(self):
         self.assertEqual(validate.slugify("A-06 Approval binding"), "a-06-approval-binding")
-        self.assertEqual(validate.slugify("Risk & Responsibility (R)"), "risk--responsibility-r")
+        self.assertEqual(validate.slugify("Scope & Stewardship (S)"), "scope--stewardship-s")
+        self.assertEqual(validate.slugify("S: Scope & Stewardship"), "s-scope--stewardship")
+        self.assertEqual(validate.slugify("D: Demonstrated Defenses"), "d-demonstrated-defenses")
         self.assertEqual(validate.slugify("`snake_case` and **bold**"), "snake_case-and-bold")
 
     def test_markdown_lines_reports_unclosed_fence(self):

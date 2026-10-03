@@ -11,7 +11,8 @@ agent behavior or application security.
 Usage:
   python3 scripts/validate.py [ROOT]            validate the repository
   python3 scripts/validate.py --stage DIR       copy the bundle to DIR (or DIR/<name>) and validate it alone
-  python3 scripts/validate.py --ledger-base REV also reject ledger entries removed since REV
+  python3 scripts/validate.py --ledger-base REV also reject ledger entries removed and retired
+                                                case numbers reused since REV
 
 Exit codes: 0 without findings, 1 with findings, 2 for usage or staging errors.
 """
@@ -74,9 +75,9 @@ SNAPSHOT_FILES = ("references/frameworks.md", CATALOG, MAPPINGS)
 # Rendered by scripts/render_catalog.py and never edited by hand.
 GENERATED = (
     "references/controls/index.md",
-    "references/controls/R.md", "references/controls/A.md",
-    "references/controls/I.md", "references/controls/S.md",
-    "references/controls/E.md",
+    "references/controls/S.md", "references/controls/T.md",
+    "references/controls/A.md", "references/controls/N.md",
+    "references/controls/D.md",
     "references/mappings.md",
 )
 
@@ -109,11 +110,11 @@ TITLE_SUFFIXES = {".md", ".yaml", ".yml", ".json"}
 
 PRINCIPLE = "The model proposes. The application enforces."
 PILLARS = {
-    "R": "Risk & Responsibility",
+    "S": "Scope & Stewardship",
+    "T": "Trust & Isolation",
     "A": "Authority & Access",
-    "I": "Isolation & Integrity",
-    "S": "Security Verification",
-    "E": "Evidence & Evolution",
+    "N": "Notice & Neutralize",
+    "D": "Demonstrated Defenses",
 }
 
 # OWASP Top 10 for Agentic Applications 2026, published December 9, 2025:
@@ -177,12 +178,12 @@ OPENAI_POLICY_KEYS = ("allow_implicit_invocation",)
 
 SNAPSHOT_MAX_AGE_DAYS = 92
 
-CONTROL_ID = re.compile(r"(?<![\w-])((?:R|A|I|S|E)-\d{2})(?![\w-])")
-CONTROL_ID_FULL = re.compile(r"^(R|A|I|S|E)-[0-9]{2}$")
+CONTROL_ID = re.compile(r"(?<![\w-])((?:S|T|A|N|D)-\d{2})(?![\w-])")
+CONTROL_ID_FULL = re.compile(r"^(S|T|A|N|D)-[0-9]{2}$")
 CONTROL_RANGE = re.compile(
-    r"(?<![\w-])((?:R|A|I|S|E)-\d{2})\s*(?:to|through|\u2013)\s*((?:R|A|I|S|E)-\d{2})(?![\w-])")
-LOWER_ID = re.compile(r"(?<![\w-])(?:r|a|i|s|e)-\d{2}(?![\w-])")
-UNHYPHENATED_ID = re.compile(r"(?<![\w-])(?:R|A|I|S|E)\d{2}(?![\w:-])(?!\.\d)")
+    r"(?<![\w-])((?:S|T|A|N|D)-\d{2})\s*(?:to|through|\u2013)\s*((?:S|T|A|N|D)-\d{2})(?![\w-])")
+LOWER_ID = re.compile(r"(?<![\w-])(?:s|t|a|n|d)-\d{2}(?![\w-])")
+UNHYPHENATED_ID = re.compile(r"(?<![\w-])(?:S|T|A|N|D)\d{2}(?![\w:-])(?!\.\d)")
 ASI_ANY = re.compile(r"\bASI(\d+)\b")
 ASI_FULL = re.compile(r"^ASI(0[1-9]|10)$")
 ASI_TITLE_USE = re.compile(
@@ -201,9 +202,12 @@ MACHINE_PATH = re.compile(
 
 # The OWASP mark is used as an adjective, never in the possessive (OWASP mark usage guidelines).
 OWASP_POSSESSIVE = re.compile("OWASP['\u2019]s\\b")
-# Case labels in a control's verification text: "(A-06/T1)" for the first case, then "(T2)" and so on.
-CASE_LABEL = re.compile(r"\((?:((?:R|A|I|S|E)-\d{2})/)?T(\d+)\)")
-CASE_RANGE = re.compile(r"(?<![\w-])((?:R|A|I|S|E)-\d{2})/T1\.\.T(\d+)\b")
+# Case labels in a control's verification text: "(A-06/C1)" for the first case, then "(C2)" and so on.
+# The letter C (case) avoids a clash with the pillar letter T. A case removed after a release keeps
+# its number as a retired marker, "(C3: retired)", so the number is never reused.
+CASE_LABEL = re.compile(r"\((?:((?:S|T|A|N|D)-\d{2})/)?C(\d+)\)")
+RETIRED_CASE = re.compile(r"\((?:((?:S|T|A|N|D)-\d{2})/)?C(\d+): retired\)")
+CASE_RANGE = re.compile(r"(?<![\w-])((?:S|T|A|N|D)-\d{2})/C1\.\.C(\d+)\b")
 
 FENCE = re.compile(r"^(\s*)(`{3,}|~{3,})(.*)$")
 LIST_ITEM = re.compile(r"^\s{0,3}(?:[-*+]|\d{1,9}[.)])(?:[ \t]|$)")
@@ -256,6 +260,7 @@ class Catalog:
     lifecycle: dict[str, str] = field(default_factory=dict)
     titles: dict[str, str] = field(default_factory=dict)
     cases: dict[str, int] = field(default_factory=dict)
+    retired: dict[str, set[int]] = field(default_factory=dict)
     controls: list = field(default_factory=list)
 
 
@@ -1086,10 +1091,10 @@ def check_catalog(rep: Reporter, root: Path) -> Catalog | None:
                         "relation_enum", "mapping_relations", "relations")
     pillars = lookup(data, "pillars")
     if pillars is not None:
-        declared = {item.get("letter"): item.get("name") for item in pillars if isinstance(item, dict)} \
+        declared = [(item.get("letter"), item.get("name")) for item in pillars if isinstance(item, dict)] \
             if isinstance(pillars, list) else None
-        if declared != PILLARS:
-            rep.report("catalog-enum", path, "The catalog's pillars must be exactly: "
+        if declared != list(PILLARS.items()):
+            rep.report("catalog-enum", path, "The catalog's pillars must be exactly, in this order: "
                        + ", ".join(f"{name} ({letter})" for letter, name in PILLARS.items()))
     levels = lookup(data, "levels")
     if isinstance(levels, list) and levels != [1, 2, 3]:
@@ -1117,7 +1122,7 @@ def check_catalog(rep: Reporter, root: Path) -> Catalog | None:
                 rep.report("catalog-field", path, f"{label} is missing {name!r}")
         if isinstance(cid, str):
             if not CONTROL_ID_FULL.match(cid):
-                rep.report("catalog-id", path, f"{cid!r} does not match ^(R|A|I|S|E)-[0-9]{{2}}$")
+                rep.report("catalog-id", path, f"{cid!r} does not match ^(S|T|A|N|D)-[0-9]{{2}}$")
             elif control.get("pillar") != cid[0]:
                 rep.report("catalog-id", path, f"{cid} must have pillar {cid[0]!r}, not {control.get('pillar')!r}")
             if cid in ids:
@@ -1224,14 +1229,21 @@ def check_catalog(rep: Reporter, root: Path) -> Catalog | None:
     if isinstance(declared_set, list) and set(declared_set) != critical:
         rep.report("critical-boundary", path, "The declared critical-boundary list differs from the derived set")
     version = data.get("version") if isinstance(data, dict) else None
-    cases = check_case_labels(rep, path, controls)
+    cases, retired = check_case_labels(rep, path, controls)
     return Catalog(known, critical, version if isinstance(version, str) else None, lifecycles, titles,
-                   cases, [control for control in controls if isinstance(control, dict)])
+                   cases, retired, [control for control in controls if isinstance(control, dict)])
 
 
-def check_case_labels(rep: Reporter, path: Path, controls: list) -> dict[str, int]:
-    """Every hostile case and twin carries a label, (<ID>/T1) then (T2) and so on."""
+def check_case_labels(rep: Reporter, path: Path, controls: list) -> tuple[dict[str, int], dict[str, set[int]]]:
+    """Every hostile case and twin carries a label, (<ID>/C1) then (C2) and so on.
+
+    A case removed after a release leaves a retired marker, (C<n>: retired), in the
+    verification text. The marker reserves the number: it counts toward the run
+    C1..Cn, is never cited as evidence and is never reused for another case.
+    Return the highest case number and the retired numbers of each control.
+    """
     counts: dict[str, int] = {}
+    retired: dict[str, set[int]] = {}
     for control in controls:
         if not isinstance(control, dict) or not isinstance(control.get("id"), str):
             continue
@@ -1239,44 +1251,84 @@ def check_case_labels(rep: Reporter, path: Path, controls: list) -> dict[str, in
         if not isinstance(text, str):
             continue
         labels = [(match.group(1), int(match.group(2)), match.start()) for match in CASE_LABEL.finditer(text)]
-        counts[cid] = len(labels)
+        markers = [(match.group(1), int(match.group(2)), match.start()) for match in RETIRED_CASE.finditer(text)]
+        numbers = [number for _, number, _ in labels]
+        reserved = [number for _, number, _ in markers]
+        counts[cid] = max(numbers + reserved, default=0)
+        retired[cid] = set(reserved)
         if control.get("lifecycle", "active") != "active":
             continue
         if not labels:
             if re.search(r"\b(?:Hostile|Twin)\b", text):
                 rep.report("case-label", path, f"{cid}: label each hostile case and twin in the verification "
-                           f"text as ({cid}/T1), (T2) and so on")
+                           f"text as ({cid}/C1), (C2) and so on")
             continue
-        if [number for _, number, _ in labels] != list(range(1, len(labels) + 1)) or labels[0][0] != cid \
-                or any(owner not in (None, cid) for owner, _, _ in labels):
-            rep.report("case-label", path, f"{cid}: case labels must run ({cid}/T1), (T2) and so on, in order")
+        reused = sorted(set(numbers) & set(reserved))
+        if reused:
+            rep.report("case-label", path, f"{cid}: retired case numbers are never reused: "
+                       + ", ".join(f"C{number}" for number in reused))
+        ordered = sorted(labels + markers, key=lambda item: item[2])
+        if numbers != sorted(set(numbers)) or sorted(numbers + reserved) != list(range(1, counts[cid] + 1)) \
+                or ordered[0][0] != cid or any(owner not in (None, cid) for owner, _, _ in ordered):
+            rep.report("case-label", path, f"{cid}: case labels must run ({cid}/C1), (C2) and so on, in order, "
+                       "with a marker such as (C3: retired) for each retired number")
         twin = text.rfind("Twin")
         if twin >= 0 and labels[-1][2] < twin:
             rep.report("case-label", path, f"{cid}: give the twin a case label")
-        evidence = control.get("evidence")
+    for control in controls:
+        if not isinstance(control, dict) or not isinstance(control.get("id"), str) \
+                or control.get("lifecycle", "active") != "active":
+            continue
+        cid, evidence = control["id"], control.get("evidence")
         for item in evidence if isinstance(evidence, list) else [evidence]:
-            for match in CASE_RANGE.finditer(item if isinstance(item, str) else ""):
-                if match.group(1) == cid and int(match.group(2)) != len(labels):
-                    rep.report("case-label", path, f"{cid}: evidence cites {cid}/T1..T{match.group(2)} but the "
-                               f"verification text labels {len(labels)} cases")
-    return counts
+            item = item if isinstance(item, str) else ""
+            for match in CASE_RANGE.finditer(item):
+                if match.group(1) == cid and int(match.group(2)) != counts.get(cid):
+                    rep.report("case-label", path, f"{cid}: evidence cites {cid}/C1..C{match.group(2)} but the "
+                               f"verification text numbers {counts.get(cid)} cases")
+            for match in TEST_ID.finditer(item):
+                if item[match.end():].startswith(".."):
+                    continue  # A range C1..Cn covers every number of the control; checked above.
+                owner, number = match.group(1).split("/C")
+                if int(number) in retired.get(owner, set()):
+                    rep.report("case-label", path, f"{cid}: evidence cites {match.group(1)}, a retired case")
+                elif owner in counts and int(number) > counts[owner]:
+                    rep.report("case-label", path, f"{cid}: evidence cites {match.group(1)}, which is not a case "
+                               f"in the catalog ({owner} numbers {counts[owner]})")
+    return counts, retired
+
+
+def check_retired_cases(rep: Reporter, path: Path, catalog: Catalog, base: dict[str, set[int]]) -> None:
+    """A case number retired at the base revision stays retired, so it is never reused."""
+    for cid, numbers in sorted(base.items()):
+        if catalog.lifecycle.get(cid, "active") != "active" or cid not in catalog.cases:
+            continue
+        for number in sorted(numbers - catalog.retired.get(cid, set())):
+            rep.report("case-label", path, f"{cid}/C{number} was retired at the base revision; keep its marker "
+                       f"(C{number}: retired) and never reuse the number")
 
 
 def check_case_citations(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
-    """A cited case number exists in the catalog, unless the citation marks it as a local addition."""
+    """A cited case number exists in the catalog and is not retired, unless the citation marks it as local."""
     for doc in docs.values():
         for match in TEST_ID.finditer(doc.text):
-            cid, number = match.group(1).split("/T")
+            cid, number = match.group(1).split("/C")
             count = catalog.cases.get(cid)
             if count is None:
                 continue
-            local = re.match(r"\s*[(,]\s*local\b", doc.text[match.end():match.end() + 12]) is not None
-            if int(number) > count and not local:
-                rep.report("case-label", doc.path, f"{match.group(1)} is not a case in the catalog ({cid} labels "
+            after = doc.text[match.end():match.end() + 12]
+            if after.startswith(": retired)"):
+                continue
+            local = re.match(r"\s*[(,]\s*local\b", after) is not None
+            if int(number) in catalog.retired.get(cid, set()):
+                rep.report("case-label", doc.path, f"{match.group(1)} is a retired case; cite a live case, and "
+                           f"number local additions after C{count}")
+            elif int(number) > count and not local:
+                rep.report("case-label", doc.path, f"{match.group(1)} is not a case in the catalog ({cid} numbers "
                            f"{count}); mark a local addition '(local)'")
             elif int(number) <= count and local:
                 rep.report("case-label", doc.path, f"{match.group(1)} is marked local but is a catalog case; "
-                           f"number local additions after T{count}")
+                           f"number local additions after C{count}")
 
 
 def check_changelog_summary(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
@@ -1292,7 +1344,7 @@ def check_changelog_summary(rep: Reporter, docs: dict[str, MarkdownDoc], catalog
             if int(found.group(1)) != len(controls):
                 rep.report("changelog-summary", doc.path, f"The catalog summary says {found.group(1)} controls; "
                            f"the catalog has {len(controls)}")
-            for span in re.finditer(r"\b(R|A|I|S|E)-(\d{2}) to \1-(\d{2})\b", line):
+            for span in re.finditer(r"\b(S|T|A|N|D)-(\d{2}) to \1-(\d{2})\b", line):
                 serials = sorted(int(c["id"][2:]) for c in controls if c["id"][0] == span.group(1))
                 if serials and (int(span.group(2)), int(span.group(3))) != (serials[0], serials[-1]):
                     rep.report("changelog-summary", doc.path, f"The catalog summary range {span.group(0)} differs "
@@ -1317,18 +1369,21 @@ def check_readme_summary(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: C
     if doc is None or not controls:
         return
     flat = " ".join(doc.text.split())
-    for found in re.finditer(r"(\d+) controls \(R (\d+), A (\d+), I (\d+), S (\d+), E (\d+)\)", flat):
-        stated = tuple(int(value) for value in found.groups())
-        expected = (len(controls), *(sum(1 for c in controls if c["id"][0] == letter) for letter in PILLARS))
-        if stated != expected:
-            rep.report("readme-summary", doc.path, f"README.md states {found.group(0)}; the catalog has "
-                       f"{expected[0]} controls (R {expected[1]}, A {expected[2]}, I {expected[3]}, "
-                       f"S {expected[4]}, E {expected[5]})")
+    letters = tuple(PILLARS)
+    expected = (len(controls), *(sum(1 for c in controls if c["id"][0] == letter) for letter in letters))
+    want = f"{expected[0]} controls (" + ", ".join(
+        f"{letter} {count}" for letter, count in zip(letters, expected[1:])) + ")"
+    # Any per-pillar count list, so a list in an outdated pillar order or with old letters is reported too.
+    for found in re.finditer(r"(\d+) controls \(((?:[A-Z] \d+, )+[A-Z] \d+)\)", flat):
+        stated = (int(found.group(1)), *(int(part.split()[1]) for part in found.group(2).split(", ")))
+        named = tuple(part.split()[0] for part in found.group(2).split(", "))
+        if named != letters or stated != expected:
+            rep.report("readme-summary", doc.path, f"README.md states {found.group(0)}; the catalog has {want}")
+    split = tuple(sum(1 for c in controls if c.get("level") == level) for level in (1, 2, 3))
     for found in re.finditer(r"(\d+) at Level 1, (\d+) at Level 2, (\d+) at Level 3", flat):
-        expected = tuple(sum(1 for c in controls if c.get("level") == level) for level in (1, 2, 3))
-        if tuple(int(value) for value in found.groups()) != expected:
+        if tuple(int(value) for value in found.groups()) != split:
             rep.report("readme-summary", doc.path, f"README.md states {found.group(0)}; the catalog has "
-                       + ", ".join(f"{count} at Level {level}" for level, count in zip((1, 2, 3), expected)))
+                       + ", ".join(f"{count} at Level {level}" for level, count in zip((1, 2, 3), split)))
 
 
 def check_pillar_table(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
@@ -1367,7 +1422,7 @@ def check_mapping_claims(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: C
         return
     by_id = {c["id"]: c for c in catalog.controls if isinstance(c.get("id"), str)}
     text = " ".join(doc.text.split())
-    for claim in re.finditer(r"(?<![\w-])((?:R|A|I|S|E)-\d{2}) \(([^()]*?), direct\)", text):
+    for claim in re.finditer(r"(?<![\w-])((?:S|T|A|N|D)-\d{2}) \(([^()]*?), direct\)", text):
         mappings = by_id.get(claim.group(1), {}).get("mappings") or {}
         for ref in (part.strip() for part in claim.group(2).split(",")):
             relations = {entry.get("relation") for framework in mappings.values() if isinstance(framework, list)
@@ -1452,7 +1507,7 @@ def check_ledger(rep: Reporter, root: Path, catalog: Catalog | None, base: list[
     seen = set()
     for cid in ids:
         if not CONTROL_ID_FULL.match(cid):
-            rep.report("ledger", path, f"{cid!r} does not match ^(R|A|I|S|E)-[0-9]{{2}}$")
+            rep.report("ledger", path, f"{cid!r} does not match ^(S|T|A|N|D)-[0-9]{{2}}$")
         if cid in seen:
             rep.report("ledger", path, f"{cid} is listed twice; IDs are never reused")
         seen.add(cid)
@@ -1472,27 +1527,51 @@ def check_ledger(rep: Reporter, root: Path, catalog: Catalog | None, base: list[
             rep.report("ledger-removed", path, f"{cid} was removed from the ledger since the base revision")
 
 
-def read_base_ledger(root: Path, revision: str) -> tuple[list[str] | None, str | None]:
-    """Read the ledger at a git revision. Return (ids or None when absent, error)."""
+def read_base_file(root: Path, revision: str, relative: str) -> tuple[str | None, str | None]:
+    """Read a file at a git revision. Return (text or None when absent, error)."""
     def git(*args: str) -> subprocess.CompletedProcess:
         return subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True, timeout=60)
     try:
         if git("rev-parse", "--verify", "--quiet", f"{revision}^{{commit}}").returncode != 0:
             return None, f"cannot resolve git revision {revision!r}"
-        if git("cat-file", "-e", f"{revision}:{LEDGER}").returncode != 0:
+        if git("cat-file", "-e", f"{revision}:{relative}").returncode != 0:
             return None, None
-        shown = git("show", f"{revision}:{LEDGER}")
+        shown = git("show", f"{revision}:{relative}")
     except (OSError, subprocess.SubprocessError) as error:
         return None, f"cannot run git: {error}"
     if shown.returncode != 0:
         return None, shown.stderr.strip() or "git show failed"
+    return shown.stdout, None
+
+
+def read_base_ledger(root: Path, revision: str) -> tuple[list[str] | None, str | None]:
+    """Read the ledger at a git revision. Return (ids or None when absent, error)."""
+    text, error = read_base_file(root, revision, LEDGER)
+    if text is None:
+        return None, error
     try:
-        ids = ledger_ids(json.loads(shown.stdout))
+        ids = ledger_ids(json.loads(text))
     except json.JSONDecodeError as error:
         return None, f"base ledger is not JSON: {error}"
     if ids is None:
         return None, "base ledger has an unrecognized structure"
     return ids, None
+
+
+def read_base_retired(root: Path, revision: str) -> tuple[dict[str, set[int]] | None, str | None]:
+    """Read the retired case numbers of each control at a git revision. Return (numbers or None, error)."""
+    text, error = read_base_file(root, revision, CATALOG)
+    if text is None:
+        return None, error
+    try:
+        controls = catalog_controls(json.loads(text))
+    except json.JSONDecodeError as error:
+        return None, f"base catalog is not JSON: {error}"
+    if controls is None:
+        return None, "base catalog has an unrecognized structure"
+    return {control["id"]: {int(match.group(2)) for match in RETIRED_CASE.finditer(control["verification"])}
+            for control in controls if isinstance(control, dict) and isinstance(control.get("id"), str)
+            and isinstance(control.get("verification"), str)}, None
 
 
 def check_mappings(rep: Reporter, root: Path, catalog: Catalog | None) -> None:
@@ -1681,8 +1760,8 @@ def check_control_headings(rep: Reporter, docs: dict[str, MarkdownDoc], catalog:
             rep.report("control-heading", doc.path, f"Missing the heading '### {cid} {title}'")
 
 
-TEST_ID = re.compile(r"(?<![\w-])((?:R|A|I|S|E)-\d{2}/T\d+)(?![\w/])")
-PATTERN_TWIN = re.compile(r"(?<![\w-])((?:R|A|I|S|E)-\d{2}/T\d+)\s*\((?:local )?twin\)")
+TEST_ID = re.compile(r"(?<![\w-])((?:S|T|A|N|D)-\d{2}/C\d+)(?![\w/])")
+PATTERN_TWIN = re.compile(r"(?<![\w-])((?:S|T|A|N|D)-\d{2}/C\d+)\s*\((?:local )?twin\)")
 
 
 def record_example(doc: MarkdownDoc) -> str | None:
@@ -1979,8 +2058,8 @@ def check_orphans(rep: Reporter, root: Path, docs: dict[str, MarkdownDoc]) -> No
 
 
 def run(root: Path, *, bundle_mode: bool = False, catalog_root: Path | None = None,
-        base_ledger: list[str] | None = None, today: dt.date | None = None,
-        run_renderer: bool = True) -> Result:
+        base_ledger: list[str] | None = None, base_retired: dict[str, set[int]] | None = None,
+        today: dt.date | None = None, run_renderer: bool = True) -> Result:
     root = Path(root).resolve()
     rep = Reporter(root)
 
@@ -2012,6 +2091,8 @@ def run(root: Path, *, bundle_mode: bool = False, catalog_root: Path | None = No
     else:
         catalog = check_catalog(rep, root)
         check_ledger(rep, root, catalog, base_ledger)
+        if catalog is not None and base_retired is not None:
+            check_retired_cases(rep, root / CATALOG, catalog, base_retired)
         check_mappings(rep, root, catalog)
 
     for doc in list(docs.values()):
@@ -2125,7 +2206,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="copy the skill bundle into DIR, or into DIR/<name> when DIR is not named after the skill "
                              "(DIR absent or empty), and validate it on its own")
     parser.add_argument("--ledger-base", metavar="REV",
-                        help="git revision whose catalog ledger entries must all still be present")
+                        help="git revision whose catalog ledger entries must all still be present and whose "
+                             "retired case numbers must stay retired")
     args = parser.parse_args(argv)
     root = args.root.resolve()
 
@@ -2139,7 +2221,7 @@ def main(argv: list[str] | None = None) -> int:
         return print_result(result, f"Staged skill bundle at {staged} passed on its own.",
                             "Staged bundle validation failed")
 
-    base = None
+    base = retired = None
     if args.ledger_base:
         base, error = read_base_ledger(root, args.ledger_base)
         if error:
@@ -2148,7 +2230,12 @@ def main(argv: list[str] | None = None) -> int:
             return print_result(result, "", "Repository validation failed")
         if base is None:
             print(f"note: no {LEDGER} at {args.ledger_base}; skipping the removal comparison")
-    result = run(root, base_ledger=base)
+        retired, error = read_base_retired(root, args.ledger_base)
+        if error:
+            result = run(root, base_ledger=base)
+            result.findings.append(Finding("case-label", CATALOG, f"Cannot compare with the base catalog: {error}"))
+            return print_result(result, "", "Repository validation failed")
+    result = run(root, base_ledger=base, base_retired=retired)
     return print_result(result, "Repository layout, skill metadata, catalog, links and portability checks passed.",
                         "Repository validation failed")
 

@@ -28,16 +28,56 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-          # The parent commit lets the validator reject ledger entries removed by this change.
-          fetch-depth: 2
+          # Full history, so the base revision of the whole push or pull request is available
+          # and the validator can reject ledger entries removed anywhere in the change.
+          fetch-depth: 0
       - name: Set up Python
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
       - name: Check generated catalog views
         run: python scripts/render_catalog.py --check
+      - name: Select the ledger base revision
+        id: ledger-base
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          # Compare with the state before the whole change (the previous head of the pushed
+          # branch, or the pull request's base commit), not only with the parent of HEAD, so
+          # a removal in an earlier commit of a multi-commit push is still caught.
+          case "$EVENT_NAME" in
+            push) base="$PUSH_BEFORE" ;;
+            pull_request) base="$PR_BASE" ;;
+            *) base="$(git rev-parse --verify --quiet 'HEAD^1^{commit}' || true)" ;;
+          esac
+          if [[ -z "$base" || "$base" =~ ^0+$ ]]; then
+            # A brand-new branch has no previous head. The in-tree ledger checks still run.
+            echo "::notice::No earlier revision to compare the ledger with; skipping the removal comparison."
+            echo "revision=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if [[ ! "$base" =~ ^[0-9a-f]{40}([0-9a-f]{24})?$ ]]; then
+            echo "::error::Unexpected base revision: $base"
+            exit 1
+          fi
+          # A force push can leave the previous head outside the fetched history.
+          if ! git cat-file -e "$base^{commit}" 2>/dev/null; then
+            git fetch --no-tags --depth=1 origin "$base"
+          fi
+          echo "revision=$base" >> "$GITHUB_OUTPUT"
       - name: Validate repository
-        run: python scripts/validate.py --ledger-base HEAD^1
+        shell: bash
+        env:
+          LEDGER_BASE: ${{ steps.ledger-base.outputs.revision }}
+        run: |
+          if [[ -n "$LEDGER_BASE" ]]; then
+            python scripts/validate.py --ledger-base "$LEDGER_BASE"
+          else
+            python scripts/validate.py
+          fi
       - name: Validate staged skill bundle
         run: python scripts/validate.py --stage "$RUNNER_TEMP/stand"
       - name: Run validator tests

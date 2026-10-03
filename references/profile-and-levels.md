@@ -6,11 +6,11 @@ This file and [conformance.md](conformance.md) are the normative framework text 
 
 "The model proposes. The application enforces." is the principle every control implements.
 
-"The application" means the deterministic controls the model cannot alter: application code, identity and policy services, sandboxes, network policy and infrastructure. Prompts, delimiters, filters and guard or classifier models are not enforcement in this sense. They can add signals, but they are never the only enforcement for any control (I-01).
+"The application" means the deterministic controls the model cannot alter: application code, identity and policy services, sandboxes, network policy and infrastructure. Prompts, delimiters, filters and guard or classifier models are not enforcement in this sense. They can add signals, but they are never the only enforcement for any control (T-01).
 
 ## Capability profile
 
-R-02 requires a capability profile in the security record. The profile decides which controls apply and which level is required.
+S-02 requires a capability profile in the security record. The profile decides which controls apply and which level is required.
 
 ### Agent contexts
 
@@ -18,7 +18,7 @@ Profile each agent context separately, not the application as a whole. An agent 
 
 ### Capability properties
 
-The three properties follow Meta's Agents Rule of Two and Simon Willison's lethal trifecta, which are related work, not part of the framework basis. Property names are words; U, D and X are abbreviations for tables and formulas and are never control-ID prefixes, so they cannot be confused with pillar letters.
+The three properties follow Meta's Agents Rule of Two and Simon Willison's lethal trifecta, which are related work, not part of the framework basis. Property names are words; U, D and X are abbreviations for tables and formulas, never control IDs. The property abbreviation D (sensitive-data) shares its letter with the Demonstrated Defenses pillar, but it never carries a hyphen and serial, so it cannot be read as a control ID such as D-01.
 
 **untrusted-input (U).** The context can contain content not authored by the authenticated principal in the current task or by reviewed trusted configuration. Examples:
 
@@ -26,14 +26,14 @@ The three properties follow Meta's Agents Rule of Two and Simon Willison's letha
 - inbound email, calendar items, tickets and chat from other people;
 - uploads, and third-party text the principal pastes or forwards;
 - images, audio, OCR output and transcripts;
-- tool results; MCP tool results, resources, prompts and sampling results from any server; and MCP or remote-agent descriptors (server instructions included) unless they are reviewed and pinned with I-18 implemented-and-verified for that server (see rule 4 below);
+- tool results; MCP tool results, resources, prompts and sampling results from any server; and MCP or remote-agent descriptors (server instructions included) unless they are reviewed and pinned with T-18 implemented-and-verified for that server (see rule 4 below);
 - peer-agent messages;
 - memory written from a tainted context;
 - client-supplied history and client-executed tool results;
 - repository content from outside contributors;
 - in multi-principal or multi-tenant systems, other principals' input.
 
-In a multi-tenant system every principal is also a potential attacker against the other tenants, even where a principal's own input is not untrusted-input for that principal's own context; I-27 applies that to code execution.
+In a multi-tenant system every principal is also a potential attacker against the other tenants, even where a principal's own input is not untrusted-input for that principal's own context; T-27 applies that to code execution.
 
 **sensitive-data (D).** The context, or a tool it can invoke, can read, or receives in its input, data an attacker should not obtain, or can reach systems an attacker should not control. Examples: another principal's or tenant's data, confidential or regulated data, secrets, payments, identity, production infrastructure, internal networks and admin APIs. The principal's own conversation and task content count as sensitive-data unless the record states why they hold nothing an attacker should obtain.
 
@@ -41,8 +41,8 @@ In a multi-tenant system every principal is also a potential attacker against th
 
 - writes, sends, payments, publication, provisioning, and code execution with side effects;
 - pull request, issue and comment creation;
-- any request whose URL, host, path or query the model chooses, including search and fetch, unless every request goes to a fixed URL or to a host-and-path entry that a trusted operator set in configuration, I-12 is implemented-and-verified, and no allowed entry is an open redirect, a content proxy, a user-content or shared-hosting domain (for example a private suffix on the Public Suffix List), an endpoint whose GET requests change state, or a host that accepts writes under a credential the request supplies, unless I-12 confines it to the operator's account or to read-only methods. A path or query segment the model chooses always makes the request external-effect, because it can carry data;
-- a client that renders model output and auto-loads remote content or unfurls links, unless I-13 is implemented-and-verified.
+- any request whose URL, host, path or query the model chooses, including search and fetch, unless every request goes to a fixed URL or to a host-and-path entry that a trusted operator set in configuration, T-12 is implemented-and-verified, and no allowed entry is an open redirect, a content proxy, a user-content or shared-hosting domain (for example a private suffix on the Public Suffix List), an endpoint whose GET requests change state, or a host that accepts writes under a credential the request supplies, unless T-12 confines it to the operator's account or to read-only methods. A path or query segment the model chooses always makes the request external-effect, because it can carry data;
+- a client that renders model output and auto-loads remote content or unfurls links, unless T-13 is implemented-and-verified.
 
 The last two exceptions reward the cheap fixes: a retrieval chat with verified inert rendering does not count as external-effect through its renderer.
 
@@ -62,9 +62,9 @@ A context whose actions fall under different scopes takes the highest of them.
 ### Evaluation rules
 
 1. Fail-safe. A property whose presence is unknown MUST be recorded as present. Treat an unknown feature tag the same way, and record the highest autonomy scope that cannot be ruled out.
-2. Propagation. A context that consumes output of an untrusted-input context MUST be recorded as untrusted-input. Summaries, memory, embeddings and delegation do not remove the property. The only exception is output that crosses a separation boundary verified under I-02 as typed, validated values or opaque references; those values stay untrusted-derived, carry their provenance to the dispatcher, and A-06 and A-07 check every consequential argument derived from them. Content passed by opaque reference stays untrusted wherever it is dereferenced: an effect that carries it, or a renderer that shows it, applies A-24, I-13 and I-14 as for a tainted context (I-02). Likewise, a context that receives in its input data an attacker should not obtain (a summary of order data, recalled memory, a delegated message) MUST be recorded as sensitive-data, even when none of its own tools can read that data, so a context that reads untrusted input and sensitive data cannot hand a summary to an effect-only context recorded with two properties.
-3. Separation credit. A property counts as removed from a context only when I-02 is implemented-and-verified for that context. Unverified separation earns nothing.
-4. Descriptor trust. Reviewed, hash-pinned MCP and remote-agent descriptors are trusted configuration, and so do not by themselves make a context untrusted-input, only while I-18 is implemented-and-verified for that server or agent. Otherwise they are untrusted content (I-01). Results from every server stay untrusted in either case.
+2. Propagation. A context that consumes output of an untrusted-input context MUST be recorded as untrusted-input. Summaries, memory, embeddings and delegation do not remove the property. The only exception is output that crosses a separation boundary verified under T-02 as typed, validated values or opaque references; those values stay untrusted-derived, carry their provenance to the dispatcher, and A-06 and A-07 check every consequential argument derived from them. Content passed by opaque reference stays untrusted wherever it is dereferenced: an effect that carries it, or a renderer that shows it, applies A-24, T-13 and T-14 as for a tainted context (T-02). Likewise, a context that receives in its input data an attacker should not obtain (a summary of order data, recalled memory, a delegated message) MUST be recorded as sensitive-data, even when none of its own tools can read that data, so a context that reads untrusted input and sensitive data cannot hand a summary to an effect-only context recorded with two properties.
+3. Separation credit. A property counts as removed from a context only when T-02 is implemented-and-verified for that context. Unverified separation earns nothing.
+4. Descriptor trust. Reviewed, hash-pinned MCP and remote-agent descriptors are trusted configuration, and so do not by themselves make a context untrusted-input, only while T-18 is implemented-and-verified for that server or agent. Otherwise they are untrusted content (T-01). Results from every server stay untrusted in either case.
 5. Absence. A property is absent only when the capability is architecturally absent, or removed under rule 3. Filters, guard models, prompts and approvals are controls; they never make a property absent.
 6. Feature tags from the applicability vocabulary are recorded per context, with the profile.
 
@@ -74,7 +74,7 @@ Derived values per context: n is the number of U, D and X present after separati
 
 The record holds one row per context, followed by a union line and a level line. Each property cell says present or absent, with the source, tool or renderer that justifies it. Example (worked example 2 below):
 
-| Context | untrusted-input (U) and source | sensitive-data (D) and source | external-effect (X) and source | Separation pattern, removed property, I-02 status | Autonomy scope (1-4) | Feature tags | n | A-08 option, if n is 3 | Computed level |
+| Context | untrusted-input (U) and source | sensitive-data (D) and source | external-effect (X) and source | Separation pattern, removed property, T-02 status | Autonomy scope (1-4) | Feature tags | n | A-08 option, if n is 3 | Computed level |
 |---|---|---|---|---|---|---|---|---|---|
 | support-agent | present: ticket thread, help-center search | present: order lookup across tenants | present: refund, send_email, helpdesk renderer | none | 3 | tools, retrieval, approvals, multi-tenant, rendered-output, provider-routing | 3 | (a) per-refund confirmation | 3 |
 
@@ -139,7 +139,7 @@ token        = an entry of the vocabulary above
 For example, `["rendered-output", "tools"]` matches a context with either tag, and `untrusted-input+external-effect` matches only a context that holds both properties.
 
 - A control is applicable to the system when at least one of its alternatives matches at least one agent context in the stated scope, using the profile after separation credit.
-- Applicability comes from the profile alone; the selected level then decides which applicable controls are required (Levels 1 through N). Many Level 1 controls are conditional on capability properties (for example A-06, A-07, A-08 and S-04); they bind whenever their condition holds, whatever level is claimed.
+- Applicability comes from the profile alone; the selected level then decides which applicable controls are required (Levels 1 through N). Many Level 1 controls are conditional on capability properties (for example A-06, A-07, A-08 and D-04); they bind whenever their condition holds, whatever level is claimed.
 - A control whose `applies_when` matches no context is recorded as not-applicable-with-reason, and the reason names the absent capability ([conformance.md](conformance.md)).
 
 ## Levels
@@ -164,54 +164,54 @@ Then:
 - The selected level is the higher of the computed level and the owner-declared level. An owner may declare a higher level, never a lower one.
 - A claim below the computed level is invalid. There is no "required level not met" wording.
 
-The rule rewards injection-resistant architecture: a verified I-02 separation that keeps every context at two properties or fewer lowers the computed level (example 3 below).
+The rule rewards injection-resistant architecture: a verified T-02 separation that keeps every context at two properties or fewer lowers the computed level (example 3 below).
 
 ### What each level adds
 
 Level 1, the enforcement baseline (61 controls, most of them conditional):
 
-- accountable scope, profile, Least Agency, threat model, consequential operations register and data policy: R-01 to R-06;
+- accountable scope, profile, Least Agency, threat model, consequential operations register and data policy: S-01 to S-06;
 - one dispatch path, deny by default, authority from trusted context at the moment of effect, idempotency, tool profiles and the destructive-operation guard: A-01 to A-05, A-09, A-10;
-- untrusted content and consequential choices (provenance-aware values, task-scope binding, Rule of Two gating, outbound payload checks, verified changes to redirecting values, taint, enforced separation, system of record): A-06, A-07, A-08, A-24, A-25, I-01, I-02, I-08;
+- untrusted content and consequential choices (provenance-aware values, task-scope binding, Rule of Two gating, outbound payload checks, verified changes to redirecting values, taint, enforced separation, system of record): A-06, A-07, A-08, A-24, A-25, T-01, T-02, T-08;
 - approval binding and presentation integrity: A-11, A-12;
 - delegation, tokens, principals and triggers, budgets, deadlines and no self-modification: A-15, A-16, A-19, A-20, A-21, A-23;
-- disclosure boundaries for prompts, retrieval, memory, conversation state and providers: I-04, I-06, I-07, I-09, I-10, I-11;
-- execution, egress and rendering boundaries, including per-tenant kernel isolation for code execution: I-05, I-12, I-13, I-14, I-15, I-17, I-27;
-- MCP, inter-agent, coding-agent and supply-chain boundaries: I-18 to I-21, I-23, I-24, I-25;
-- verification discipline and the release gate: S-01 to S-07;
-- audit, baseline signals, stop without deploy and governed change: E-01, E-02, E-04, E-06, E-09.
+- disclosure boundaries for prompts, retrieval, memory, conversation state and providers: T-04, T-06, T-07, T-09, T-10, T-11;
+- execution, egress and rendering boundaries, including per-tenant kernel isolation for code execution: T-05, T-12, T-13, T-14, T-15, T-17, T-27;
+- MCP, inter-agent, coding-agent and supply-chain boundaries: T-18 to T-21, T-23, T-24, T-25;
+- verification discipline and the release gate: D-01 to D-07;
+- audit, baseline signals, stop without deploy and governed change: N-01, N-02, N-04, N-06, N-09.
 
-Most agents that read web content compute to Level 3. An agent that reads search results or web pages (untrusted-input), holds the principal's conversation (sensitive-data unless the record says why not) and chooses its own search or fetch queries (external-effect) has all three properties. That follows from the lethal trifecta and is deliberate. The ways to a lower level are architectural: a separation verified under I-02, fetches limited to fixed destinations behind a verified egress boundary (I-12), or a recorded reason that the context holds nothing an attacker should obtain.
+Most agents that read web content compute to Level 3. An agent that reads search results or web pages (untrusted-input), holds the principal's conversation (sensitive-data unless the record says why not) and chooses its own search or fetch queries (external-effect) has all three properties. That follows from the lethal trifecta and is deliberate. The ways to a lower level are architectural: a separation verified under T-02, fetches limited to fixed destinations behind a verified egress boundary (T-12), or a recorded reason that the context holds nothing an attacker should obtain.
 
 Level 2 adds depth for systems with two risky properties or supervised autonomy (12 controls):
 
 - approval anomaly cues and fatigue management: A-13;
 - workload identity and token exchange: A-17;
 - principal, tenant and provider quotas: A-22;
-- hidden-text normalization: I-03;
-- strong isolation tier: I-16;
-- fault-propagation containment: I-22;
-- agent-to-human communication integrity: I-26;
-- live-model adversarial evaluation: S-08;
-- forensic context manifest, behavioral detection, kill-switch scopes with measured latency, quarantine and exercised recovery: E-03, E-05, E-07, E-08.
+- hidden-text normalization: T-03;
+- strong isolation tier: T-16;
+- fault-propagation containment: T-22;
+- agent-to-human communication integrity: T-26;
+- live-model adversarial evaluation: D-08;
+- forensic context manifest, behavioral detection, kill-switch scopes with measured latency, quarantine and exercised recovery: N-03, N-05, N-07, N-08.
 
 Level 3 adds, for trifecta or fully autonomous effectful systems (5 controls):
 
 - step-up and dual control: A-14;
 - sender-constrained tokens: A-18;
-- independent adversarial review with adaptive attacks: S-09;
-- replay before rollout and before authority expansion: S-10;
-- tamper-evident audit: E-10.
+- independent adversarial review with adaptive attacks: D-09;
+- replay before rollout and before authority expansion: D-10;
+- tamper-evident audit: N-10.
 
 Counts in catalog v0.1:
 
 | Pillar | Level 1 | Level 2 | Level 3 | Total |
 |---|---|---|---|---|
-| R Risk & Responsibility | 6 | 0 | 0 | 6 |
+| S Scope & Stewardship | 6 | 0 | 0 | 6 |
+| T Trust & Isolation | 23 | 4 | 0 | 27 |
 | A Authority & Access | 20 | 3 | 2 | 25 |
-| I Isolation & Integrity | 23 | 4 | 0 | 27 |
-| S Security Verification | 7 | 1 | 2 | 10 |
-| E Evidence & Evolution | 5 | 4 | 1 | 10 |
+| N Notice & Neutralize | 5 | 4 | 1 | 10 |
+| D Demonstrated Defenses | 7 | 1 | 2 | 10 |
 | Total | 61 | 12 | 5 | 78 |
 
 ### Worked examples
@@ -221,11 +221,11 @@ The counts below are computed from catalog v0.1 for the stated contexts and tags
 **1. Public product-docs assistant.** One context.
 
 - U present: retrieval over public documentation, counted conservatively.
-- D absent: no accounts, secrets or other principals' data are reachable, and the record states that conversations are anonymous, not retained and hold nothing an attacker should obtain (otherwise D is present, n is 2, the computed level is Level 2, and R-06 and I-10 apply).
-- X absent: there are no tools, and the client renders output inertly, with I-13 implemented-and-verified.
+- D absent: no accounts, secrets or other principals' data are reachable, and the record states that conversations are anonymous, not retained and hold nothing an attacker should obtain (otherwise D is present, n is 2, the computed level is Level 2, and S-06 and T-10 apply).
+- X absent: there are no tools, and the client renders output inertly, with T-13 implemented-and-verified.
 - Autonomy scope 1. Tags: retrieval, rendered-output, provider-routing.
-- n is 1, so the computed level is Level 1, with 15 applicable controls: R-01 to R-04, I-01, I-04, I-06, I-13, I-14, I-24, S-01, S-03, S-06, S-07, E-09.
-- If I-13 were not yet implemented-and-verified and the client auto-loaded images, the renderer would count as external-effect, n would be 2, and the computed level would be Level 2.
+- n is 1, so the computed level is Level 1, with 15 applicable controls: S-01 to S-04, T-01, T-04, T-06, T-13, T-14, T-24, D-01, D-03, D-06, D-07, N-09.
+- If T-13 were not yet implemented-and-verified and the client auto-loaded images, the renderer would count as external-effect, n would be 2, and the computed level would be Level 2.
 
 **2. Multi-tenant support agent.** One context. A support representative starts the agent on a ticket. It reads the ticket thread and help-center search results, looks up orders, issues refunds and sends customer emails; refunds above a threshold need the representative's approval.
 
@@ -234,16 +234,16 @@ This example illustrates profiling only; its design must still satisfy A-08 and 
 - U present (ticket thread, search results), D present (order data across tenants), X present (refunds, emails, helpdesk renderer). It is a trifecta context, so A-08 binds.
 - Autonomy scope 3. Tags: tools, retrieval, approvals, multi-tenant, rendered-output, provider-routing.
 - n is 3, so the computed level is Level 3: 45 applicable controls at Level 1, 55 through Level 2 and 60 through Level 3.
-- The other 18 controls are not applicable because their tags are absent: A-15, A-19, I-02, I-07, I-09, I-11, I-12, I-15, I-16, I-17, I-18, I-19, I-20, I-21, I-22, I-23, I-25, I-27.
+- The other 18 controls are not applicable because their tags are absent: A-15, A-19, T-02, T-07, T-09, T-11, T-12, T-15, T-16, T-17, T-18, T-19, T-20, T-21, T-22, T-23, T-25, T-27.
 
-**3. The same support agent with enforced separation.** Two contexts, using a plan-then-execute or dual-model pattern under I-02 (option (c) of A-08).
+**3. The same support agent with enforced separation.** Two contexts, using a plan-then-execute or dual-model pattern under T-02 (option (c) of A-08).
 
 - Ticket reader: the application places the ticket thread and help-center results in its context. It has no tools and returns only typed, validated values (an order ID, an intent from a fixed list, an opaque reference to the ticket text). U present, D present (the ticket can hold personal data), X absent. Tags: retrieval, multi-tenant, provider-routing, separation-pattern.
-- Planner: receives only those values and trusted configuration, looks up orders, issues refunds and sends emails. D and X present; U absent by separation credit, because I-02 is implemented-and-verified. Tags: tools, approvals, multi-tenant, rendered-output, provider-routing, separation-pattern.
+- Planner: receives only those values and trusted configuration, looks up orders, issues refunds and sends emails. D and X present; U absent by separation credit, because T-02 is implemented-and-verified. Tags: tools, approvals, multi-tenant, rendered-output, provider-routing, separation-pattern.
 - Both contexts are autonomy scope 3 with n of 2, so the computed level is Level 2: 45 applicable controls at Level 1 and 55 through Level 2.
-- A-08 no longer applies, because no context holds all three properties. A-06 and A-07 still apply, per value, through their `separation-pattern+external-effect` alternative: the order ID is still the ticket author's choice, so a ticket naming another customer's order is caught at dispatch, where the value arrives labelled untrusted-derived and is denied or confirmed with its origin shown. It matches the system of record only among the case requester's orders (R-05); that the order exists is not a match.
-- A-24, I-13 and S-04 also still apply, through their `separation-pattern` alternatives. The planner never reads the ticket text, but it places the reader's opaque reference in customer emails and helpdesk replies, so that text reaches a recipient and a renderer: the payload check treats it as untrusted content with the reader's data classes, the helpdesk renderer stays inert, and the injection fixtures cover the reader's channels.
-- I-02 now applies, and the level rests on it: if I-02 is not implemented-and-verified, the planner is untrusted-input by taint propagation and the system returns to Level 3.
+- A-08 no longer applies, because no context holds all three properties. A-06 and A-07 still apply, per value, through their `separation-pattern+external-effect` alternative: the order ID is still the ticket author's choice, so a ticket naming another customer's order is caught at dispatch, where the value arrives labelled untrusted-derived and is denied or confirmed with its origin shown. It matches the system of record only among the case requester's orders (S-05); that the order exists is not a match.
+- A-24, T-13 and D-04 also still apply, through their `separation-pattern` alternatives. The planner never reads the ticket text, but it places the reader's opaque reference in customer emails and helpdesk replies, so that text reaches a recipient and a renderer: the payload check treats it as untrusted content with the reader's data classes, the helpdesk renderer stays inert, and the injection fixtures cover the reader's channels.
+- T-02 now applies, and the level rests on it: if T-02 is not implemented-and-verified, the planner is untrusted-input by taint propagation and the system returns to Level 3.
 
 ### Levels in other frameworks
 
@@ -251,7 +251,7 @@ OWASP AISVS 1.0 also has Levels 1 to 3, with a different meaning: there, a level
 
 ## Change triage
 
-E-09 requires changes to be triaged; this section defines the tiers. Its instructions apply to whoever makes the change, human or coding agent.
+N-09 requires changes to be triaged; this section defines the tiers. Its instructions apply to whoever makes the change, human or coding agent.
 
 Classify every task before doing security work, from the task-owned diff rather than the wording of the request. Record the tier and a one-line reason in the final report.
 
@@ -305,14 +305,14 @@ The diff touches one or more trigger locations, and the capability profile is un
 
 - Select controls with the routing table in [SKILL.md](../SKILL.md): touched locations to control IDs, filtered by `applies_when` and the selected level. Select rows by the concern the diff changes, not by the file it is in: a timeout change inside an effect adapter uses only the timeouts row.
 - A control is touched when the diff changes the code or configuration that enforces it. Always include any touched critical-boundary control.
-- In a context with untrusted-input and external-effect, add I-01, A-06, A-07 and S-04 (and A-08 in a trifecta context) only when the diff changes consequential arguments or destinations, prompt assembly, an untrusted-input channel or the dispatcher. Changes confined to timeouts, retries, budgets, audit or stop mechanisms do not add them.
+- In a context with untrusted-input and external-effect, add T-01, A-06, A-07 and D-04 (and A-08 in a trifecta context) only when the diff changes consequential arguments or destinations, prompt assembly, an untrusted-input channel or the dispatcher. Changes confined to timeouts, retries, budgets, audit or stop mechanisms do not add them.
 - A diff that adds or alters an operation setting a redirecting value (A-25), through a tool, an effect adapter or an MCP server, also routes the "Consequential arguments or destination policy" row, whether or not code enforcing A-25 exists yet.
-- A wording-only change to prompt, tool-description or outbound-template text (no change to inputs, offered tools, arguments, recipients or assembly) does not add the untrusted-input and external-effect set above. It keeps I-01 and I-04, verifies the row's critical-boundary controls by re-running their existing cases, and lists S-10 as a release prerequisite where it applies.
-- Drop a routed control whose subject the touched operation lacks only when the R-05 register shows that the operation has no effect (for example A-05 and E-02 for a pure read). Never drop a critical-boundary control this way, and state the reason in the compact record. Where no R-05 register exists, drop a control only when the code shows that the touched operation has no effect, and say so in the record.
-- Route about 8 control entries (S-03 and S-06, which apply to every SCOPED task, not counted). The cap is a scoping signal, not a reason to drop a routed control: touched critical-boundary controls and the untrusted-input and external-effect additions above are always routed, even past it. Routing well beyond it is reported as a broad change, or reclassified as FULL if the profile changed. For S-05, load only the matrix rows for the touched boundary.
-- Implement and verify only those controls, each with its hostile cases and authorized twin through the real path, and re-run the existing security suite (S-07). Run every required case of each routed control; a control whose cases did not all run at this commit is implemented-but-unverified.
-- S-08, S-09 and S-10 are release activities that a SCOPED task does not perform. List any that the change triggers (S-10 for a model, prompt, provider, tool-definition, tool-grant or policy change at Level 3) as release prerequisites for the owner in the compact record.
-- Update the inventory in the same change when the diff adds or alters an inventory entry, such as a tool, a model version or a descriptor hash (R-04).
+- A wording-only change to prompt, tool-description or outbound-template text (no change to inputs, offered tools, arguments, recipients or assembly) does not add the untrusted-input and external-effect set above. It keeps T-01 and T-04, verifies the row's critical-boundary controls by re-running their existing cases, and lists D-10 as a release prerequisite where it applies.
+- Drop a routed control whose subject the touched operation lacks only when the S-05 register shows that the operation has no effect (for example A-05 and N-02 for a pure read). Never drop a critical-boundary control this way, and state the reason in the compact record. Where no S-05 register exists, drop a control only when the code shows that the touched operation has no effect, and say so in the record.
+- Route about 8 control entries (D-03 and D-06, which apply to every SCOPED task, not counted). The cap is a scoping signal, not a reason to drop a routed control: touched critical-boundary controls and the untrusted-input and external-effect additions above are always routed, even past it. Routing well beyond it is reported as a broad change, or reclassified as FULL if the profile changed. For D-05, load only the matrix rows for the touched boundary.
+- Implement and verify only those controls, each with its hostile cases and authorized twin through the real path, and re-run the existing security suite (D-07). Run every required case of each routed control; a control whose cases did not all run at this commit is implemented-but-unverified.
+- D-08, D-09 and D-10 are release activities that a SCOPED task does not perform. List any that the change triggers (D-10 for a model, prompt, provider, tool-definition, tool-grant or policy change at Level 3) as release prerequisites for the owner in the compact record.
+- Update the inventory in the same change when the diff adds or alters an inventory entry, such as a tool, a model version or a descriptor hash (S-04).
 - The baseline is the security record from an earlier assessment, at the record path named in the repository's instructions (otherwise `docs/agent-security-record.md`). Use the selected level it states, or compute the level from the profile it records. If it states neither, route Level 1 entries only, say "level not stated in baseline" in the Profile line and never invent a level; if it records no readiness value, readiness is blocked (baseline readiness not stated).
 - Write a compact change record (format below) into that record, never into a second record file. The record is append-only: leave the baseline Controls table and release gate result unchanged, and add the compact record at the top of the section "Compact change record (SCOPED changes)", so the newest comes first. The newest compact record's Readiness line is the current readiness.
 - If no baseline record exists, the change is still SCOPED. Create the record file with only its header (assessment tier SCOPED) and the compact change record with "Baseline: missing", route Level 1 entries only and say that the level is not computed, leave the other applicable controls as not-assessed, and recommend a full assessment. Do not build a baseline unless asked or unless the change qualifies as FULL.
@@ -322,9 +322,9 @@ The diff touches one or more trigger locations, and the capability profile is un
 
 ### Compact change record
 
-Line budget: at most 12 lines plus one line per routed control. The budget counts every non-blank line the change adds to the record file, including the two code-fence lines and any heading or note; add no heading or note, because the section heading already exists and the Header pins the catalog version. Not counted: Inventory rows the diff adds or alters (R-04), "Finding:" lines, and, when the change creates the record file or the section, its Header and the section heading. If an existing record lacks this section, add its heading at the end of the file; that heading is not counted.
+Line budget: at most 12 lines plus one line per routed control. The budget counts every non-blank line the change adds to the record file, including the two code-fence lines and any heading or note; add no heading or note, because the section heading already exists and the Header pins the catalog version. Not counted: Inventory rows the diff adds or alters (S-04), "Finding:" lines, and, when the change creates the record file or the section, its Header and the section heading. If an existing record lacks this section, add its heading at the end of the file; that heading is not counted.
 
-Each routed control takes one line, including a control dropped with its reason; the touched S-05 rows share one line, and controls with the same status and evidence scope may share one. S-03 and S-06 take no line of their own: the "Tests run" and "Readiness" lines record them. The other lines, with the two fences, fit in the 12:
+Each routed control takes one line, including a control dropped with its reason; the touched D-05 rows share one line, and controls with the same status and evidence scope may share one. D-03 and D-06 take no line of their own: the "Tests run" and "Readiness" lines record them. The other lines, with the two fences, fit in the 12:
 
 - "Change:" with the change ID (the pull request, ticket or commit reference, or "none") and a one-line description;
 - "Tier: SCOPED" with the reason, then "locations:" with the trigger locations touched, on the same line;
@@ -332,10 +332,10 @@ Each routed control takes one line, including a control dropped with its reason;
 - "Tests run:" with the tests actually run and their results;
 - "Residual risk:" with new or changed residual risks, severity and owner or "unassigned", or "none new";
 - "Finding:" only for a gap found in a pre-existing, unchanged feature (scope rule item 2), one line each with control ID, status, severity, location, failing test or "none" and suggested fix; these lines are outside the budget, so a finding is never compressed or dropped to fit;
-- "Release prerequisites:" only when the change triggers S-08, S-09 or S-10;
+- "Release prerequisites:" only when the change triggers D-08, D-09 or D-10;
 - "Owner decisions:" only when product rules, flows or thresholds are proposed and not implemented, or a minimal mechanism was built for a critical boundary;
 - "Readiness:" with one value of the readiness enum and its basis;
-- "Approver:" with the name a human provided, or "unassigned" (E-09);
+- "Approver:" with the name a human provided, or "unassigned" (N-09);
 - the literal line "Other controls: not re-assessed (outside change scope)".
 
 ### FULL
@@ -351,14 +351,14 @@ FULL applies to:
 - a change that adds external-effect when no baseline exists;
 - an explicit request for an assessment.
 
-Action: compute the profile and level (R-02), complete R-01 to R-06 where they apply, evaluate every applicable control at Levels 1 to N, build the ASI applicability table with architectural reasons for exclusions (R-04), and apply the release gate (S-06).
+Action: compute the profile and level (S-02), complete S-01 to S-06 where they apply, evaluate every applicable control at Levels 1 to N, build the ASI applicability table with architectural reasons for exclusions (S-04), and apply the release gate (D-06).
 
-On an existing system, a FULL change assesses every applicable control but implements only within the scope rule below: it implements and verifies the controls whose enforcement boundary the change adds or alters and the critical-boundary controls whose enforcement path the new feature's calls traverse, re-runs the cases of carried-over rows, and records every other applicable control by inspection with its status and severity. Adding a first MCP server, for example, implements I-18, I-19, I-20 and the dispatcher, credential and egress controls on the MCP call path, and makes the new server and its tools disableable without a deploy (E-06) where a disable or stop path exists or can be added minimally; a missing system-wide kill switch is recorded as an open item rather than built.
+On an existing system, a FULL change assesses every applicable control but implements only within the scope rule below: it implements and verifies the controls whose enforcement boundary the change adds or alters and the critical-boundary controls whose enforcement path the new feature's calls traverse, re-runs the cases of carried-over rows, and records every other applicable control by inspection with its status and severity. Adding a first MCP server, for example, implements T-18, T-19, T-20 and the dispatcher, credential and egress controls on the MCP call path, and makes the new server and its tools disableable without a deploy (N-06) where a disable or stop path exists or can be added minimally; a missing system-wide kill switch is recorded as an open item rather than built.
 
 A profile change re-assesses the whole system, not only the new feature, because a new property or tag can change which contexts are trifecta contexts and which controls bind, and the whole claim lapses when a FULL change lands without a new assessment ([conformance.md](conformance.md)). Re-assessing means recomputing every context's profile and level, re-running the cases of every carried-over row, and recording every other applicable control by inspection with its status and severity; implementation still follows the scope rule. A FULL change that adds an entry point but no property, tag or higher level verifies the new path and the carried-over cases on it, not the whole system. When the work expands well beyond the request, say so in the report and, in an interactive session, tell the user before continuing.
 
 - When a record already exists, update it by control ID rather than starting a second one. A carried-over row keeps implemented-and-verified only if all its required cases re-ran and passed at the new commit at or above the minimum evidence scope. Isolated-runtime or deployed evidence that was not re-run becomes implemented-but-unverified. A newly applicable control enforced at a boundary this change adds or alters is implemented and verified in this change; any other newly applicable control is assessed by inspection and recorded as planned, failing or implemented-but-unverified, with its severity.
-- Build order: the critical-boundary set first, then the remaining Level 1 controls, then Level 2 and Level 3. Controls whose evidence needs people, production data or unapproved model spend (S-08 live-model trials without an approved budget, the S-09 review, E-08 exercises, the S-10 replay corpus) are implemented as far as code allows and otherwise recorded as planned with the owner action needed; a coding agent never simulates a human reviewer or an exercise. Level 2 and 3 controls whose enforcement needs infrastructure the repository lacks (for example A-17 workload identity with token exchange, A-18 sender-constrained tokens, E-07 measured kill-switch scopes, E-10 tamper-evident audit storage) are implemented on the application side, behind an interface where code allows, and otherwise recorded as planned with the owner action needed; never provision infrastructure nobody asked for.
+- Build order: the critical-boundary set first, then the remaining Level 1 controls, then Level 2 and Level 3. Controls whose evidence needs people, production data or unapproved model spend (D-08 live-model trials without an approved budget, the D-09 review, N-08 exercises, the D-10 replay corpus) are implemented as far as code allows and otherwise recorded as planned with the owner action needed; a coding agent never simulates a human reviewer or an exercise. Level 2 and 3 controls whose enforcement needs infrastructure the repository lacks (for example A-17 workload identity with token exchange, A-18 sender-constrained tokens, N-07 measured kill-switch scopes, N-10 tamper-evident audit storage) are implemented on the application side, behind an interface where code allows, and otherwise recorded as planned with the owner action needed; never provision infrastructure nobody asked for.
 
 ### Assessing and implementing
 
@@ -366,8 +366,8 @@ Assessing and implementing are different obligations. FULL assesses every applic
 
 1. Implement and verify the routed controls at the boundaries the change creates or changes, and the critical-boundary controls on the requested feature's call path. A mechanism such a control's MUST requires there (for example an A-20 budget or an A-21 deadline on a call the change adds) is not a product rule; take its values from existing configuration, otherwise use a documented placeholder recorded as an owner decision to confirm.
 2. A gap in a pre-existing, unchanged feature is a finding, not a task. Record it (status failing or not-assessed, severity per the rubric in [conformance.md](conformance.md), location, failing test if any, suggested fix) and report it. Fix it only when the user asked, when the new feature makes it reachable, or when it is critical and inside a touched boundary.
-3. The requested behavior, plus the smallest change needed to deliver it, is the task. Beyond that and the mechanisms item 1 puts in scope (an E-06 disable switch for a new tool, an I-24 version reference for a model the change adds), new user-facing flows, endpoints, confirmations, limits, caps, timeouts, circuit breakers, fail-fast paths, configuration switches, choosing or changing a model version, API or constructor changes, and behavior changes to existing features that the request did not ask for are product decisions. Build the minimal mechanism only when a critical-boundary control for the requested feature cannot otherwise be met, choosing the option that changes existing behavior least (for A-08, an existing approval step or option (b) before a new confirmation flow), and flag it as an owner decision. Otherwise list it as an owner decision and leave the gap open.
-4. The release gate (S-06) then reports "blocked" honestly, naming the open IDs. Rewriting the application to pass the gate, or refactoring unrelated code, is out of scope.
+3. The requested behavior, plus the smallest change needed to deliver it, is the task. Beyond that and the mechanisms item 1 puts in scope (an N-06 disable switch for a new tool, a T-24 version reference for a model the change adds), new user-facing flows, endpoints, confirmations, limits, caps, timeouts, circuit breakers, fail-fast paths, configuration switches, choosing or changing a model version, API or constructor changes, and behavior changes to existing features that the request did not ask for are product decisions. Build the minimal mechanism only when a critical-boundary control for the requested feature cannot otherwise be met, choosing the option that changes existing behavior least (for A-08, an existing approval step or option (b) before a new confirmation flow), and flag it as an owner decision. Otherwise list it as an owner decision and leave the gap open.
+4. The release gate (D-06) then reports "blocked" honestly, naming the open IDs. Rewriting the application to pass the gate, or refactoring unrelated code, is out of scope.
 
 For example, a request to queue refunds that are paid by a worker implements A-11 approval binding and A-04 time-of-effect checks on the new queued path. It does not add a customer confirmation endpoint, rewrite the existing lookup tool or change the existing inline refund path; the worker's new call to the payment provider gets an A-21 deadline, because the change adds that call, while a missing deadline on the existing inline call is recorded as an A-21 finding with its severity and a suggested fix.
 
@@ -382,16 +382,16 @@ For example, a request to queue refunds that are paid by a worker implements A-1
 
 Changing one adapter's timeout is SCOPED: it touches timeout and retry handling (inside the payments adapter) and leaves the profile unchanged. Only the timeouts row applies, so the adapter's other controls are not routed.
 
-- Routing selects A-21 (caller-enforced deadline, bounded retries), A-05 (same idempotency key on retry, reconcile after an ambiguous timeout) and the S-05 rows "transport ignores its timeout" and "timeout after possible commit".
+- Routing selects A-21 (caller-enforced deadline, bounded retries), A-05 (same idempotency key on retry, reconcile after an ambiguous timeout) and the D-05 rows "transport ignores its timeout" and "timeout after possible commit".
 - The output is the deadline fix, every required case of the two routed controls (for A-21, a stalled-transport hostile test, the denial-retry case, the end-to-end deadline case and the transient-error twin; for A-05, the duplicate-delivery, timeout-after-commit and split-amount cases and the twin), and this record, 14 counted lines (12 field lines and two fences) against a budget of 15 for three routed controls:
 
 ```text
 Change: CH-142, payments adapter timeout 30s to 10s
 Tier: SCOPED (timeout and retry handling only); locations: timeouts and retries (payments adapter)
 Profile: unchanged (no new tool, data source, renderer or autonomy)
-A-21: implemented-and-verified, integration, A-21/T1 stalled transport abandoned at 10s, A-21/T2 denial not retried via fallback, A-21/T3 end-to-end deadline held, A-21/T4 twin pass
-A-05: implemented-and-verified, integration, A-05/T1 duplicate delivery one effect, A-05/T2 timeout-after-commit reconciled, A-05/T3 split amount capped, A-05/T4 twin pass
-S-05 (touched rows): implemented-and-verified, integration, "transport ignores its timeout" A-21/T1 and A-21/T3, "timeout after possible commit" A-05/T2
+A-21: implemented-and-verified, integration, A-21/C1 stalled transport abandoned at 10s, A-21/C2 denial not retried via fallback, A-21/C3 end-to-end deadline held, A-21/C4 twin pass
+A-05: implemented-and-verified, integration, A-05/C1 duplicate delivery one effect, A-05/C2 timeout-after-commit reconciled, A-05/C3 split amount capped, A-05/C4 twin pass
+D-05 (touched rows): implemented-and-verified, integration, "transport ignores its timeout" A-21/C1 and A-21/C3, "timeout after possible commit" A-05/C2
 Tests run: pytest tests/security -k "A-21 or A-05": 8 passed
 Residual risk: none new
 Owner decisions: retry cap 3 to 2 proposed (not implemented)
@@ -404,7 +404,7 @@ Other controls: not re-assessed (outside change scope)
 
 ### Form
 
-An ID is a pillar letter, a hyphen and a two-digit serial: `^(R|A|I|S|E)-[0-9]{2}$`, for example A-06, I-13 or E-06. The letter is the pillar: R Risk & Responsibility, A Authority & Access, I Isolation & Integrity, S Security Verification, E Evidence & Evolution. Serials are assigned in creation order within a pillar and encode no topic, so regrouping never changes an ID. IDs contain no framework name and survive the rename unchanged. Only the uppercase letter, the hyphen and exactly two digits form a valid ID; lowercase, unhyphenated and one-digit variants are invalid.
+An ID is a pillar letter, a hyphen and a two-digit serial: `^(S|T|A|N|D)-[0-9]{2}$`, for example A-06, T-13 or N-06. The letter is the pillar: S Scope & Stewardship, T Trust & Isolation, A Authority & Access, N Notice & Neutralize, D Demonstrated Defenses. Serials are assigned in creation order within a pillar and encode no topic, so regrouping never changes an ID. IDs contain no framework name, so a future rename of the framework does not change them. Only the uppercase letter, the hyphen and exactly two digits form a valid ID; lowercase, unhyphenated and one-digit variants are invalid.
 
 The form is chosen so it cannot be read as another scheme's identifier: it always has a hyphen, exactly two digits and no dot. OWASP Top 10 identifiers (ASI01, LLM01, AST01, and the web Top 10's colon-year form), AIUC-1 identifiers (A003, B006.1), ISO/IEC 42001 Annex A references (A.x.y), AISVS requirements (v1.0-C9.2.8) and NIST references (MAP 3.5, GV-6.1-007, AC-3) all differ in shape. In mapping tables, foreign identifiers always sit in separately labeled columns, never in the ID column.
 
@@ -414,7 +414,7 @@ The form is chosen so it cannot be read as another scheme's identifier: it alway
 |---|---|---|
 | Bare ID | A-06 | This framework's own files, and records and change records whose header states the catalog version |
 | Version-pinned | A-06@0.1 | Conformance claims, external mappings, and any record or document that does not state the catalog version |
-| Test fixture | A-06/T1, pinned A-06@0.1/T1 | Hostile cases and authorized twins; the slash avoids the dotted suffix AIUC-1 controls use |
+| Test fixture | A-06/C1, pinned A-06@0.1/C1 | Hostile cases and authorized twins; the slash avoids the dotted suffix AIUC-1 controls use |
 | Mixed documents | `<catalog name> v0.1 A-06` | Prose that also cites other frameworks always qualifies the bare ID |
 
 The version in a citation is the catalog MAJOR.MINOR; PATCH releases are editorial and are never cited. A namespace token is assigned once, at the rename, and lives only in catalog metadata; the fully qualified form is then `<namespace>:A-06@0.1`.

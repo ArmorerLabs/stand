@@ -18,8 +18,8 @@ TODAY = "2026-10-03"
 
 PRINCIPLE = "**The model proposes. The application enforces.**"
 PILLARS = (
-    "Risk & Responsibility (R), Authority & Access (A), Isolation & Integrity (I), "
-    "Security Verification (S) and Evidence & Evolution (E)."
+    "Scope & Stewardship (S), Trust & Isolation (T), Authority & Access (A), "
+    "Notice & Neutralize (N) and Demonstrated Defenses (D)."
 )
 STATUSES = ("implemented-and-verified, implemented-but-unverified, planned, "
             "not-applicable-with-reason, failing, not-assessed")
@@ -61,8 +61,8 @@ def control(cid, title, level, severity, scope, applies, asi, statement=None):
         "asi": asi,
         "statement": statement or f"The application MUST enforce {title.lower()}.",
         "rationale": f"Without {title.lower()} the boundary fails open.",
-        "verification": f"Hostile: bypass {title.lower()} and observe denial ({cid}/T1). "
-                        "Twin: the authorized case passes (T2).",
+        "verification": f"Hostile: bypass {title.lower()} and observe denial ({cid}/C1). "
+                        "Twin: the authorized case passes (C2).",
         "evidence": [f"Test reference for {cid}"],
         "mappings": {"aiuc1": [], "nist": [], "aisvs": []},
     }
@@ -70,13 +70,13 @@ def control(cid, title, level, severity, scope, applies, asi, statement=None):
 
 def catalog() -> dict:
     controls = [
-        control("R-01", "Accountable owner", 1, "high", "inspection", ["all"], ["ASI01"]),
+        control("S-01", "Accountable owner", 1, "high", "inspection", ["all"], ["ASI01"]),
         control("A-01", "Single dispatch path", 1, "critical", "integration", ["tools"], ["ASI02", "ASI03"]),
         control("A-02", "Workload identity", 2, "critical", "integration", ["tools+external-effect"], ["ASI03"]),
-        control("I-01", "Untrusted content stays data", 1, "critical", "integration",
+        control("T-01", "Untrusted content stays data", 1, "critical", "integration",
                 ["untrusted-input"], ["ASI01", "ASI06"]),
-        control("S-01", "Real execution path", 1, "high", "integration", ["all"], ["ASI01"]),
-        control("E-01", "Tamper-evident audit", 3, "medium", "isolated-runtime", ["tools"], ["ASI10"]),
+        control("D-01", "Real execution path", 1, "high", "integration", ["all"], ["ASI01"]),
+        control("N-01", "Tamper-evident audit", 3, "medium", "isolated-runtime", ["tools"], ["ASI10"]),
     ]
     controls[1]["mappings"]["aiuc1"] = [{"ref": "B006.1", "relation": "partial"}]
     return {
@@ -85,11 +85,11 @@ def catalog() -> dict:
         "status": "draft",
         "license": "CC-BY-SA-4.0",
         "pillars": [
-            {"letter": "R", "name": "Risk & Responsibility"},
+            {"letter": "S", "name": "Scope & Stewardship"},
+            {"letter": "T", "name": "Trust & Isolation"},
             {"letter": "A", "name": "Authority & Access"},
-            {"letter": "I", "name": "Isolation & Integrity"},
-            {"letter": "S", "name": "Security Verification"},
-            {"letter": "E", "name": "Evidence & Evolution"},
+            {"letter": "N", "name": "Notice & Neutralize"},
+            {"letter": "D", "name": "Demonstrated Defenses"},
         ],
         "levels": [1, 2, 3],
         "applicability_vocabulary": VOCABULARY,
@@ -107,7 +107,7 @@ def catalog() -> dict:
 def ledger() -> dict:
     return {
         "catalog": "placeholder",
-        "id_pattern": "^(R|A|I|S|E)-[0-9]{2}$",
+        "id_pattern": "^(S|T|A|N|D)-[0-9]{2}$",
         "status_values": ["active", "deprecated", "withdrawn"],
         "entries": [
             {"id": entry["id"], "title": entry["title"], "status": "active", "introduced": "0.1.0"}
@@ -172,7 +172,7 @@ The five pillars are {PILLARS}
 
 <!-- critical-boundary:start -->
 - One enforcement path (A-01).
-- Untrusted content stays data (I-01).
+- Untrusted content stays data (T-01).
 <!-- critical-boundary:end -->
 
 ## References
@@ -184,7 +184,7 @@ the [ASI view](references/owasp-agentic-top-10.md), [frameworks](references/fram
 and the [control index](references/controls/index.md).
 
 Record results in [the record](assets/agent-security-record.md) and adopt with
-[the snippet](assets/AGENTS-snippet.md). Cite R-01, S-01 and E-01 by bare ID.
+[the snippet](assets/AGENTS-snippet.md). Cite S-01, D-01 and N-01 by bare ID.
 """,
         "references/profile-and-levels.md": "# Profile and levels\n\nTokens: " + ", ".join(VOCABULARY)
         + ".\n\nSee [conformance](conformance.md).\n",
@@ -201,15 +201,15 @@ Weakest to strongest: {SCOPES}.
 ## Critical-boundary set
 
 <!-- critical-boundary:start -->
-A-01, I-01
+A-01, T-01
 <!-- critical-boundary:end -->
 
 See [profile and levels](profile-and-levels.md).
 """,
-        "references/runtime-controls.md": "# Runtime controls\n\nPatterns for A-01 and I-01. See [patterns](patterns.md).\n",
+        "references/runtime-controls.md": "# Runtime controls\n\nPatterns for A-01 and T-01. See [patterns](patterns.md).\n",
         "references/mcp.md": "# MCP\n\nPins MCP specification 2025-11-25. See [controls](controls/A.md#a-01-single-dispatch-path).\n",
         "references/patterns.md": "# Patterns\n\nIllustrative pseudocode for A-01.\n\n```python\ndispatch(request)\n```\n",
-        "references/verification.md": "# Verification\n\nA mock proves only the boundary it exercises (S-01).\n",
+        "references/verification.md": "# Verification\n\nA mock proves only the boundary it exercises (D-01).\n",
         "references/owasp-agentic-top-10.md": owasp_view(),
         "references/frameworks.md": f"""# Frameworks
 
@@ -217,18 +217,18 @@ See [profile and levels](profile-and-levels.md).
 
 Checked {TODAY}. AIUC-1 requirement [B006]({AIUC_URL}). Mappings are in [mappings](mappings.md).
 
-## Risk & Responsibility
+## Scope & Stewardship
 
 Heading with an ampersand.
 """,
         "references/mappings.md": "# Mappings\n\n| Control | AIUC-1 | Relation |\n| --- | --- | --- |\n| A-01 | B006.1 | partial |\n",
         "references/controls/index.md": "# Control index\n\n"
-        + "\n".join(f"- [{letter}]({letter}.md)" for letter in ("R", "A", "I", "S", "E")) + "\n",
-        "references/controls/R.md": pillar_file("R", [("R-01", "Accountable owner")]),
+        + "\n".join(f"- [{letter}]({letter}.md)" for letter in ("S", "T", "A", "N", "D")) + "\n",
+        "references/controls/S.md": pillar_file("S", [("S-01", "Accountable owner")]),
         "references/controls/A.md": pillar_file("A", [("A-01", "Single dispatch path"), ("A-02", "Workload identity")]),
-        "references/controls/I.md": pillar_file("I", [("I-01", "Untrusted content stays data")]),
-        "references/controls/S.md": pillar_file("S", [("S-01", "Real execution path")]),
-        "references/controls/E.md": pillar_file("E", [("E-01", "Tamper-evident audit")]),
+        "references/controls/T.md": pillar_file("T", [("T-01", "Untrusted content stays data")]),
+        "references/controls/D.md": pillar_file("D", [("D-01", "Real execution path")]),
+        "references/controls/N.md": pillar_file("N", [("N-01", "Tamper-evident audit")]),
         "assets/agent-security-record.md": f"# Record\n\n- Status: {STATUSES}.\n- Evidence scope: {SCOPES}.\n",
         "assets/AGENTS-snippet.md": "# Snippet\n\nUse the skill for agent changes.\n",
         "agents/openai.yaml": f"""interface:
@@ -249,7 +249,7 @@ The pillars are {PILLARS}
 
 Install with [the install guide](docs/install.md); read [the pillars](docs/pillars.md),
 the [skill](SKILL.md) and the [source snapshot](references/frameworks.md#source-snapshot).
-See also [the ampersand heading](references/frameworks.md#risk--responsibility).
+See also [the ampersand heading](references/frameworks.md#scope--stewardship).
 Home-relative paths such as ~/.agents/skills are portable, and so is https://example.com/home/guide.
 """,
         "docs/pillars.md": f"# Pillars\n\n{PRINCIPLE}\n\n{PILLARS}\n\nSee the [control index](../references/controls/index.md).\n",

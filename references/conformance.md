@@ -6,12 +6,12 @@ This file defines the normative language, the evidence-scope and status enums, t
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in the normative sources are to be interpreted as described in BCP 14 (RFC 2119 and RFC 8174) when, and only when, they appear in all capitals, as shown here. Definitions, enum meanings, the conditions of the conformance statement and the release gate table are normative as written; a lowercase "may" describes a permitted option.
 
-- A SHOULD clause is satisfied either by implementation or by a recorded deviation that states the reason and the compensating measure. A recorded deviation does not make the control failing. Status follows the control's MUST clauses and required cases: a control whose MUST clauses are implemented and whose required cases passed is implemented-and-verified even while one of its SHOULD clauses carries a recorded deviation. Each deviation is listed in the record's deviations section with the clause, reason, compensating measure, owner and test or review reference. A deviation counts only when the accountable owner (R-01), or a delegate the owner named, has recorded it. A deviation whose owner is unassigned leaves the SHOULD clause unsatisfied: it is an open item rated with the severity rubric, and no conformance statement can be published while it remains.
+- A SHOULD clause is satisfied either by implementation or by a recorded deviation that states the reason and the compensating measure. A recorded deviation does not make the control failing. Status follows the control's MUST clauses and required cases: a control whose MUST clauses are implemented and whose required cases passed is implemented-and-verified even while one of its SHOULD clauses carries a recorded deviation. Each deviation is listed in the record's deviations section with the clause, reason, compensating measure, owner and test or review reference. A deviation counts only when the accountable owner (S-01), or a delegate the owner named, has recorded it. A deviation whose owner is unassigned leaves the SHOULD clause unsatisfied: it is an open item rated with the severity rubric, and no conformance statement can be published while it remains.
 - MAY clauses describe permitted options and impose no obligation.
 - Rationale text is informative.
 - Each control's verification text is normative as to its intent: the hostile cases and the authorized twin it names are required cases, run at or above the control's minimum evidence scope. Tooling and harness details are informative.
-- A required case whose subject is architecturally absent from every context in scope (for example a stdio launch command when the system uses only remote MCP servers, or a proxy consent flow when the application operates no proxy) is recorded as `<ID>/T<n>: not applicable (<verifiable absence>)`. It does not count against implemented-and-verified when every remaining required case ran and passed. Role-conditional cases are labelled in the verification text (for example "Server role:" or "stdio servers"). The absence MUST be verifiable in code or configuration, as for not-applicable-with-reason.
-- Equivalent alternative evidence is acceptable when it exercises the same boundary at the same or a stronger evidence scope and the record names the substitution (S-03).
+- A required case whose subject is architecturally absent from every context in scope (for example a stdio launch command when the system uses only remote MCP servers, or a proxy consent flow when the application operates no proxy) is recorded as `<ID>/C<n>: not applicable (<verifiable absence>)`. It does not count against implemented-and-verified when every remaining required case ran and passed. Role-conditional cases are labelled in the verification text (for example "Server role:" or "stdio servers"). The absence MUST be verifiable in code or configuration, as for not-applicable-with-reason.
+- Equivalent alternative evidence is acceptable when it exercises the same boundary at the same or a stronger evidence scope and the record names the substitution (D-03).
 
 ### Normative sources
 
@@ -38,7 +38,7 @@ Rules:
 
 - A mock proves only the boundary it exercises. Simulated outputs cannot establish sandbox, egress, rendering or provider properties.
 - Each control names a minimum evidence scope. Evidence below it cannot make the control implemented-and-verified.
-- The controls whose minimum is isolated-runtime remain implemented-but-unverified on any weaker evidence (S-03): A-12, A-14, A-17, A-18, A-23, I-05, I-11, I-12, I-13, I-15, I-16, I-17, I-19, I-23, I-26, I-27, S-08, S-10, E-10.
+- The controls whose minimum is isolated-runtime remain implemented-but-unverified on any weaker evidence (D-03): T-05, T-11, T-12, T-13, T-15, T-16, T-17, T-19, T-23, T-26, T-27, A-12, A-14, A-17, A-18, A-23, N-10, D-08, D-10.
 - An entry that cites evidence states the scope of that evidence. An entry that cites none (planned, not-assessed, or implemented-but-unverified with nothing run) states the control's minimum evidence scope as its target and cites no test; the status shows that the evidence is missing.
 - Label simulated, sandboxed and deployed evidence accurately. An unrun test is never recorded as passed.
 
@@ -48,7 +48,7 @@ Every record entry has exactly one status from this closed enum.
 
 | Status | Meaning |
 |---|---|
-| implemented-and-verified | The control is implemented, and its required hostile cases and authorized twin ran and passed at the recorded commit, through the real execution path (S-01, S-02), at or above its minimum evidence scope (S-03). |
+| implemented-and-verified | The control is implemented, and its required hostile cases and authorized twin ran and passed at the recorded commit, through the real execution path (D-01, D-02), at or above its minimum evidence scope (D-03). |
 | implemented-but-unverified | The control is implemented, but its required verification is missing, did not run at the recorded commit, or ran below the minimum evidence scope. |
 | planned | The control is not implemented at the recorded commit; the record names the intended implementation and its location. A planned control is not an implemented control. |
 | not-applicable-with-reason | The control's `applies_when` matches no agent context in scope, or it matches but the subject of every required case is architecturally absent from every context in scope (see "Normative language"). The reason names the architecturally absent capability so that a reviewer can verify it in code or configuration. Reliance on a library, vendor or provider is not a reason. |
@@ -61,7 +61,7 @@ Every record entry has exactly one status from this closed enum.
 
 ## Severity rubric
 
-Apply the rubric to every applicable control that is failing, implemented-but-unverified, planned or not-assessed, and to every open finding and failed adversarial case. Record the severity, the matrix cell used and a rationale in the record's "Severity and rationale" column (S-06).
+Apply the rubric to every applicable control that is failing, implemented-but-unverified, planned or not-assessed, and to every open finding and failed adversarial case. Record the severity, the matrix cell used and a rationale in the record's "Severity and rationale" column (D-06).
 
 ### Step 1, harm class
 
@@ -113,23 +113,23 @@ Apply the rubric to every applicable control that is failing, implemented-but-un
 The critical-boundary set is every Level 1 control whose default failure severity is critical. It is derived from the catalog, not chosen, and changes only when a control's level or default severity changes. [SKILL.md](../SKILL.md) lists the same set as its always-on invariants.
 
 <!-- critical-boundary:start -->
-A-01, A-02, A-03, A-04, A-06, A-07, A-08, A-10, A-11, A-15, A-16, A-19, A-23, A-24, A-25, I-01, I-02, I-05, I-06, I-08, I-09, I-10, I-11, I-12, I-13, I-14, I-15, I-17, I-19, I-23, S-06, E-06
+T-01, T-02, T-05, T-06, T-08, T-09, T-10, T-11, T-12, T-13, T-14, T-15, T-17, T-19, T-23, A-01, A-02, A-03, A-04, A-06, A-07, A-08, A-10, A-11, A-15, A-16, A-19, A-23, A-24, A-25, N-06, D-06
 <!-- critical-boundary:end -->
 
-- The set holds the enforcement boundaries plus the release gate itself (S-06), because a readiness claim contradicted by evidence is an H-breach harm.
+- The set holds the enforcement boundaries plus the release gate itself (D-06), because a readiness claim contradicted by evidence is an H-breach harm.
 - An applicable control from this set whose status is implemented-but-unverified, planned or not-assessed counts as an open critical.
-- An applicable control from this set that is failing is rated with the rubric, and it blocks every readiness and conformance claim whatever its rating (S-06).
+- An applicable control from this set that is failing is rated with the rubric, and it blocks every readiness and conformance claim whatever its rating (D-06).
 - Do not describe a release as ready while an applicable critical boundary is bypassable or its required verification is missing.
 - For partial adoption, the set is implemented and verified first (see "Progress statement" below).
 
 ## Release gate
 
-The gate (S-06) turns open items into a readiness value. It applies before any readiness claim and before any conformance statement.
+The gate (D-06) turns open items into a readiness value. It applies before any readiness claim and before any conformance statement.
 
 | Severity | Effect |
 |---|---|
 | Critical | Blocks every readiness and conformance claim; no exception converts it into a pass. The readiness value is blocked, or confined-prototype when the system runs only with synthetic data and no production credentials. |
-| High | Release requires an exception under R-01 from the accountable owner, naming a compensating control, with an expiry no more than 90 days after acceptance. Highs never count toward conformance. |
+| High | Release requires an exception under S-01 from the accountable owner, naming a compensating control, with an expiry no more than 90 days after acceptance. Highs never count toward conformance. |
 | Medium | Tracked with an owner and a target date. Does not block. |
 | Low | Tracked. |
 
@@ -137,7 +137,7 @@ Readiness values (closed enum):
 
 | Value | Meaning |
 |---|---|
-| ready-within-scope | The accountable owner is recorded (R-01); every applicable critical-boundary control is implemented-and-verified; no critical is open; every open high carries an unexpired owner exception; every open item has a severity and rationale. Ready applies only to the stated scope and is not a conformance claim. |
+| ready-within-scope | The accountable owner is recorded (S-01); every applicable critical-boundary control is implemented-and-verified; no critical is open; every open high carries an unexpired owner exception; every open item has a severity and rationale. Ready applies only to the stated scope and is not a conformance claim. |
 | confined-prototype | The system runs only with synthetic data and no production credentials. Open criticals are listed by ID. |
 | blocked | Any other state. The record lists the open IDs that block. |
 
@@ -146,7 +146,7 @@ A readiness claim means the value ready-within-scope. confined-prototype and blo
 A SCOPED change rates only its routed controls and any new finding. With a baseline record, readiness is computed as the baseline value with the routed rows updated (the record itself is append-only: the baseline Controls table stays unchanged and the compact change record carries the routed rows), and it is blocked if a routed control is failing or a routed critical-boundary control is not implemented-and-verified. With "Baseline: missing", readiness is blocked (baseline missing: critical-boundary set not assessed), and the individual not-assessed controls are not rated.
 
 - A human may still choose to deploy a blocked system. The record then states "blocked" with the open IDs, and the coding agent does not describe the release as ready.
-- The coding agent may draft an exception, but it MUST NOT record acceptance, enter an owner who has not been provided, or suppress or weaken a failing check. Where the owner is unknown it writes "unassigned", and an unassigned owner blocks ready-within-scope (R-01).
+- The coding agent may draft an exception, but it MUST NOT record acceptance, enter an owner who has not been provided, or suppress or weaken a failing check. Where the owner is unknown it writes "unassigned", and an unassigned owner blocks ready-within-scope (S-01).
 - OWASP AIVSS scores (v0.8, pre-1.0) may be recorded alongside as related scoring. They never change the gate.
 
 ## Conformance statement
@@ -160,12 +160,12 @@ A system that satisfies every condition below may publish this statement:
 `<catalog name>` is the name recorded in the catalog metadata, and `v<X.Y>` is the catalog MAJOR.MINOR. The statement is valid only when all of the following hold:
 
 1. **Scope.** The scope names the system, components, environments and commit. It includes every component on the enforcement path that in-scope agents rely on (dispatcher, policy engine, adapters, credential broker, sandbox, egress proxy, approval UI, audit store). A claim cannot exclude a component it depends on.
-2. **Profile.** R-02 records the profile of every context in scope, and N is at least the computed level M. A claim below M is invalid.
+2. **Profile.** S-02 records the profile of every context in scope, and N is at least the computed level M. A claim below M is invalid.
 3. **Controls.** Every control of Levels 1 through N has status implemented-and-verified, or not-applicable-with-reason because its `applies_when` matches no agent context in scope or the subject of every required case is architecturally absent (see "Status"). The reason is a verifiable architectural absence; reliance on a library, vendor or provider is not a reason.
-4. **Excluded statuses.** No applicable control is failing, implemented-but-unverified, planned or not-assessed, and no SHOULD clause rests on an unaccepted deviation. Owner exceptions are release decisions under S-06 and never count toward conformance.
-5. **Evidence.** Each implemented-and-verified entry cites a test or review that ran at the claimed commit, at or above the control's minimum evidence scope (S-03). It drives the real execution path (S-01) and pairs each denial with an authorized twin (S-02).
+4. **Excluded statuses.** No applicable control is failing, implemented-but-unverified, planned or not-assessed, and no SHOULD clause rests on an unaccepted deviation. Owner exceptions are release decisions under D-06 and never count toward conformance.
+5. **Evidence.** Each implemented-and-verified entry cites a test or review that ran at the claimed commit, at or above the control's minimum evidence scope (D-03). It drives the real execution path (D-01) and pairs each denial with an authorized twin (D-02).
 6. **Findings.** No finding rated critical or high is open within the scope.
-7. **Metadata.** The record names the catalog version, the accountable owner (R-01) and a re-establish date no later than 12 months after the claim.
+7. **Metadata.** The record names the catalog version, the accountable owner (S-01) and a re-establish date no later than 12 months after the claim.
 
 The statement and its record live in the security record ([agent-security-record.md](../assets/agent-security-record.md)). A SCOPED change record can state that the changed controls were re-verified. It cannot support a level claim unless the baseline record satisfies conditions 1 to 7.
 

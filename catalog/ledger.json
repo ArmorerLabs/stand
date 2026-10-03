@@ -1,6 +1,6 @@
 {
   "rule": "Control IDs are never reused or renumbered. Every ID ever assigned stays in this ledger, including deprecated and withdrawn IDs. A change of subject, a split or a merge withdraws the old ID and assigns a new one.",
-  "id_pattern": "^(R|A|I|S|E)-[0-9]{2}$",
+  "id_pattern": "^(S|T|A|N|D)-[0-9]{2}$",
   "status_values": [
     "active",
     "deprecated",
@@ -8,38 +8,200 @@
   ],
   "entries": [
     {
-      "id": "R-01",
+      "id": "S-01",
       "title": "Accountable scope, owner and risk acceptance",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "R-02",
+      "id": "S-02",
       "title": "Capability profile and required level",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "R-03",
+      "id": "S-03",
       "title": "Least Agency",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "R-04",
+      "id": "S-04",
       "title": "Threat model: inventory, boundary trace and ASI applicability",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "R-05",
+      "id": "S-05",
       "title": "Consequential operations register and trusted sources",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "R-06",
+      "id": "S-06",
       "title": "Data classification and disclosure policy",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-01",
+      "title": "Untrusted content stays data and taints its context",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-02",
+      "title": "Enforced separation patterns",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-03",
+      "title": "Hidden-text normalization and reviewer view",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-04",
+      "title": "System prompts hold no secrets or enforcement",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-05",
+      "title": "No ambient credentials or enforcement access in model-influenced processes",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-06",
+      "title": "Retrieval authorization before context",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-07",
+      "title": "Memory provenance, scope, expiry and revocation",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-08",
+      "title": "System of record for consequential facts",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-09",
+      "title": "Server-held conversation state",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-10",
+      "title": "Provider data routing",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-11",
+      "title": "Provider-executed tools",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-12",
+      "title": "Network egress boundary",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-13",
+      "title": "Rendered-output exfiltration channels",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-14",
+      "title": "Sink-safe output handling and no implicit execution",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-15",
+      "title": "Code-execution sandbox baseline",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-16",
+      "title": "Strong isolation tier",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-17",
+      "title": "Browser and computer-use containment",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-18",
+      "title": "Pinned descriptors and fully qualified tool identity",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-19",
+      "title": "Local tool and third-party component confinement",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-20",
+      "title": "MCP sampling and elicitation",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-21",
+      "title": "Inter-agent message integrity",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-22",
+      "title": "Fault propagation containment",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-23",
+      "title": "Coding and CI agent boundaries",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-24",
+      "title": "Component pinning and intake",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-25",
+      "title": "Model artifact integrity",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-26",
+      "title": "Agent-to-human communication integrity",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "T-27",
+      "title": "Per-tenant kernel isolation for code execution",
       "status": "active",
       "introduced": "0.1.0"
     },
@@ -194,284 +356,122 @@
       "introduced": "0.1.0"
     },
     {
-      "id": "I-01",
-      "title": "Untrusted content stays data and taints its context",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-02",
-      "title": "Enforced separation patterns",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-03",
-      "title": "Hidden-text normalization and reviewer view",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-04",
-      "title": "System prompts hold no secrets or enforcement",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-05",
-      "title": "No ambient credentials or enforcement access in model-influenced processes",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-06",
-      "title": "Retrieval authorization before context",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-07",
-      "title": "Memory provenance, scope, expiry and revocation",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-08",
-      "title": "System of record for consequential facts",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-09",
-      "title": "Server-held conversation state",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-10",
-      "title": "Provider data routing",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-11",
-      "title": "Provider-executed tools",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-12",
-      "title": "Network egress boundary",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-13",
-      "title": "Rendered-output exfiltration channels",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-14",
-      "title": "Sink-safe output handling and no implicit execution",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-15",
-      "title": "Code-execution sandbox baseline",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-16",
-      "title": "Strong isolation tier",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-17",
-      "title": "Browser and computer-use containment",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-18",
-      "title": "Pinned descriptors and fully qualified tool identity",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-19",
-      "title": "Local tool and third-party component confinement",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-20",
-      "title": "MCP sampling and elicitation",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-21",
-      "title": "Inter-agent message integrity",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-22",
-      "title": "Fault propagation containment",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-23",
-      "title": "Coding and CI agent boundaries",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-24",
-      "title": "Component pinning and intake",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-25",
-      "title": "Model artifact integrity",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-26",
-      "title": "Agent-to-human communication integrity",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "I-27",
-      "title": "Per-tenant kernel isolation for code execution",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "S-01",
-      "title": "Enforcement-path tests",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "S-02",
-      "title": "Hostile proposals with authorized twins",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "S-03",
-      "title": "Evidence scope, runtime boundaries and record integrity",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "S-04",
-      "title": "Injection channel coverage with within-authority payloads",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "S-05",
-      "title": "Failure, revocation and concurrency test matrix",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "S-06",
-      "title": "Severity-rated release gate",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "S-07",
-      "title": "Security regressions as required checks",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "S-08",
-      "title": "Live-model adversarial evaluation",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "S-09",
-      "title": "Independent adversarial review with adaptive attacks",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "S-10",
-      "title": "Replay before rollout and before authority expansion",
-      "status": "active",
-      "introduced": "0.1.0"
-    },
-    {
-      "id": "E-01",
+      "id": "N-01",
       "title": "Decision and effect audit trail",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "E-02",
+      "id": "N-02",
       "title": "Audit custody and audit-before-effect",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "E-03",
+      "id": "N-03",
       "title": "Forensic context manifest",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "E-04",
+      "id": "N-04",
       "title": "Baseline security signals routed to an owner",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "E-05",
+      "id": "N-05",
       "title": "Behavioral detection and automatic containment",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "E-06",
+      "id": "N-06",
       "title": "Stop without deploy",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "E-07",
+      "id": "N-07",
       "title": "Kill-switch scopes and measured revocation latency",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "E-08",
+      "id": "N-08",
       "title": "Quarantine, recovery and exercised incident response",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "E-09",
+      "id": "N-09",
       "title": "Governed change and re-assessment",
       "status": "active",
       "introduced": "0.1.0"
     },
     {
-      "id": "E-10",
+      "id": "N-10",
       "title": "Tamper-evident audit",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "D-01",
+      "title": "Enforcement-path tests",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "D-02",
+      "title": "Hostile proposals with authorized twins",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "D-03",
+      "title": "Evidence scope, runtime boundaries and record integrity",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "D-04",
+      "title": "Injection channel coverage with within-authority payloads",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "D-05",
+      "title": "Failure, revocation and concurrency test matrix",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "D-06",
+      "title": "Severity-rated release gate",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "D-07",
+      "title": "Security regressions as required checks",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "D-08",
+      "title": "Live-model adversarial evaluation",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "D-09",
+      "title": "Independent adversarial review with adaptive attacks",
+      "status": "active",
+      "introduced": "0.1.0"
+    },
+    {
+      "id": "D-10",
+      "title": "Replay before rollout and before authority expansion",
       "status": "active",
       "introduced": "0.1.0"
     }

@@ -1,7 +1,7 @@
 <!-- Generated from catalog/controls.json in the source repository by scripts/render_catalog.py. Do not edit; propose changes upstream. -->
 <!-- License: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). SPDX-License-Identifier: CC-BY-SA-4.0 -->
 
-# E: Evidence & Evolution
+# N: Notice & Neutralize
 
 **Can we see, stop, and improve behavior?**
 
@@ -11,7 +11,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 ## Level 1
 
-### E-01 Decision and effect audit trail
+### N-01 Decision and effect audit trail
 
 - **Level:** 1
 - **Applies when:** `tools`
@@ -20,11 +20,11 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - **Critical boundary:** no
 - **ASI:** ASI01, ASI02, ASI03, ASI08, ASI09, ASI10
 
-**Statement:** The system MUST emit a structured event for each proposal, policy decision with reason code, approval, dispatch attempt, denial, confirmed effect and failure, carrying actor, principal, tenant, run, lineage ID, tool and version, policy version, target reference, taint state and correlation ID. Proposed, attempted, denied and confirmed effects MUST be distinguishable. Events MUST minimize sensitive content according to R-06, MUST NOT contain secrets, and MUST NOT depend on hidden model reasoning.
+**Statement:** The system MUST emit a structured event for each proposal, policy decision with reason code, approval, dispatch attempt, denial, confirmed effect and failure, carrying actor, principal, tenant, run, lineage ID, tool and version, policy version, target reference, taint state and correlation ID. Proposed, attempted, denied and confirmed effects MUST be distinguishable. Events MUST minimize sensitive content according to S-06, MUST NOT contain secrets, and MUST NOT depend on hidden model reasoning.
 
 **Rationale:** This preserves the evidence discipline: proposed, attempted, denied and confirmed are different facts. Misuse through chains of trusted tools is invisible to host monitoring (ASI02 example scenario 6), so only application-level events show it.
 
-**Verification:** Test: a forced denied proposal emits proposed and denied events with a reason code (E-01/T1); an allowed one emits proposed, attempted and confirmed events (T2); a canary secret is absent from all events (T3).
+**Verification:** Test: a forced denied proposal emits proposed and denied events with a reason code (N-01/C1); an allowed one emits proposed, attempted and confirmed events (C2); a canary secret is absent from all events (C3).
 
 **Evidence:**
 
@@ -37,7 +37,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - NIST: MEASURE 2.8 (supports), MEASURE 2.4 (supports), MS-2.7-004 (supports), MS-4.2-004 (supports)
 - AISVS: v1.0-C12.1.2 (supports), v1.0-C12.4.2 (partial), v1.0-C12.1.1 (partial), v1.0-C12.1.3 (supports)
 
-### E-02 Audit custody and audit-before-effect
+### N-02 Audit custody and audit-before-effect
 
 - **Level:** 1
 - **Applies when:** `external-effect`
@@ -50,7 +50,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** A rogue or hijacked agent must not be able to erase its trail, and consequential effects must not outrun their evidence. ASI08's security-operations example has agents purging logs and reporting clean metrics.
 
-**Verification:** Hostile: the agent's credentials attempt to delete or overwrite audit records and are denied by store permissions (E-02/T1); with the audit sink down, the consequential effect is blocked and the outbox keeps the event (T2). Twin: with a healthy sink, the effect and its record both exist (T3).
+**Verification:** Hostile: the agent's credentials attempt to delete or overwrite audit records and are denied by store permissions (N-02/C1); with the audit sink down, the consequential effect is blocked and the outbox keeps the event (C2). Twin: with a healthy sink, the effect and its record both exist (C3).
 
 **Evidence:**
 
@@ -63,7 +63,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - NIST: MEASURE 2.8 (supports)
 - AISVS: none
 
-### E-04 Baseline security signals routed to an owner
+### N-04 Baseline security signals routed to an owner
 
 - **Level:** 1
 - **Applies when:** `tools`
@@ -72,11 +72,11 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - **Critical boundary:** no
 - **ASI:** ASI01, ASI02, ASI04, ASI06, ASI08, ASI09, ASI10
 
-**Statement:** The system MUST emit signals for: denials of consequential actions; provenance and task-scope denials from tainted contexts; budget and quota stops; descriptor or component drift; audit-write failures; kill-switch activations; and user reports of suspicious agent behavior. Each signal MUST be routed to a named owner (or 'unassigned', which R-01 treats as blocking) with a recorded response target. Detection MUST supplement, never replace, enforcement.
+**Statement:** The system MUST emit signals for: denials of consequential actions; provenance and task-scope denials from tainted contexts; budget and quota stops; descriptor or component drift; audit-write failures; kill-switch activations; and user reports of suspicious agent behavior. Each signal MUST be routed to a named owner (or 'unassigned', which S-01 treats as blocking) with a recorded response target. Detection MUST supplement, never replace, enforcement.
 
 **Rationale:** Every ASI entry lists monitoring or anomaly detection among its mitigations. Persistent and within-authority attacks first show up as repeated denials and drift that enforcement blocks but nobody notices.
 
-**Verification:** For each signal type, trigger its condition in a test and assert that it is emitted and delivered to the owner's controlled channel (E-04/T1).
+**Verification:** For each signal type, trigger its condition in a test and assert that it is emitted and delivered to the owner's controlled channel (N-04/C1).
 
 **Evidence:**
 
@@ -89,7 +89,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - NIST: MEASURE 2.4 (partial), MANAGE 4.1 (partial), MEASURE 3.1 (supports), GOVERN 2.1 (supports), MG-4.1-002 (partial), MS-2.7-004 (supports), MG-4.1-007 (supports), MEASURE 3.3 (supports), MG-4.3-002 (supports)
 - AISVS: v1.0-C12.4.3 (partial), v1.0-C12.2.1 (supports), v1.0-AC.6.1 (supports)
 
-### E-06 Stop without deploy
+### N-06 Stop without deploy
 
 - **Level:** 1
 - **Applies when:** `tools`
@@ -102,7 +102,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** A prompt asking the agent to stop is not enforcement. A rogue-agent stop and a supply-chain kill switch need the same mechanism.
 
-**Verification:** Hostile: stop a run while one child is queued and another is running; no new effects occur after the stop (recorder), and the queued job revalidates and aborts (E-06/T1). Disabling a tool flag makes dispatch deny it (T2). Twin: other runs are unaffected (T3).
+**Verification:** Hostile: stop a run while one child is queued and another is running; no new effects occur after the stop (recorder), and the queued job revalidates and aborts (N-06/C1). Disabling a tool flag makes dispatch deny it (C2). Twin: other runs are unaffected (C3).
 
 **Evidence:**
 
@@ -115,7 +115,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - NIST: MANAGE 2.4 (partial), MG-2.4-002 (supports), MG-2.4-004 (supports)
 - AISVS: v1.0-C9.6.1 (partial), v1.0-C9.6.3 (supports)
 
-### E-09 Governed change and re-assessment
+### N-09 Governed change and re-assessment
 
 - **Level:** 1
 - **Applies when:** `all`
@@ -128,7 +128,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** Agent behavior changes with configuration as much as with code, and ungoverned changes silently invalidate verified controls. AIUC-1 E004 is change approval, and ASI01 mitigation 3 (p. 10) recommends locking system prompts and routing changes to goals or reward definitions through configuration management and human approval.
 
-**Verification:** Inspection: a sample of recent changes of the listed kinds each shows a triage tier, re-run test IDs, a record update and a named approver; a profile change has a full record. Hostile: a configuration change merged without these is caught by review rules or the record linter (E-09/T1).
+**Verification:** Inspection: a sample of recent changes of the listed kinds each shows a triage tier, re-run test IDs, a record update and a named approver; a profile change has a full record. Hostile: a configuration change merged without these is caught by review rules or the record linter (N-09/C1).
 
 **Evidence:**
 
@@ -144,7 +144,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 ## Level 2
 
-### E-03 Forensic context manifest
+### N-03 Forensic context manifest
 
 - **Level:** 2
 - **Applies when:** `untrusted-input`
@@ -157,7 +157,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** Investigating an injection requires knowing what the model saw, and minimization applied literally discards exactly that. Retention and deletion rules keep forensic capture consistent with data-subject deletion.
 
-**Verification:** Drill: run an injection fixture that triggers a denied or confirmed effect, then identify the planted source using only the stored manifest (E-03/T1). Hostile: the manifest contains no canary secret (T2), and after a deletion request captured content is gone while references remain (T3).
+**Verification:** Drill: run an injection fixture that triggers a denied or confirmed effect, then identify the planted source using only the stored manifest (N-03/C1). Hostile: the manifest contains no canary secret (C2), and after a deletion request captured content is gone while references remain (C3).
 
 **Evidence:**
 
@@ -171,7 +171,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - NIST: MEASURE 2.8 (supports), MEASURE 2.9 (supports), MANAGE 4.3 (supports), MP-2.1-001 (supports), MG-4.1-006 (supports)
 - AISVS: v1.0-C12.1.4 (partial), v1.0-C12.1.3 (supports), v1.0-AC.5.1 (supports)
 
-### E-05 Behavioral detection and automatic containment
+### N-05 Behavioral detection and automatic containment
 
 - **Level:** 2
 - **Applies when:** `external-effect`
@@ -184,7 +184,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** Within-authority abuse, poisoning, cascades and rogue behavior are often visible only as behavior (ASI10 examples include exfiltration that continues after the poisoned source is removed).
 
-**Verification:** Replay recorded hostile sessions (an exfiltration-like sequence and a spawning burst); each detector fires, routes to the owner and suspends the agent at the right scope within the target (E-05/T1). Replay clean sessions and record the false-positive rate (T2).
+**Verification:** Replay recorded hostile sessions (an exfiltration-like sequence and a spawning burst); each detector fires, routes to the owner and suspends the agent at the right scope within the target (N-05/C1). Replay clean sessions and record the false-positive rate (C2).
 
 **Evidence:**
 
@@ -197,7 +197,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - NIST: MEASURE 2.4 (partial), MANAGE 2.4 (partial), MEASURE 1.2 (supports), MS-2.6-005 (partial), MG-2.4-004 (supports)
 - AISVS: v1.0-C12.2.2 (partial), v1.0-C9.3.8 (partial), v1.0-C12.3.4 (supports), v1.0-C12.4.1 (supports)
 
-### E-07 Kill-switch scopes and measured revocation latency
+### N-07 Kill-switch scopes and measured revocation latency
 
 - **Level:** 2
 - **Applies when:** `tools`
@@ -210,7 +210,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** 'After revocation takes effect' needs a bound, and the bound is set by TTLs and leases that otherwise go unexamined.
 
-**Verification:** Test: revoke at tenant and global scope during a long run with children, queued jobs and an in-flight external call; the measured time to the last new effect is within target and unaffected scopes continue (E-07/T1). Inspection: TTL and lease values match the derivation.
+**Verification:** Test: revoke at tenant and global scope during a long run with children, queued jobs and an in-flight external call; the measured time to the last new effect is within target and unaffected scopes continue (N-07/C1). Inspection: TTL and lease values match the derivation.
 
 **Evidence:**
 
@@ -223,7 +223,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - NIST: MANAGE 2.4 (partial), MEASURE 2.6 (supports), MG-2.4-004 (supports)
 - AISVS: v1.0-C9.1.3 (partial), v1.0-C9.6.3 (supports), v1.0-AC.14.3 (partial)
 
-### E-08 Quarantine, recovery and exercised incident response
+### N-08 Quarantine, recovery and exercised incident response
 
 - **Level:** 2
 - **Applies when:** `all`
@@ -236,7 +236,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** Poisoning persists after its source is removed, ASI10 calls for quarantine and verified reintegration, and recovery fails if it is first attempted during an incident.
 
-**Verification:** Drill: poison memory or an index with a canary, quarantine it, purge by lineage and confirm the canary is gone from retrieval and the next session (E-08/T1). Hostile: use of the quarantined component is denied (T2), and reintegration with a changed hash or without approval is refused (T3). Twin: restore from the trusted baseline works (T4). Record the incident exercise with its date and outcomes.
+**Verification:** Drill: poison memory or an index with a canary, quarantine it, purge by lineage and confirm the canary is gone from retrieval and the next session (N-08/C1). Hostile: use of the quarantined component is denied (C2), and reintegration with a changed hash or without approval is refused (C3). Twin: restore from the trusted baseline works (C4). Record the incident exercise with its date and outcomes.
 
 **Evidence:**
 
@@ -252,7 +252,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 ## Level 3
 
-### E-10 Tamper-evident audit
+### N-10 Tamper-evident audit
 
 - **Level:** 3
 - **Applies when:** `external-effect`
@@ -265,7 +265,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** At the highest level, investigators must be able to prove that the record was not altered, including by an insider or a compromised component. ASI08 mitigation 10 calls for tamper-evident, time-stamped logs (p. 32).
 
-**Verification:** Hostile: alter or delete one stored event out of band; the integrity check detects it (E-10/T1). Twin: an untouched log verifies (T2).
+**Verification:** Hostile: alter or delete one stored event out of band; the integrity check detects it (N-10/C1). Twin: an untouched log verifies (C2).
 
 **Evidence:**
 

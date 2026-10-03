@@ -185,7 +185,7 @@ What it suggests, without showing it:
 - The skill arm's advantages concentrated in three places: binding and revoking authority over time (approval expiry and approver re-check, provenance through derived memory, recalled memory treated as untrusted data), a secondary leak channel (crash reports and logs), and honest reporting.
 - The core architecture was the same in both arms. The baseline model also built dispatcher allowlists, pointer-only queue messages, session-derived identity and idempotency keys.
 - The skill cost scope discipline, enough to lose `narrow-timeout`.
-- Both arms missed two failures the skill text should have prevented. The catalog now states both (A-04 for policy checked at payout; A-21 and S-05 for caller-enforced deadlines). Whether the skill now carries them into agent output is untested.
+- Both arms missed two failures the skill text should have prevented. The catalog now states both (A-04 for policy checked at payout; A-21 and D-05 for caller-enforced deadlines). Whether the skill now carries them into agent output is untested.
 - The catalog's control rationales state these failure modes in general terms and do not cite this pilot, its probe IDs or its arms as evidence.
 
 What it does not show:
