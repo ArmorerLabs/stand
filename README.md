@@ -152,9 +152,9 @@ What this project adds is an agent-executable workflow in which every control na
 - No behavioral results are published yet. The [evaluation cases](evals/README.md) define what will be measured and the acceptance bar; that page also summarizes a small internal pilot, labelled as such, which is not a benchmark.
 - Control IDs are frozen from the first tagged release. If the framework or a pillar is ever renamed, IDs keep their current letters: the letters are identifiers, not abbreviations of the name. The catalog records its namespace, `STAND`, for references that need to qualify an ID outside this catalog ([references/profile-and-levels.md](references/profile-and-levels.md)).
 
-## Origin
+## Contributors
 
-STAND was started by engineers at Armorer Labs. Its guidance is vendor neutral and never requires a commercial product or service.
+Armorer Labs is the main contributor. The guidance is vendor neutral and never requires a commercial product or service.
 
 ## License
 

@@ -530,7 +530,7 @@ The version in a citation is the catalog MAJOR.MINOR; PATCH releases are editori
 
 ### Catalog changes
 
-- Normative changes need approval from two maintainers, from different employers once the project has maintainers from more than one employer.
+- Normative changes need maintainer review before release.
 - From 1.0, normative changes also need a public comment period of at least 14 days.
 - Errata that correct a factual source error ship as a PATCH release with an advisory in `CHANGELOG.md`.
 - A report that a control's guidance leads to an exploitable design goes through the source repository's private security reporting process, not a public issue. A confirmed defect is fixed in a new catalog version and announced by a security advisory in `CHANGELOG.md` that names the affected catalog versions and controls; claims lapse for those controls until reassessed against the fixed version ([conformance.md](conformance.md)).
