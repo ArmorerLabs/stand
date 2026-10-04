@@ -5,9 +5,12 @@
 > - **Format.** Adapt the record to the project's existing evidence format, but keep the control IDs, the column names of the control table, and the enum values exactly as written here.
 > - **Control IDs.** IDs refer to the catalog version in the header. Outside this record, cite a control as `A-06@0.1` and a test as `A-06@0.1/C1`.
 > - **SCOPED changes.** Write only the "Compact change record (SCOPED changes)" section at the end, plus any Inventory entry the diff adds or alters (S-04); its rules and line budget are stated there.
-> - **Length (FULL).** Budget about 110 lines for the template's fixed structure, plus one per applicable control and one per Inventory entry, register operation, assumption, signal or residual risk beyond the template's placeholder rows, counting non-blank lines once these quoted instructions are removed: a system with about 40 applicable controls and about 20 such entries fits in roughly 170 lines. One Controls row per applicable control; one row per not-applicable reason, listing all its IDs; cells cite files, functions and test IDs instead of describing code; no prose that repeats a table, the catalog or the code. One line per Inventory entry; omit the empty Deviations table (write "Deviations: none") and, below the selected level, the Level 2 and 3 rows and bullets. Never drop a required field to meet the budget; a record far beyond it usually duplicates code or the catalog.
+> - **Length (FULL).** Budget about 120 lines for the template's fixed structure, plus one per applicable control and one per Inventory entry, register operation, assumption, signal or residual risk beyond the template's placeholder rows, counting non-blank lines once these quoted instructions are removed: a system with about 40 applicable controls and about 20 such entries fits in roughly 180 lines. One Controls row per applicable control; one row per not-applicable reason, listing all its IDs; cells cite files, functions and test IDs instead of describing code; no prose that repeats a table, the catalog or the code. One line per Inventory entry; omit the empty Deviations table (write "Deviations: none") and, below the selected level, the Level 2 and 3 rows and bullets. Never drop a required field to meet the budget; a record far beyond it usually duplicates code or the catalog.
 > - **Unknowns.** Write "unknown", "unassigned" or not-assessed rather than inventing evidence, owners or approval. Keep an unrun test distinct from a passed test.
 > - **Owner fields.** A coding agent never enters an owner, an acceptance or an exception that a human has not provided (S-01).
+> - **Confidentiality.** This record maps open, located weaknesses. Where it is readable beyond the people authorized to see unfixed vulnerabilities (a public repository, or visibility unknown), write each open critical or high item by reference only, as `<ID>: open, details in <private tracker reference>`, and keep its location, failing test and suggested fix in the project's private vulnerability channel (its SECURITY.md process or a private advisory). Set "Record visibility" in the Header accordingly.
+> - **Integrity.** The record is a claim, not configuration. Name the commit each assessment was made at, and change the profile, level, status or readiness lines only through the repository's review for security-relevant paths. A later task recomputes the level from the recorded profile and uses the higher value if they differ.
+> - **Claim audit.** Before recording implemented-and-verified, list every required case of the control by label with its result at the recorded commit. A case not run or not passing keeps the status implemented-but-unverified or failing.
 > - **Status** (exactly one per control): implemented-and-verified, implemented-but-unverified, planned, not-applicable-with-reason, failing, not-assessed.
 > - **Evidence scope** (weakest to strongest): inspection, unit, simulation, integration, isolated-runtime, deployed.
 > - **Where definitions live:**
@@ -21,7 +24,9 @@
 | Field | Value |
 | --- | --- |
 | Catalog version | 0.1.0 |
-| System, version and commit | |
+| Skill version and commit (the STAND bundle used; a bundle manifest SHA-256 if one is shipped) | 0.1.0; |
+| System, version and assessment commit (D-03) | |
+| Record visibility (private, or public with open critical and high details redacted); location of redacted details | |
 | Scope (agents, entry points, deployments, environments) and enforcement-path components in scope (dispatcher, policy engine, adapters, credential broker, sandbox, egress proxy, approval UI, audit store) | |
 | Intended use; forbidden outcomes | |
 | Affected principals | |
@@ -29,6 +34,7 @@
 | Record date; prepared by (a person, or a coding agent named as such) | |
 | Assessment tier; selected level | FULL; |
 | Re-establish date (no later than 12 months after any claim) | |
+| Progress (FULL, while incomplete): last completed control ID; next planned control ID; commit | |
 
 ## Capability profile (S-02)
 
@@ -46,6 +52,7 @@
 
 - Union across contexts (U, D, X and tags); computed level (the maximum over contexts):
 - Owner-declared level (or none); selected level (the higher of the two; a claim below the computed level is invalid):
+- Principal browser agent-capable (A-12; an agentic browser or an extension can drive it): yes | no | unknown (unknown counts as yes)
 
 ## Inventory (S-04)
 
@@ -57,18 +64,21 @@
 - MCP server or remote agent: <name>; <transport and protocol version>; <endpoint, or exact launch command (T-19)>; <pinned descriptor hash (T-18)>; <credential audience (A-16)>; <sandbox>; <reviewed on>
 - Provider-executed tool (T-11): <tool>; <provider and account>; <domain or tool allowlist>; <approval mode>; <data classes that can be in context>; <where call records are logged>
 - Model or data recipient (T-10): <inference, embedding, reranking, evaluation, telemetry, tracing or crash reporting>; <provider, account, endpoint, region>; <model and version>; <approved data classes (S-06)>; <retention, training and logging terms>; <fallback order>
-- Egress destination (T-12, T-13): <destination class>; <allowed hosts or allowlist reference>; <contexts>; <enforced at (proxy, network policy, renderer allowlist, provider setting)>
-- Data class (S-06): <class>; <policy reference>; <permitted providers, destinations, stores, logs and audiences>; <retention and deletion>
+- Egress destination (T-12, T-13): <destination class>; <mode (allowlist or public-internet) and tool>; <allowed hosts or allowlist reference>; <contexts>; <enforced at (proxy, network policy, renderer allowlist, provider setting)>
+- Read-tool exemption (A-06): <context>; <L>; <per-run cap>; <daily cap>; <per-run bound in bits (per-run cap x log2(L+1))>; <ceiling in bits, below the lowest-entropy secret class, and its rationale>; <daily bound and retention-period total, accepted as residual risk (S-01)>
+- Browser context (T-17): <context>; <navigation rule (allowlist, exempt links in a profile with no delegated session, or unrestricted in an isolated logged-out profile)>; <delegated sessions and expiry>; <input to pages outside the allowlist (none, or page requests blocked after input)>
+- Data class (S-06): <class>; <policy reference>; <secret class: entropy in bits, or no>; <permitted providers, destinations, stores, logs and audiences>; <retention and deletion>
 - Store: <index, memory, cache, export, log or audit store>; <data classes>; <partitioning (tenant, principal, purpose)>; <writers>
 - Component (T-24, T-25): <dependency, plugin, sandbox image or model artifact>; <version or hash>; <provenance>; <advisories checked (for example CVE, AVID)>
 - Entry point (S-04, A-19): <interactive, job, callback, webhook, schedule, MCP server or CLI>; <principals (initiating user, trigger sender, data owner, output viewers)>; <path through components>; <boundaries where data becomes instruction, identity, permission, executable input, destination or persistent state>
 - Trigger policy (A-19), per trigger type for unattended runs: <policy>
+- External enforcement component: <component owned by another team, repository or vendor>; <owner>; <evidence reference (another record of this catalog at a named commit, or a listed vendor attestation) and the adopter-side test that exercised it>
 
 ## Consequential operations register (S-05)
 
 > Summarize the machine-readable register that the dispatcher reads, and link to it; do not keep a second hand-maintained copy. The consequence class is one of: sensitive read, reversible write, irreversible or financial effect, external communication.
 
-| Operation | Consequence class | Allowed resources and destinations | Consequential arguments and trusted source | Value and rate limits | Reversibility | Approval policy | System of record for each fact relied on |
+| Operation | Consequence class | Allowed resources and destinations | Consequential arguments and trusted source | Value and rate limits; impact threshold (funds or access) | Reversibility | Approval policy | System of record for each fact relied on |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | | | | | | | | |
 
@@ -100,7 +110,7 @@
 
 > **Rows.** Add one row for each control whose applies_when matches any context in scope, at Level 1 through the selected level. Group the controls excluded as not applicable into one row per reason, with every ID it covers in the Control ID cell (for example `T-15, T-16, T-27` with "no code execution in any context"). Conditional Level 1 controls bind whenever their condition holds, whatever level is claimed.
 >
-> **Cells.** Cite the enforcing file and function, and the test IDs with their observed results; do not describe the code or restate the control. A gap in a pre-existing feature that this change did not implement is still a row: status failing or not-assessed, severity, location and suggested fix.
+> **Cells.** Cite the enforcing file and function, and the test IDs with their observed results; do not describe the code or restate the control. A gap in a pre-existing feature that this change did not implement is still a row: status failing or not-assessed, severity, location and suggested fix (by reference only where the confidentiality rule above applies).
 >
 > **Pillars:** S Scope & Stewardship, T Trust & Isolation, A Authority & Access, N Notice & Neutralize, D Demonstrated Defenses.
 >
@@ -182,7 +192,7 @@
 ## Release gate result (D-06)
 
 - Selected level; applicable controls at Level 1 through it; counts implemented-and-verified and not-applicable-with-reason:
-- Open critical, including applicable critical-boundary controls that are not implemented-and-verified (IDs):
+- Open critical, including applicable critical-boundary controls that are not implemented-and-verified (IDs; details by reference where the record is not private):
 - Open high, each with its exception reference or "no exception" (IDs):
 - Medium and low, each with owner and target date (IDs):
 - Accountable owner assigned (yes or no; an unassigned owner blocks ready-within-scope); readiness (exactly one: ready-within-scope, confined-prototype, blocked):
@@ -204,6 +214,8 @@ Progress statement:
 Adopting <catalog name> v<X.Y>: <k> of <m> applicable Level 1 controls implemented-and-verified; critical-boundary controls outstanding: <IDs>.
 ```
 
+- Statement reviewed by (a human, never a coding agent; review date, commit and reference, as validity condition 8 requires); published by (the accountable owner or a named delegate), or "draft, pending owner review":
+
 Either statement is a self-declared engineering statement about this catalog's controls only. It is not a certification, an audit opinion, an attestation or a guarantee of security. It is not a statement of conformance to, or certification against, the OWASP Top 10 for Agentic Applications 2026 or any other OWASP project, AIUC-1, NIST AI RMF 1.0 or its Generative AI Profile (NIST AI 600-1), or ISO/IEC 42001.
 
 ## Compact change record (SCOPED changes)
@@ -211,10 +223,10 @@ Either statement is a self-declared engineering statement about this catalog's c
 > Rules for a SCOPED change (defined in the change triage of references/profile-and-levels.md):
 >
 > - **Placement.** Add each record at the top of this section, newest first, as a fenced `text` block. The record is append-only: leave the baseline Controls table and release gate result unchanged. The newest record's Readiness line is the current readiness. In the same change, update any Inventory entry the diff adds or alters (S-04). Add no ASI table, full assessment or other section.
-> - **No record file.** Create this file at the path the repository's instructions name, otherwise `docs/agent-security-record.md`, with only the Header and this section: fill in the Catalog version so bare IDs stay pinned, set Assessment tier to SCOPED, Selected level to "not computed (no baseline)" and Accountable owner to "unassigned" unless a human named one, and leave the other fields empty.
+> - **No record file.** Create this file at the path the repository's instructions name, otherwise `docs/agent-security-record.md`, with only the Header and this section: fill in the Catalog version so bare IDs stay pinned, set Assessment tier to SCOPED, Selected level to "not computed (no baseline)" and Accountable owner to "unassigned" unless a human named one, and leave the other fields empty. When the repository has no record and no instruction adopting this workflow, and the user did not explicitly ask for the record, put the compact record in the report and offer to create the file instead.
 > - **Line budget: at most 12 lines plus one per routed control.** Count every non-blank line the change adds to the record file: the two fence lines, every field line, and any heading or note. Add no heading or note; this heading already exists and the Header pins the catalog version. Not counted: Inventory rows the diff requires (S-04), "Finding:" lines, and, when the change creates the file or this section, its Header and this heading. If an existing record lacks this section, add this heading at the end of the file; that heading is not counted.
 > - **Control lines.** One line per routed control, including a control dropped with its reason; the touched D-05 rows share one line, and controls with the same status and evidence scope may share one. D-03 and D-06 take no line: the "Tests run" and "Readiness" lines record them. A control whose required cases did not all run at this commit is implemented-but-unverified.
-> - **Fixed and conditional lines.** The skeleton's other lines fill the 12 with the fences. Lines marked "only if" are left out otherwise. With no baseline record, append "Baseline: missing (full assessment recommended)" to the Profile line, leave the other applicable controls not-assessed and record readiness as blocked (baseline missing: critical-boundary set not assessed). "Release prerequisites:" lists the D-08, D-09 or D-10 activities the change triggers. "Owner decisions:" lists proposed product rules, flows and thresholds, marked not implemented, or a minimal mechanism built for a critical boundary. A gap found in a pre-existing, unchanged feature (scope rule item 2) takes one "Finding:" line each, outside the budget, so it is never compressed or dropped to fit.
+> - **Fixed and conditional lines.** The skeleton's other lines fill the 12 with the fences. Lines marked "only if" are left out otherwise. With no baseline record, append "Baseline: missing (full assessment recommended)" to the Profile line, leave the other applicable controls not-assessed and record readiness as blocked (baseline missing: critical-boundary set not assessed). "Release prerequisites:" lists the D-08, D-09 or D-10 activities the change triggers. "Owner decisions:" lists proposed product rules, flows and thresholds, marked not implemented, or a minimal mechanism built for a critical boundary. A gap found in a pre-existing, unchanged feature (scope rule item 2) takes one "Finding:" line each, outside the budget, so it is never compressed or dropped to fit; where the confidentiality rule applies, a critical or high finding gives the control ID, status, severity and private reference only.
 
 ```text
 Change: <PR, ticket or commit reference, or none>, <one-line description>

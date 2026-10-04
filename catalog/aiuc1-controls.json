@@ -1,0 +1,490 @@
+{
+ "registry": "AIUC-1 controls cited by catalog mappings",
+ "license": "CC-BY-SA-4.0",
+ "purpose": "Machine-readable record of every AIUC-1 control that catalog/mappings.json cites, so a new AIUC-1 release can be rechecked control by control. For each control: a subject in this project's own words (not AIUC-1 text), whether AIUC-1 lists it as a core or supplemental control, and the AIUC-1 release it was last checked against. For each cited requirement: the capabilities it is scoped to. scripts/validate.py rejects a cited control that is missing here, an entry that nothing cites, and a justification whose opening 'Core control' or 'Supplemental control' disagrees with the status; it warns while a control's release differs from the mapped release.",
+ "source": "https://standard.aiuc-1.com/",
+ "source_version": "AIUC-1 release of July 15, 2026",
+ "checked": "2026-10-02",
+ "method": "Read from each cited requirement page of the July 15, 2026 release: a control listed among the controls a requirement should include is core, one listed among those it may include is supplemental. Capabilities are the requirement's capability tags; Universal applies to every assessed product.",
+ "recheck": "For each new AIUC-1 release: confirm every control below still exists under the same requirement with the same subject and status, update status, capabilities and release, renumber or remove entries the release changed, then fix every validator error in catalog/mappings.json. AIUC-1 allows up to 30 days of grace after a release for audits against the previous version.",
+ "status_values": [
+  "core",
+  "supplemental"
+ ],
+ "requirements": {
+  "A001": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "A003": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "A004": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "A005": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "A006": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "A008": {
+   "capabilities": [
+    "Code-generation"
+   ]
+  },
+  "B001": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "B002": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "B004": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "B006": {
+   "capabilities": [
+    "Automation"
+   ]
+  },
+  "B007": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "B008": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "B010": {
+   "capabilities": [
+    "Code-generation"
+   ]
+  },
+  "C001": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "C002": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "C006": {
+   "capabilities": [
+    "Code-generation",
+    "Text-generation",
+    "Voice-generation"
+   ]
+  },
+  "C007": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "C008": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "C009": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "C012": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "D003": {
+   "capabilities": [
+    "Automation"
+   ]
+  },
+  "D004": {
+   "capabilities": [
+    "Automation"
+   ]
+  },
+  "E001": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "E004": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "E005": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "E006": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "E008": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "E009": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "E011": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "E013": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "E015": {
+   "capabilities": [
+    "Universal"
+   ]
+  },
+  "E017": {
+   "capabilities": [
+    "Universal"
+   ]
+  }
+ },
+ "controls": {
+  "A001.1": {
+   "title": "Published terms for how customer input data is used and kept",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "A001.2": {
+   "title": "Scheduled deletion of input data",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "A003.1": {
+   "title": "Agent data access scoped to task and role",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "A003.2": {
+   "title": "Distinct identities for agents",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "A003.3": {
+   "title": "Managing what each agent may access",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "A004.2": {
+   "title": "Intellectual property terms with the model provider",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "A005.2": {
+   "title": "Keeping each customer's data apart",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "A006.1": {
+   "title": "Detecting and filtering personal data",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "A006.2": {
+   "title": "Data loss prevention tooling",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "A008.3": {
+   "title": "Protected storage of credentials that users supply",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "A008.5": {
+   "title": "Removing secrets from logs and stored artifacts",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "B001.1": {
+   "title": "Results of external adversarial testing",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "B002.2": {
+   "title": "Records of adversarial incidents and the response",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "B002.4": {
+   "title": "Screening input for attacks before processing",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "B004.1": {
+   "title": "Detecting unusual use of model endpoints",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "B004.2": {
+   "title": "Request rate limiting",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "B004.3": {
+   "title": "External penetration test of model endpoints",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "B006.1": {
+   "title": "Limits on which services an agent can reach",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "B006.2": {
+   "title": "Monitoring and alerts when an agent crosses a security boundary",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "B006.3": {
+   "title": "Runtime checks and sandboxing where agent actions execute",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "B007.1": {
+   "title": "Access control for the people who use the AI system",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "B008.1": {
+   "title": "Authenticating callers of model and agent interfaces",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "B008.2": {
+   "title": "Encrypted transport for model and agent interfaces",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "B008.3": {
+   "title": "Integrity of messages on agent interfaces",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "B008.4": {
+   "title": "Hardened hosting for models",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "B008.5": {
+   "title": "Checking model artifacts before deployment",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "B010.3": {
+   "title": "Pinned, verified dependencies in generated code",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "C001.1": {
+   "title": "A documented AI risk taxonomy",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "C002.1": {
+   "title": "Test and sign-off records before deployment",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "C002.2": {
+   "title": "Testing built into the development lifecycle",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "C002.3": {
+   "title": "Vulnerability scanning before release",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "C006.1": {
+   "title": "Sanitizing model output before it is used",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "C006.2": {
+   "title": "Labelling and separate handling of untrusted content",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "C006.3": {
+   "title": "Detecting attack payloads in output",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "C007.1": {
+   "title": "Criteria for what counts as high-risk output",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "C007.2": {
+   "title": "Automated flagging of high-risk output",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "C007.3": {
+   "title": "Human review of flagged output",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "C008.3": {
+   "title": "Security tooling that watches AI risk categories",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "C009.1": {
+   "title": "Ways for users to step in while the system runs",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "C012.1": {
+   "title": "External evaluation against risks the customer defines",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "D003.1": {
+   "title": "Authorizing and validating tool calls before they run",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "D003.2": {
+   "title": "Rate and value caps on tool use",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "D003.3": {
+   "title": "A log of every tool call",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "D003.4": {
+   "title": "Human approval for risky tool calls",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "D003.5": {
+   "title": "Periodic review of tool call logs",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "D004.1": {
+   "title": "External testing of tool calls",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E001.1": {
+   "title": "Response plan for AI security breaches",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E004.1": {
+   "title": "Approval policy and records for system changes",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E004.2": {
+   "title": "Signing code before release",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "E005.1": {
+   "title": "How stored data is secured",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E006.1": {
+   "title": "Due diligence on vendors",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E008.1": {
+   "title": "Periodic review of internal processes",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E009.1": {
+   "title": "Watching third-party access",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E009.2": {
+   "title": "Alerts on unusual third-party access",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "E011.1": {
+   "title": "Where AI processing takes place",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E013.2": {
+   "title": "Change management procedure",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E015.1": {
+   "title": "Logging of AI system activity",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E015.2": {
+   "title": "Logging of agent actions",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "E015.3": {
+   "title": "Retention and storage of logs",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E015.4": {
+   "title": "Tamper protection for logs",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  },
+  "E017.1": {
+   "title": "Transparency documentation for the AI system",
+   "status": "core",
+   "release": "2026-07-15"
+  },
+  "E017.3": {
+   "title": "Split of security duties between platform and deployer",
+   "status": "supplemental",
+   "release": "2026-07-15"
+  }
+ }
+}

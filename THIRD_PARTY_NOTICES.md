@@ -8,7 +8,7 @@ This project is independent. Citing a standard, publication or project does not 
 | --- | --- |
 | Documentation and data: `SKILL.md`, `README.md` and the other Markdown files at the repository root, `references/`, `assets/`, `agents/`, `docs/` (including the infographic SVG and PNG), `catalog/`, and the text and data in `evals/` | Creative Commons Attribution-ShareAlike 4.0 International ([CC BY-SA 4.0](LICENSES/CC-BY-SA-4.0.txt)) |
 | `references/owasp-agentic-top-10.md` | CC BY-SA 4.0, as an adaptation of an OWASP publication (see [OWASP Top 10 for Agentic Applications 2026](#owasp-top-10-for-agentic-applications-2026)) |
-| Code: `scripts/`, `tests/`, `.github/` and repository configuration files such as `.gitattributes` and `.gitignore` | [MIT](LICENSE) |
+| Code: `scripts/`, `tests/`, `.github/` and repository configuration files such as `.gitattributes`, `.gitignore` and `REUSE.toml` | [MIT](LICENSE) |
 | `LICENSE` and `LICENSES/` | The license texts, under their own terms |
 | The Developer Certificate of Origin 1.1 text quoted in `CONTRIBUTING.md` | Reproduced verbatim under its own terms, not CC BY-SA 4.0 |
 
@@ -16,7 +16,8 @@ This project is independent. Citing a standard, publication or project does not 
 - Documentation and data: Copyright (c) 2026 the project contributors. Licensed under CC BY-SA 4.0.
 - Suggested credit: "STAND by its contributors, https://github.com/ArmorerLabs/stand, licensed under CC BY-SA 4.0". If the project or repository is renamed, use the name and URL given here at the time of the copy.
 - `references/controls/` and `references/mappings.md` are generated from `catalog/` and are licensed under CC BY-SA 4.0, like their source.
-- A file that states its own license follows that statement. A new path that this table does not cover gets its license recorded here before it is merged.
+- A file that states its own license follows that statement. A new path that this table does not cover gets its license recorded here, and in `REUSE.toml`, before it is merged.
+- In the source repository, `REUSE.toml` (REUSE Specification 3.3) records the same per-path licensing in machine-readable form, and the Developer Certificate of Origin text in `CONTRIBUTING.md` is marked as a snippet under its own terms. If `REUSE.toml` and this table ever disagree, this table states the intended licensing; please report the difference.
 - The installed skill bundle (`SKILL.md`, `references/`, `assets/`, `agents/`, `LICENSE`, `LICENSES/` and this file) contains only CC BY-SA 4.0 material and license texts.
 
 ### Sharing copies and adaptations
@@ -40,13 +41,17 @@ The license text governs. This summary is not legal advice.
 - License: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). The legal code is in [LICENSES/CC-BY-SA-4.0.txt](LICENSES/CC-BY-SA-4.0.txt).
 - Copyright: Copyright © 2025 OWASP Foundation, Inc., per the genai.owasp.org site notice; the publication is licensed under CC BY-SA 4.0 and the site states it is provided without warranty of service or accuracy.
 - Taken from the source: the ten risk identifiers and titles, with page references. The target outcomes, adversarial evidence, detection signals and control mappings are this project's adaptation, informed by the publication's examples and mitigations.
-- Changes: first adapted on September 30, 2026, and revised on October 3, 2026 for catalog version 0.1.0. The file's own header lists what changed.
+- Changes: first adapted on September 30, 2026, and revised on October 3 and October 4, 2026 for catalog version 0.1.0. The file's own header lists what changed.
 
 The ASI identifiers, and in places their titles, also appear in `catalog/`, the generated control references and other documentation, where they identify the publication's risk categories. Those files are CC BY-SA 4.0 as well, and this attribution covers that use. It does not suggest that OWASP endorses this project or any use of it.
 
 ## Other OWASP projects
 
 The catalog cross-references the OWASP Artificial Intelligence Security Verification Standard (AISVS) 1.0 (June 2026) as a related project. It cites AISVS by version-prefixed requirement identifiers only, for example `v1.0-C10.2.7`, and describes each correspondence in this project's own words. AISVS is Copyright © 2025-2026 The AISVS Project and is licensed under CC BY-SA 4.0 ([repository](https://github.com/OWASP/AISVS)). It is not part of this framework's basis, and this repository does not bundle it.
+
+[references/owasp-agentic-top-10.md](references/owasp-agentic-top-10.md) also cross-references the OWASP Top 10 for LLM Applications 2026 (Version 2026, OWASP GenAI Security Project, OWASP Foundation; [resource page](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/)), licensed under CC BY-SA 4.0. It takes from that publication only the risk identifiers and titles, the ASI entries its Appendix A maps to each risk, and page references; the catalog controls, relations and scope notes are this project's own. That file's header records the change.
+
+In the source repository, `docs/ast10-self-assessment.md` uses the risk identifiers and titles of the [OWASP Agentic Skills Top 10](https://github.com/OWASP/www-project-agentic-skills-top-10) (AST01 to AST10, an OWASP Incubator project, licensed under CC BY-SA 4.0), read at the commit that page names, and summarizes its risk descriptions in this project's own words.
 
 The [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/) is cited as further reading. This repository does not bundle its articles or example code. Preserve the applicable attribution and license if adding an adaptation from those sources.
 

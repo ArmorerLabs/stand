@@ -24,7 +24,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** This preserves the evidence discipline: proposed, attempted, denied and confirmed are different facts. Misuse through chains of trusted tools is invisible to host monitoring (ASI02 example scenario 6), so only application-level events show it.
 
-**Verification:** Test: a forced denied proposal emits proposed and denied events with a reason code (N-01/C1); an allowed one emits proposed, attempted and confirmed events (C2); a canary secret is absent from all events (C3).
+**Verification:** Hostile: a forced denied proposal emits proposed and denied events with a reason code (N-01/C1). Twin: an allowed proposal emits proposed, attempted and confirmed events (C2). Hostile: a canary secret placed in context and in an adapter response is absent from all events (C3).
 
 **Evidence:**
 
@@ -33,7 +33,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Mappings:**
 
-- AIUC-1: E015.2 (partial), D003.3 (partial), E015.1 (partial), A006.1 (supports), A008.5 (supports)
+- AIUC-1: E015.2 (partial), D003.3 (partial; Automation only), E015.1 (partial), A006.1 (supports), A008.5 (supports; Code-generation only)
 - NIST: MEASURE 2.8 (supports), MEASURE 2.4 (supports), MS-2.7-004 (supports), MS-4.2-004 (supports)
 - AISVS: v1.0-C12.1.2 (supports), v1.0-C12.4.2 (partial), v1.0-C12.1.1 (partial), v1.0-C12.1.3 (supports)
 
@@ -70,13 +70,13 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - **Failure severity:** medium
 - **Minimum evidence scope:** integration
 - **Critical boundary:** no
-- **ASI:** ASI01, ASI02, ASI04, ASI06, ASI08, ASI09, ASI10
+- **ASI:** ASI01, ASI02, ASI03, ASI04, ASI05, ASI06, ASI07, ASI08, ASI09, ASI10
 
-**Statement:** The system MUST emit signals for: denials of consequential actions; provenance and task-scope denials from tainted contexts; budget and quota stops; descriptor or component drift; audit-write failures; kill-switch activations; and user reports of suspicious agent behavior. Each signal MUST be routed to a named owner (or 'unassigned', which S-01 treats as blocking) with a recorded response target. Detection MUST supplement, never replace, enforcement.
+**Statement:** The system MUST emit signals for: denials of consequential actions; provenance and task-scope denials from tainted contexts; budget and quota stops; descriptor or component drift; audit-write failures; kill-switch activations; user reports of suspicious agent behavior; and, where the capability exists, sandbox policy violations and blocked sandbox egress, rejected, replayed or unregistered-peer inter-agent messages, and denied delegations and tokens presented outside their audience, session or delegation envelope. Each signal MUST be routed to a named owner (or 'unassigned', which S-01 treats as blocking) with a recorded response target. Detection MUST supplement, never replace, enforcement.
 
-**Rationale:** Every ASI entry lists monitoring or anomaly detection among its mitigations. Persistent and within-authority attacks first show up as repeated denials and drift that enforcement blocks but nobody notices.
+**Rationale:** Every ASI entry lists monitoring or anomaly detection among its mitigations. Persistent and within-authority attacks first show up as repeated denials and drift that enforcement blocks but nobody notices. Sandbox violations, rejected inter-agent messages and out-of-envelope tokens are the first visible trace of code-execution, inter-agent and privilege attacks (ASI05, ASI07, ASI03). These are event signals any Level 1 system can emit; baselines of normal behavior, including memory write rates, are Level 2 detection (N-05).
 
-**Verification:** For each signal type, trigger its condition in a test and assert that it is emitted and delivered to the owner's controlled channel (N-04/C1).
+**Verification:** For each signal type, trigger its condition in a test and assert that it is emitted and delivered to the owner's controlled channel (N-04/C1). In particular: a sandboxed command attempts blocked egress and a write outside its allowed paths (C2); a replayed message and a message from an unregistered peer reach the inter-agent receiver (C3); and a delegate presents a token outside its audience and requests an action beyond its delegation envelope (C4). Each is denied and its signal reaches the owner's channel. Twin: a routine authorized action within budget, policy and envelope produces no security signal (C5).
 
 **Evidence:**
 
@@ -85,7 +85,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Mappings:**
 
-- AIUC-1: B006.2 (partial), D003.3 (partial), B002.2 (supports), C009.1 (supports), C008.3 (supports), E009.2 (supports)
+- AIUC-1: B006.2 (partial; Automation only), D003.3 (partial; Automation only), B002.2 (supports), C009.1 (supports), C008.3 (supports), E009.2 (supports)
 - NIST: MEASURE 2.4 (partial), MANAGE 4.1 (partial), MEASURE 3.1 (supports), GOVERN 2.1 (supports), MG-4.1-002 (partial), MS-2.7-004 (supports), MG-4.1-007 (supports), MEASURE 3.3 (supports), MG-4.3-002 (supports)
 - AISVS: v1.0-C12.4.3 (partial), v1.0-C12.2.1 (supports), v1.0-AC.6.1 (supports)
 
@@ -98,11 +98,11 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - **Critical boundary:** yes
 - **ASI:** ASI04, ASI08, ASI10
 
-**Statement:** Authorized operators MUST be able to stop a run together with all its descendants, and to disable a specific tool, component, model version or agent, without a deploy. After a stop takes effect, new effects MUST NOT start, and queued work MUST be cancelled or revalidated before execution.
+**Statement:** Authorized operators MUST be able to stop a run together with all its descendants, and to disable a specific tool, component, model version or agent, without a deploy. The principal who started a run MUST also be able to stop it and its descendants, with the same guarantee, from the interface where they started it; for a run started through an API, that is a cancel operation on the same API. After a stop takes effect, new effects MUST NOT start, and queued work MUST be cancelled or revalidated before execution. The stop MUST also reach work that runs outside the dispatcher: it MUST cancel the run's provider-side background responses and managed agent sessions through the provider's API (where the provider offers no cancel operation for a background response or a managed session type, the run MUST NOT use that feature), MUST disable provider-executed tools and remote connectors in the configuration of every later request of the run, and MUST revoke or suspend the run's delegated credentials held by remote servers and connectors.
 
-**Rationale:** A prompt asking the agent to stop is not enforcement. A rogue-agent stop and a supply-chain kill switch need the same mechanism.
+**Rationale:** A prompt asking the agent to stop is not enforcement. A rogue-agent stop and a supply-chain kill switch need the same mechanism. A stop flag that the dispatcher checks never reaches a provider-hosted background response or a managed session, which run until they finish unless the provider is told to cancel them. Supervised autonomy promises that a person can intervene, so the person who started the run gets the stop, not only operators.
 
-**Verification:** Hostile: stop a run while one child is queued and another is running; no new effects occur after the stop (recorder), and the queued job revalidates and aborts (N-06/C1). Disabling a tool flag makes dispatch deny it (C2). Twin: other runs are unaffected (C3).
+**Verification:** Hostile: stop a run while one child is queued and another is running; no new effects occur after the stop (recorder), and the queued job revalidates and aborts (N-06/C1). Disabling a tool flag makes dispatch deny it (C2). Twin: other runs are unaffected (C3). Hostile: stop a run whose provider-side background response or managed agent session is in progress with a hosted connector; the provider reports it cancelled, no provider-executed tool call or connector effect is recorded after the stop, and the connector's delegated credential is revoked (C4). The principal who started a run stops it from its interface while a child is running and another is queued; no new effect follows and the queued work aborts (C5). Record lint: a run configuration that uses a provider background response or managed session type for which the provider offers no cancel operation is rejected (C6).
 
 **Evidence:**
 
@@ -128,7 +128,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** Agent behavior changes with configuration as much as with code, and ungoverned changes silently invalidate verified controls. AIUC-1 E004 is change approval, and ASI01 mitigation 3 (p. 10) recommends locking system prompts and routing changes to goals or reward definitions through configuration management and human approval.
 
-**Verification:** Inspection: a sample of recent changes of the listed kinds each shows a triage tier, re-run test IDs, a record update and a named approver; a profile change has a full record. Hostile: a configuration change merged without these is caught by review rules or the record linter (N-09/C1).
+**Verification:** Inspection: a sample of recent changes of the listed kinds each shows a triage tier, re-run test IDs, a record update and a named approver; a profile change has a full record. Hostile: a configuration change merged without these is caught by review rules or the record linter (N-09/C1). Twin: a configuration change that carries its tier, re-run test IDs, record update and approver passes (C2).
 
 **Evidence:**
 
@@ -157,7 +157,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** Investigating an injection requires knowing what the model saw, and minimization applied literally discards exactly that. Retention and deletion rules keep forensic capture consistent with data-subject deletion.
 
-**Verification:** Drill: run an injection fixture that triggers a denied or confirmed effect, then identify the planted source using only the stored manifest (N-03/C1). Hostile: the manifest contains no canary secret (C2), and after a deletion request captured content is gone while references remain (C3).
+**Verification:** Drill: run an injection fixture that triggers a denied or confirmed effect, then identify the planted source using only the stored manifest (N-03/C1). Hostile: the manifest contains no canary secret (C2), and after a deletion request captured content is gone while references remain (C3). Twin: for a run with no deletion request, every manifest reference resolves to the captured content or to a source whose hash matches (C4).
 
 **Evidence:**
 
@@ -178,13 +178,13 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - **Failure severity:** medium
 - **Minimum evidence scope:** simulation
 - **Critical boundary:** no
-- **ASI:** ASI02, ASI08, ASI09, ASI10
+- **ASI:** ASI02, ASI06, ASI08, ASI09, ASI10
 
-**Statement:** The system MUST baseline each agent's tool sequences, destinations, volumes and fan-out, MUST alert when recorded thresholds are crossed, and MUST automatically throttle or suspend the agent at the narrowest scope for high-risk patterns: a sensitive read followed by an external send to a new destination, a novel tool combination, activity that continues after its triggering source was removed, and spawning bursts. False-positive rates MUST be recorded.
+**Statement:** The system MUST baseline each agent's tool sequences, destinations, volumes and fan-out, and the write rates and write sources of each memory scope and index, MUST alert when recorded thresholds are crossed, and MUST automatically throttle or suspend the agent at the narrowest scope for high-risk patterns: a sensitive read followed by an external send to a new destination, a novel tool combination, activity that continues after its triggering source was removed, spawning bursts, and a burst of memory or index writes, or writes from a new source, in one scope. False-positive rates MUST be recorded.
 
-**Rationale:** Within-authority abuse, poisoning, cascades and rogue behavior are often visible only as behavior (ASI10 examples include exfiltration that continues after the poisoned source is removed).
+**Rationale:** Within-authority abuse, poisoning, cascades and rogue behavior are often visible only as behavior (ASI10 examples include exfiltration that continues after the poisoned source is removed), and memory poisoning often shows first as an unusual write rate or a new writer for a memory scope (ASI06).
 
-**Verification:** Replay recorded hostile sessions (an exfiltration-like sequence and a spawning burst); each detector fires, routes to the owner and suspends the agent at the right scope within the target (N-05/C1). Replay clean sessions and record the false-positive rate (C2).
+**Verification:** Replay recorded hostile sessions (an exfiltration-like sequence and a spawning burst); each detector fires, routes to the owner and suspends the agent at the right scope within the target (N-05/C1). Twin: replay clean sessions; they are not suspended, and the false-positive rate is recorded (C2). Hostile: replay a session that writes to a memory scope at many times its baseline rate, from a source that has not written to it before; the detector fires and writes to that scope are throttled or suspended (C3).
 
 **Evidence:**
 
@@ -193,8 +193,8 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Mappings:**
 
-- AIUC-1: B006.2 (partial), B004.1 (supports), E009.2 (supports), D003.5 (supports)
-- NIST: MEASURE 2.4 (partial), MANAGE 2.4 (partial), MEASURE 1.2 (supports), MS-2.6-005 (partial), MG-2.4-004 (supports)
+- AIUC-1: B006.2 (partial; Automation only), B004.1 (supports), E009.2 (supports), D003.5 (supports; Automation only)
+- NIST: MEASURE 2.4 (partial), MANAGE 2.4 (partial), MEASURE 1.2 (supports), MS-2.6-005 (partial), MG-2.4-004 (supports), MG-1.3-002 (supports)
 - AISVS: v1.0-C12.2.2 (partial), v1.0-C9.3.8 (partial), v1.0-C12.3.4 (supports), v1.0-C12.4.1 (supports)
 
 ### N-07 Kill-switch scopes and measured revocation latency
@@ -210,7 +210,7 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 
 **Rationale:** 'After revocation takes effect' needs a bound, and the bound is set by TTLs and leases that otherwise go unexamined.
 
-**Verification:** Test: revoke at tenant and global scope during a long run with children, queued jobs and an in-flight external call; the measured time to the last new effect is within target and unaffected scopes continue (N-07/C1). Inspection: TTL and lease values match the derivation.
+**Verification:** Test: revoke at tenant and global scope during a long run with children, queued jobs and an in-flight external call; the measured time to the last new effect is within target (N-07/C1). Twin: during the same revocation, runs in an unaffected tenant complete their effects (C2). Inspection: TTL and lease values match the derivation.
 
 **Evidence:**
 
@@ -232,11 +232,11 @@ Catalog version 0.1.0 (draft). This pillar has 10 controls: 5 at Level 1, 4 at L
 - **Critical boundary:** no
 - **ASI:** ASI04, ASI06, ASI08, ASI10
 
-**Statement:** The system MUST be able to quarantine a suspect agent, MCP server, memory scope or index (revoke credentials, block memory writes and peer messaging, hold pending work, preserve evidence), purge derived content by source lineage, and restore from a trusted baseline. Reintegration MUST require re-verification of pinned versions and configuration hashes and an accountable human's approval. Irreversible effects MUST be listed in the record with any compensating actions. A documented incident procedure covering containment, evidence preservation, cleanup and owner notification MUST be exercised at least once per release cycle.
+**Statement:** The system MUST be able to quarantine a suspect agent, MCP server, memory scope or index (revoke credentials, block memory writes and peer messaging, hold pending work, preserve evidence), purge derived content by source lineage, and restore from a trusted baseline. Reintegration MUST require re-verification of pinned versions and configuration hashes and an accountable human's approval. Irreversible effects MUST be listed in the record with any compensating actions. A documented incident procedure covering containment, evidence preservation, cleanup and owner notification MUST be exercised at least every 12 months and after any change to the quarantine path.
 
 **Rationale:** Poisoning persists after its source is removed, ASI10 calls for quarantine and verified reintegration, and recovery fails if it is first attempted during an incident.
 
-**Verification:** Drill: poison memory or an index with a canary, quarantine it, purge by lineage and confirm the canary is gone from retrieval and the next session (N-08/C1). Hostile: use of the quarantined component is denied (C2), and reintegration with a changed hash or without approval is refused (C3). Twin: restore from the trusted baseline works (C4). Record the incident exercise with its date and outcomes.
+**Verification:** Drill: poison memory or an index with a canary, quarantine it, purge by lineage and confirm the canary is gone from retrieval and the next session (N-08/C1). Hostile: use of the quarantined component is denied (C2), and reintegration with a changed hash or without approval is refused (C3). Twin: restore from the trusted baseline works (C4). Record the incident exercise with its date and outcomes; an exercise older than 12 months, or older than the last change to the quarantine path, leaves the control implemented-but-unverified.
 
 **Evidence:**
 

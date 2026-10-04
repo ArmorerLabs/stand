@@ -108,15 +108,29 @@ class FixtureTestCase(unittest.TestCase):
         self.git("commit", "-q", "-m", message)
         return self.git("rev-parse", "HEAD")
 
+    def add_tombstone(self, cid="D-02", title="Retired check", successor="D-01"):
+        """Add a withdrawn control with its ledger entry and heading. Counts and routing ignore it."""
+        def add(data):
+            tombstone = fixture_repo.control(cid, title, 1, "high", "integration", ["tools"], ["ASI01"])
+            tombstone.update(lifecycle="withdrawn", withdrawn_in="0.1.0", superseded_by=[successor],
+                             critical_boundary=False)
+            data["controls"].append(tombstone)
+        self.edit_json("catalog/controls.json", add)
+        self.edit_json("catalog/ledger.json", lambda data: data["entries"].append(
+            {"id": cid, "title": title, "status": "withdrawn", "introduced": "0.1.0"}))
+        self.append(f"references/controls/{cid[0]}.md", f"\n### {cid} {title}\n\nWithdrawn.\n")
+
     def remove_highest_serial(self):
-        """Remove A-02 with its ledger entry and heading: consistent in-tree, caught only against a base."""
-        _remove_control("A-02")(self)
-        _drop_ledger("A-02")(self)
-        self.write("references/controls/A.md", fixture_repo.pillar_file("A", [("A-01", "Single dispatch path")]))
+        """Remove the tombstone D-02 with its ledger entry and heading: consistent in-tree, caught only
+        against a base."""
+        _remove_control("D-02")(self)
+        _drop_ledger("D-02")(self)
+        self.write("references/controls/D.md", fixture_repo.files()["references/controls/D.md"])
 
     def history_with_early_removal(self):
-        """Commit the fixture, then a removal, then an unrelated change. Return the first commit."""
+        """Commit the fixture with a tombstone, then its removal, then an unrelated change. Return the first commit."""
         self.git("init", "-q")
+        self.add_tombstone()
         first = self.commit("Fixture")
         self.remove_highest_serial()
         self.commit("Remove a control and its ledger entry")
@@ -136,7 +150,8 @@ class FixtureTestCase(unittest.TestCase):
         """Findings against the base revision and every commit since it, as --ledger-base compares."""
         baseline, failure = validate.read_baseline(self.root, revision)
         self.assertIsNone(failure)
-        return self.result(base_ledger=baseline.ledger, base_retired=baseline.retired).findings
+        return self.result(base_ledger=baseline.ledger, base_retired=baseline.retired,
+                           base_controls=baseline.controls, base_version=baseline.version).findings
 
     def cli(self, *args):
         return subprocess.run([sys.executable, str(self.root / "scripts/validate.py"), *args],
@@ -429,6 +444,25 @@ CASES = [
      lambda t: t.edit_control("A-01", lambda c: c.update(evidence=["Dispatcher tests A-01/C1..C5"]))),
     ("cited case number beyond the catalog", "case-label",
      lambda t: t.append("references/patterns.md", "\nA-01/C7: an extra case.\n")),
+    ("record template lacks a field a statement requires", "record-template",
+     lambda t: t.replace("assets/agent-security-record.md", "Browser context", "Browser")),
+    ("worked example count drift", "worked-example",
+     lambda t: t.append("references/profile-and-levels.md", "\n**9. Test agent.** One context.\n\n- U present.\n"
+                        "- Autonomy scope 1. Tags: tools.\n- n is 1, so the computed level is Level 1, with 99 "
+                        "applicable controls.\n")),
+    ("catalog case label marked local", "case-label",
+     lambda t: t.append("references/patterns.md", "\nA-01/C2 (local): an extra case.\n")),
+    ("local case label defined twice", "case-label",
+     lambda t: t.append("references/patterns.md", "\nA-01/L1: one case.\n\nA-01/L1 (twin): another case.\n")),
+    ("local case label cited but never defined", "case-label",
+     lambda t: t.append("references/patterns.md", "\nThe record cites A-01/L4.\n")),
+    ("statement floor missing from the floor lists", "severity-floor",
+     lambda t: (t.edit_control("S-01", lambda c: c.update(statement=c["statement"] + " A failure of this control "
+                                                          "MUST be rated critical when it is fabricated (D-06).")),
+                t.append("references/conformance.md", "\nFor an unverified control, a floor applies when the profile "
+                         "or register shows the floor's precondition: A-01 where funds move. A floor whose condition "
+                         "is the failure itself (T-01) applies when that failure is found.\n"),
+                t.append("CHANGELOG.md", "\n- The escalations are now floors in the statements of S-01.\n"))),
     ("changelog summary count drift", "changelog-summary",
      lambda t: t.append("CHANGELOG.md", "\n- Control catalog 0.1.0 with 99 controls across the five pillars: "
                         "Authority & Access A-01 to A-09.\n- Levels 1 to 3 (9, 9 and 9 controls).\n")),
@@ -447,6 +481,10 @@ CASES = [
      lambda t: t.append("references/frameworks.md", "\nThe dispatcher row: A-01 (B006.1, direct).\n")),
     ("empty nist list drift", "mapping-claim",
      lambda t: t.append("references/frameworks.md", "\nSo their `nist` lists are empty: A-01.\n")),
+    ("relation definition differs from mappings.json", "mapping-claim",
+     lambda t: t.replace("references/frameworks.md", "- **partial**: Part of it.", "- **partial**: Some of it.")),
+    ("relation definition missing", "expected-fact-missing",
+     lambda t: t.replace("references/frameworks.md", "- **supports**: Helps.", "Supports helps.")),
     ("OWASP mark in the possessive", "owasp-mark",
      lambda t: t.append("README.md", "\nThe " + "OWASP" + "'s list.\n")),
     ("routing row misses a tagged critical control", "routing",
@@ -464,7 +502,151 @@ CASES = [
      lambda t: t.write(".github/workflows/extra.yml", "permissions:\n  contents: read\njobs:\n  x:\n    steps:\n      - uses: actions/checkout@v7\n")),
     ("missing workflow permissions", "workflow-permissions",
      lambda t: t.write(".github/workflows/extra.yml", "jobs:\n  x:\n    runs-on: ubuntu-latest\n")),
+    ("write-all workflow permissions", "workflow-permissions",
+     lambda t: t.write(".github/workflows/extra.yml", "permissions: write-all\njobs:\n  x:\n    runs-on: ubuntu-latest\n")),
+    ("job-level write-all permissions", "workflow-permissions",
+     lambda t: t.write(".github/workflows/extra.yml", "permissions:\n  contents: read\njobs:\n  x:\n"
+                       "    permissions: write-all\n    runs-on: ubuntu-latest\n")),
+    ("pull_request_target trigger", "workflow-trigger",
+     lambda t: t.write(".github/workflows/extra.yml", "on:\n  pull_request_target:\npermissions:\n  contents: read\n")),
+    ("pull_request_target in a trigger list", "workflow-trigger",
+     lambda t: t.write(".github/workflows/extra.yml", "on: [push, pull_request_target]\npermissions:\n  contents: read\n")),
+    ("checkout persists credentials", "workflow-credentials",
+     lambda t: t.replace(".github/workflows/validate.yml", "persist-credentials: false", "persist-credentials: true")),
+    ("expression inline in a run script", "workflow-injection",
+     lambda t: t.write(".github/workflows/extra.yml", "permissions:\n  contents: read\njobs:\n  x:\n    steps:\n"
+                       "      - run: |\n          echo \"${{ github.event.pull_request.title }}\"\n")),
+    # Skill size and routing
+    ("SKILL.md over the token budget", "skill-tokens", lambda t: t.append("SKILL.md", "x" * 20100 + "\n")),
+    ("routing row lists a Level 2 control without its prefix", "routing",
+     lambda t: t.replace("SKILL.md", "| A-01, D-01; L2: A-02 |", "| A-01, D-01, A-02 |")),
+    ("routing row puts a Level 1 control after L2", "routing",
+     lambda t: t.replace("SKILL.md", "| A-01, D-01; L2: A-02 |", "| D-01; L2: A-02, A-01 |")),
+    ("feature row misses a non-critical tagged control", "routing",
+     lambda t: t.edit_control("N-01", lambda c: c.update(applies_when=["tools", "browser-agent"]))),
+    ("routing table missing", "expected-fact-missing",
+     lambda t: t.replace("SKILL.md", "| Trigger location | Control IDs |", "| Where | Control IDs |")),
+    ("feature row missing", "expected-fact-missing",
+     lambda t: t.replace("SKILL.md", "| Browser runtime | T-01 |\n", "")),
+    ("snippet trigger list incomplete", "trigger-list",
+     lambda t: t.write("assets/AGENTS-snippet.md", "# Snippet\n\nTrigger locations include tool dispatch, "
+                       "retrieval indexes and caches, and model or provider settings.\n")),
+    ("snippet has no trigger list", "trigger-list",
+     lambda t: t.write("assets/AGENTS-snippet.md", "# Snippet\n\nUse the skill for agent changes.\n")),
+    ("Trigger locations heading missing", "expected-fact-missing",
+     lambda t: t.replace("references/profile-and-levels.md", "### Trigger locations", "### Where to look")),
+    # Catalog obligations, twins and namespace
+    ("statement with only MAY", "catalog-field",
+     lambda t: t.edit_control("A-01", lambda c: c.update(statement="Dispatch MAY be centralized."))),
+    ("statement with only OPTIONAL", "catalog-field",
+     lambda t: t.edit_control("A-01", lambda c: c.update(statement="Dispatch is OPTIONAL."))),
+    ("namespace missing", "catalog-field", lambda t: t.edit_json("catalog/controls.json", lambda d: d.pop("namespace"))),
+    ("namespace wrong", "catalog-field",
+     lambda t: t.edit_json("catalog/controls.json", lambda d: d.update(namespace="RAISE"))),
+    ("empty twin exemption", "catalog-field", lambda t: t.edit_control("D-01", lambda c: c.update(twin_exempt=""))),
+    ("control without a twin", "case-label",
+     lambda t: t.edit_control("A-01", lambda c: c.update(verification="Hostile: x (A-01/C1). Hostile: y (C2)."))),
+    ("control without any case", "case-label",
+     lambda t: t.edit_control("A-01", lambda c: c.update(verification="Inspection of the dispatcher."))),
+    ("twin exemption on a control with cases", "case-label",
+     lambda t: t.edit_control("A-01", lambda c: c.update(twin_exempt="Inspection only."))),
+    ("ASI category without a page", "asi-title",
+     lambda t: t.edit_json("catalog/controls.json", lambda d: d["asi_categories"][0].pop("page"))),
+    # Stated counts and lists
+    ("README total drift", "readme-summary", lambda t: t.append("README.md", "\nA catalog of 80 controls.\n")),
+    ("README per-pillar counts missing", "expected-fact-missing",
+     lambda t: t.replace("README.md", fixture_repo.readme_counts(), "It holds controls.")),
+    ("CHANGELOG summary reworded", "expected-fact-missing",
+     lambda t: t.replace("CHANGELOG.md", "Control catalog 0.1.0 with 6 controls", "Catalog 0.1.0: 6 controls")),
+    ("CHANGELOG summary names another version", "changelog-summary",
+     lambda t: t.replace("CHANGELOG.md", "Control catalog 0.1.0 with", "Control catalog 0.0.9 with")),
+    ("pillar table header reworded", "expected-fact-missing",
+     lambda t: t.replace("docs/pillars.md", "Controls (L1/L2/L3)", "Controls (L1, L2, L3)")),
+    ("level table drift", "count-drift",
+     lambda t: t.replace("references/profile-and-levels.md", "| Total | 4 | 1 | 1 | 6 |", "| Total | 4 | 1 | 1 | 7 |")),
+    ("level sentence drift", "count-drift",
+     lambda t: t.append("references/profile-and-levels.md", "\nLevel 2 adds depth (3 controls).\n")),
+    ("level table missing", "expected-fact-missing",
+     lambda t: t.replace("references/profile-and-levels.md", "| Pillar | Level 1 |", "| Pillar | L1 |")),
+    ("infographic count drift", "count-drift",
+     lambda t: t.write("docs/stand-infographic.svg", "<svg><desc>Pillar 01, letter S, asks. It has 1 controls. "
+                       "Pillar 02, letter T, asks. It has 1 controls. Pillar 03, letter A, asks. It has 2 controls. "
+                       "Pillar 04, letter N, asks. It has 1 controls. Pillar 05, letter D, asks. It has 1 controls."
+                       "</desc><text>1 controls</text><text>1 controls</text><text>3 controls</text>"
+                       "<text>1 controls</text><text>1 controls</text></svg>\n")),
+    ("infographic description drift", "count-drift",
+     lambda t: t.write("docs/stand-infographic.svg", "<svg><desc>Pillar 01, letter S, asks. It has 2 controls. "
+                       "Pillar 02, letter T, asks. It has 1 controls. Pillar 03, letter A, asks. It has 2 controls. "
+                       "Pillar 04, letter N, asks. It has 1 controls. Pillar 05, letter D, asks. It has 1 controls."
+                       "</desc><text>1 controls</text><text>1 controls</text><text>2 controls</text>"
+                       "<text>1 controls</text><text>1 controls</text></svg>\n")),
+    ("infographic counts missing", "expected-fact-missing",
+     lambda t: t.write("docs/stand-infographic.svg", "<svg><desc>Five pillars.</desc></svg>\n")),
+    ("cross-cutting list drift", "cross-cutting",
+     lambda t: t.append("docs/pillars.md", "\nThe cross-cutting controls are S-01 and D-01.\n")),
+    ("cross-cutting count word drift", "cross-cutting",
+     lambda t: t.append("docs/pillars.md", "\nThe four cross-cutting controls (S-01) list every category.\n")),
+    ("nist empty-list sentence missing", "expected-fact-missing",
+     lambda t: t.replace("references/frameworks.md", "`nist` lists are empty", "NIST lists are empty")),
+    ("unknown control in eval cases", "unknown-control",
+     lambda t: t.write("evals/cases.json", '{"cases": [{"controls": ["A-99"]}]}\n')),
+    ("retired or missing case in eval cases", "case-label",
+     lambda t: t.write("evals/cases.json", '{"cases": [{"evidence": "A-01/C9"}]}\n')),
+    ("eval catalog_version drift", "eval-cases",
+     lambda t: t.write("evals/cases.json", '{"catalog_version": "0.2", "cases": []}\n')),
+    ("metadata catalog-version drift", "version",
+     lambda t: t.replace("SKILL.md", 'catalog-version: "0.1.0"', 'catalog-version: "0.2"')),
+    ("metadata version missing", "expected-fact-missing",
+     lambda t: t.replace("SKILL.md", '  catalog-version: "0.1.0"\n', "")),
+    # ASI view and titles
+    ("key control lacks the row's ASI", "asi-view",
+     lambda t: t.replace("references/owasp-agentic-top-10.md", "| N-01 |", "| N-01, D-01 |")),
+    ("ASI page differs from the catalog", "asi-view",
+     lambda t: t.replace("references/owasp-agentic-top-10.md", "(pp. 9-11)", "(pp. 8-11)")),
+    ("ASI row without a page", "asi-view",
+     lambda t: t.replace("references/owasp-agentic-top-10.md", " (pp. 9-11)", "")),
+    ("Level 2 key control missing from the level sentence", "asi-view",
+     lambda t: t.replace("references/owasp-agentic-top-10.md", "Level 2 (A-02)", "Level 2 (A-01)")),
+    ("level sentence missing", "expected-fact-missing",
+     lambda t: t.replace("references/owasp-agentic-top-10.md", "Some key controls are Level 2", "Some are Level 2")),
+    ("wrong title after a bare identifier", "asi-title", lambda t: t.append("README.md", "\nASI01 Prompt Injection.\n")),
+    ("wrong title in parentheses", "asi-title", lambda t: t.append("README.md", "\nSee ASI01 (Goal Hijack).\n")),
+    # Registries
+    ("NIST subcategory not in the registry", "nist-id", lambda t: _nist_ref(t, "GOVERN 9.9")),
+    ("NIST ref in another form", "nist-id", lambda t: _nist_ref(t, "GV 1.1")),
+    ("NIST citation names another page", "nist-id",
+     lambda t: t.edit_json("catalog/mappings.json", lambda d: d["nist"]["refs"]["A-01"][0].update(
+         justification="Policies are documented. [AI 100-1 Table 1 p.99]"))),
+    ("NIST action citation missing", "nist-id",
+     lambda t: t.edit_json("catalog/mappings.json", lambda d: d["nist"]["refs"]["T-01"][0].update(
+         justification="Align use with law."))),
+    ("NIST identifier in prose not in the registry", "nist-id",
+     lambda t: t.append("references/frameworks.md", "\nSee MEASURE 9.1 and MG-9.9-001.\n")),
+    ("NIST registry action without its subcategory", "nist-id",
+     lambda t: t.edit_json("catalog/nist-ids.json", lambda d: d["actions"].update({"MS-2.7-001": {"page": 30}}))),
+    ("NIST registry subcategory in the wrong table", "nist-id",
+     lambda t: t.edit_json("catalog/nist-ids.json", lambda d: d["subcategories"]["MAP 2.1"].update(table=3))),
+    ("AIUC control not in the registry", "aiuc-registry", lambda t: _aiuc_ref(t, "B006.9")),
+    ("AIUC status contradicts the justification", "aiuc-registry",
+     lambda t: t.edit_json("catalog/aiuc1-controls.json", lambda d: d["controls"]["B006.1"].update(status="supplemental"))),
+    ("AIUC registry entry cited by nothing", "aiuc-registry",
+     lambda t: t.edit_json("catalog/aiuc1-controls.json", lambda d: d["controls"].update(
+         {"B006.2": {"title": "Alerts", "status": "core", "release": "2026-07-15"}}))),
+    ("AIUC registry entry without a release", "aiuc-registry",
+     lambda t: t.edit_json("catalog/aiuc1-controls.json", lambda d: d["controls"]["B006.1"].pop("release"))),
+    ("AIUC requirement without capabilities", "aiuc-registry",
+     lambda t: t.edit_json("catalog/aiuc1-controls.json", lambda d: d["requirements"]["B006"].update(capabilities=[]))),
 ]
+
+
+def _nist_ref(test, ref):
+    test.edit_json("catalog/mappings.json", lambda d: d["nist"]["refs"]["A-01"][0].update(ref=ref))
+    test.edit_control("A-01", lambda c: c["mappings"]["nist"][0].update(ref=ref))
+
+
+def _aiuc_ref(test, ref):
+    test.edit_json("catalog/mappings.json", lambda d: d["aiuc1"]["refs"]["A-01"][0].update(ref=ref))
+    test.edit_control("A-01", lambda c: c["mappings"]["aiuc1"][0].update(ref=ref))
 
 
 class FindingCodeTests(FixtureTestCase):
@@ -481,7 +663,7 @@ class FindingCodeTests(FixtureTestCase):
         source = (REPOSITORY / "scripts/validate.py").read_text(encoding="utf-8")
         emitted = set(re.findall(r'report\(\s*"([a-z-]+)"', source))
         emitted |= set(re.findall(r'Finding\("([a-z-]+)"', source))
-        covered = {code for _, code, _ in CASES} | {"skill-dir-name"}
+        covered = {code for _, code, _ in CASES} | {"skill-dir-name", "normative-change", "normative-weakening"}
         self.assertEqual(emitted - covered, set())
 
     def test_ledger_entry_removed_since_base_revision(self):
@@ -489,7 +671,7 @@ class FindingCodeTests(FixtureTestCase):
         self.assertIn("ledger-removed", self.codes(base_ledger=base))
 
     def test_removal_in_an_earlier_commit_is_caught_against_the_push_base(self):
-        # Greptile P1: the parent of HEAD already lacks A-02, so only the push's previous head
+        # Regression: the parent of HEAD already lacks D-02, so only the push's previous head
         # (or the pull request's base commit) reveals the removal.
         first = self.history_with_early_removal()
         self.assertEqual(self.codes_against("HEAD^1"), set())
@@ -508,7 +690,7 @@ RETIRED_TEXT = "Hostile: bypass it (A-01/C1). A removed case (C2: retired). Twin
 
 
 class RetiredCaseTests(FixtureTestCase):
-    """Greptile P2: a retired case keeps its number, so removing a case after a release passes."""
+    """Regression: a retired case keeps its number, so a case removed after a release cannot be reused."""
 
     def assertCode(self, code):
         self.assertIn(code, self.codes())
@@ -567,6 +749,11 @@ class RetiredCaseTests(FixtureTestCase):
                     "(A-01/C2: retired).\n")
         self.assertClean()
 
+    def test_local_cases_use_their_own_labels(self):
+        self.append("references/patterns.md", "\n- A-01/L1: a local hostile case.\n- A-01/L2 (twin): its twin.\n\n"
+                    "The record cites A-01/L1 and A-01/L2.\n")
+        self.assertClean()
+
     def test_retired_number_stays_retired_since_the_base_revision(self):
         self.edit_control("A-01", _retire(RETIRED_TEXT))
         self.assertEqual(self.result(base_retired={"A-01": {2}}).findings, [])
@@ -609,16 +796,12 @@ class RangeHistoryTests(FixtureTestCase):
         return base
 
     def add_then_remove_ledger_id(self):
-        """Commit the fixture, add A-03 with its ledger entry, then delete both. Return the base commit."""
+        """Commit the fixture, add A-03 (a tombstone, so counts stay) with its ledger entry, then delete
+        both. Return the base commit."""
         self.git("init", "-q")
         base = self.commit("Fixture")
         cid, title = A03
-        self.edit_json("catalog/controls.json", lambda data: data["controls"].append(
-            fixture_repo.control(cid, title, 2, "high", "integration", ["tools"], ["ASI02"])))
-        self.edit_json("catalog/ledger.json", lambda data: data["entries"].append(
-            {"id": cid, "title": title, "status": "active", "introduced": "0.1.0"}))
-        self.write("references/controls/A.md", fixture_repo.pillar_file(
-            "A", [("A-01", "Single dispatch path"), ("A-02", "Workload identity"), A03]))
+        self.add_tombstone(cid, title, "A-01")
         self.assertEqual(self.result().findings, [])
         self.commit("Add A-03")
         _remove_control(cid)(self)
@@ -743,6 +926,108 @@ class RangeHistoryTests(FixtureTestCase):
         self.assertIn("ledger-removed: Cannot compare with the commits since", completed.stdout)
 
 
+class NormativeChangeTests(FixtureTestCase):
+    """--ledger-base also compares each control's normative fields with the base revision."""
+
+    def commit_base(self):
+        self.git("init", "-q")
+        return self.commit("Fixture")
+
+    def codes_since(self, revision):
+        return {finding.code for finding in self.findings_since(revision)}
+
+    def test_must_to_should_is_flagged_until_the_changelog_says_so(self):
+        base = self.commit_base()
+        self.edit_control("A-01", lambda c: c.update(statement="The application SHOULD enforce single dispatch path."))
+        self.assertEqual(self.result().findings, [])
+        findings = self.findings_since(base)
+        self.assertTrue(any(f.code == "normative-weakening" and "A-01" in f.message and "MUST to SHOULD" in f.message
+                            for f in findings), findings)
+        self.append("CHANGELOG.md", "- A-01 relaxes the single dispatch path to SHOULD.\n")
+        self.assertEqual(self.findings_since(base), [])
+
+    def test_other_weakenings_are_flagged(self):
+        base = self.commit_base()
+        for change in (lambda c: c.update(level=2, critical_boundary=False),
+                       lambda c: c.update(failure_severity="high", critical_boundary=False),
+                       lambda c: c.update(min_evidence_scope="unit"),
+                       lambda c: c.update(applies_when=["tools+external-effect"])):
+            with self.subTest(change=change):
+                self.git("checkout", "-q", "--", ".")
+                self.edit_control("A-01", change)
+                self.assertIn("normative-weakening", self.codes_since(base))
+
+    def test_weakening_detail(self):
+        before = fixture_repo.control("A-01", "Dispatch", 1, "critical", "integration", ["tools", "mcp"], [])
+        after = dict(before, level=2, failure_severity="high", min_evidence_scope="unit", applies_when=["tools"])
+        found = " ".join(validate.weakenings(before, after))
+        for expected in ("level 1 to 2", "default severity critical to high",
+                         "minimum evidence scope integration to unit", "applies_when covers fewer situations"):
+            self.assertIn(expected, found)
+        self.assertEqual(validate.weakenings(before, dict(before, applies_when=["all"])), [])
+        self.assertEqual(validate.weakenings(before, dict(before, statement="The app MUST and MUST NOT x.")), [])
+
+    def test_removed_must_is_flagged_when_others_remain(self):
+        before = fixture_repo.control("A-01", "Dispatch", 1, "critical", "integration", ["tools", "mcp"], [])
+        before = dict(before, statement="The app MUST check a. The app MUST check b.")
+        found = " ".join(validate.weakenings(before, dict(before, statement="The app MUST check a.")))
+        self.assertIn("statement loses 1 of its MUST, SHALL and REQUIRED keywords (2 to 1)", found)
+
+    def test_edited_case_under_the_same_label_is_a_normative_change(self):
+        base = self.commit_base()
+        self.edit_control("N-01", lambda c: c.update(
+            verification=c["verification"].replace("(N-01/C1)", "and something weaker (N-01/C1)", 1)
+            if "(N-01/C1)" in c["verification"] else c["verification"] + " Edited."))
+        findings = self.findings_since(base)
+        self.assertTrue(any(f.code == "normative-change" and f.message.startswith("N-01 ") for f in findings), findings)
+
+    def test_changed_control_must_be_named_in_the_newest_section(self):
+        base = self.commit_base()
+        self.edit_control("N-01", lambda c: c.update(statement="The audit log MUST be tamper-evident and signed."))
+        findings = self.findings_since(base)
+        self.assertTrue(any(f.code == "normative-change" and f.message.startswith("N-01 ") for f in findings), findings)
+        self.append("CHANGELOG.md", "- N-01 now requires signed audit logs.\n")
+        self.assertEqual(self.findings_since(base), [])
+
+    def test_new_case_is_a_normative_change(self):
+        base = self.commit_base()
+        self.edit_control("N-01", lambda c: c.update(
+            verification="Hostile: x (N-01/C1). Twin: y (C2). Hostile: z (C3)."))
+        self.assertIn("normative-change", self.codes_since(base))
+
+    def test_new_control_must_be_named(self):
+        base = self.commit_base()
+        self.add_tombstone("A-03", "Bounded delegation", "A-01")
+        self.assertIn("normative-change", self.codes_since(base))
+
+    def test_editorial_change_needs_no_entry(self):
+        base = self.commit_base()
+        self.edit_control("N-01", lambda c: c.update(rationale="Reworded rationale."))
+        self.assertEqual(self.findings_since(base), [])
+
+    def test_released_section_needs_a_new_version(self):
+        self.replace("CHANGELOG.md", "## [0.1.0] - Unreleased", "## [0.1.0] - 2026-10-01")
+        base = self.commit_base()
+        self.edit_control("N-01", lambda c: c.update(statement="The audit log MUST be tamper-evident and signed."))
+        self.append("CHANGELOG.md", "- N-01 now requires signed audit logs.\n")
+        findings = self.findings_since(base)
+        self.assertTrue(any(f.code == "normative-change" and "new catalog version" in f.message for f in findings),
+                        findings)
+        self.edit_json("catalog/controls.json", lambda d: d.update(version="0.2.0"))
+        self.replace("SKILL.md", 'catalog-version: "0.1.0"', 'catalog-version: "0.2.0"')
+        section = fixture_repo.changelog().split("## [0.1.0] - Unreleased\n", 1)[1].replace("0.1.0", "0.2.0")
+        self.replace("CHANGELOG.md", "## [0.1.0] - 2026-10-01", "## [0.2.0] - Unreleased\n" + section
+                     + "- N-01 now requires signed audit logs.\n\n## [0.1.0] - 2026-10-01")
+        self.assertEqual(self.findings_since(base), [])
+
+    def test_command_line_reports_a_weakening(self):
+        base = self.commit_base()
+        self.edit_control("A-01", lambda c: c.update(statement="The application MAY enforce it; it SHOULD log."))
+        completed = self.cli(str(self.root), "--ledger-base", base, "--no-render")
+        self.assertEqual(completed.returncode, 1, completed.stdout + completed.stderr)
+        self.assertIn("catalog/controls.json: normative-weakening: A-01 is weaker", completed.stdout)
+
+
 class NoFalsePositiveTests(FixtureTestCase):
     def assertClean(self):
         self.assertEqual(self.result().findings, [])
@@ -816,20 +1101,66 @@ class NoFalsePositiveTests(FixtureTestCase):
         self.assertClean()
 
     def test_withdrawn_tombstone_is_accepted(self):
-        def withdraw(data):
-            control = self.control(data, "N-01")
-            control.update(lifecycle="withdrawn", withdrawn_in="0.2.0", superseded_by=["D-01"])
-        self.edit_json("catalog/controls.json", withdraw)
-        self.edit_json("catalog/ledger.json", lambda d: d["entries"][-1].update(status="withdrawn"))
+        self.add_tombstone()
+        self.assertClean()
+
+    def test_deprecated_control_is_accepted(self):
+        self.edit_control("N-01", lambda c: c.update(lifecycle="deprecated", superseded_by="D-01"))
+        self.edit_json("catalog/ledger.json", lambda d: d["entries"][-1].update(status="deprecated"))
+        self.assertClean()
+
+    def test_links_inside_html_comments_are_ignored(self):
+        self.append("README.md", "\n<!-- [x](missing.md) -->\n\n<!--\n[y](also-missing.md)\n-->\n")
+        self.assertClean()
+
+    def test_inspection_only_control_with_twin_exemption(self):
+        self.edit_control("D-01", lambda c: c.update(
+            verification="Inspection of the evaluation report.", twin_exempt="Live trials, not fixed cases."))
+        self.assertClean()
+
+    def test_named_scenario_after_an_identifier_is_not_a_title(self):
+        self.append("README.md", "\nThe publication's ASI09 Invoice Copilot Fraud scenario. ASI02 (pp. 12-14).\n")
+        self.assertClean()
+
+    def test_complete_trigger_list_in_the_snippet(self):
+        listed = " ".join(item.rstrip(";.") + ";" for item in fixture_repo.TRIGGER_LOCATIONS)
+        self.write("assets/AGENTS-snippet.md", f"# Snippet\n\nTrigger locations include {listed} and so on.\n")
+        self.assertClean()
+
+    def test_condensed_trigger_list_matching_every_location(self):
+        self.write("assets/AGENTS-snippet.md", "# Snippet\n\nTrigger locations include tool dispatch, credentials "
+                   "and tokens, retrieval indexes and caches, browsers, and model, provider, routing and telemetry "
+                   "settings.\n")
         self.assertClean()
 
 
-class WarningTests(FixtureTestCase):
-    def test_token_budget_warns_without_failing(self):
+class TokenBudgetTests(FixtureTestCase):
+    def test_word_count_over_budget_fails(self):
         self.append("SKILL.md", ("word " * 100 + "\n") * 45)
+        self.assertIn("skill-tokens", self.codes())
+
+    def test_dense_text_over_budget_fails_by_characters(self):
+        # Few words, many characters: words x 1.3 stays far under 5,000, characters / 4 does not.
+        self.append("SKILL.md", ("c1|t12|x9;q" * 20 + "\n") * 100)
+        body = self.read("SKILL.md").split("---\n", 2)[2]
+        self.assertLess(len(body.split()) * 1.3, validate.TOKEN_BUDGET)
+        self.assertIn("skill-tokens", self.codes())
+
+    def test_body_over_the_target_warns_without_failing(self):
+        body = self.read("SKILL.md").split("---\n", 2)[2]
+        self.append("SKILL.md", "z" * ((validate.TOKEN_WARN + 50) * 4 - len(body)) + "\n")
         result = self.result()
-        self.assertEqual(result.findings, [])
+        self.assertNotIn("skill-tokens", {finding.code for finding in result.findings})
         self.assertIn("skill-tokens", {warning.code for warning in result.warnings})
+
+    def test_estimate_is_the_larger_of_the_two(self):
+        self.assertEqual(validate.token_estimate("word " * 100), 130)
+        self.assertEqual(validate.token_estimate("x" * 400), 100)
+        self.assertGreater(validate.token_estimate("y" * 20004), validate.TOKEN_BUDGET)
+        self.assertLessEqual(validate.token_estimate("y" * 20000), validate.TOKEN_BUDGET)
+
+
+class WarningTests(FixtureTestCase):
 
     def test_stale_snapshot_warns_without_failing(self):
         result = self.result(today=dt.date(2027, 6, 1))
@@ -939,6 +1270,13 @@ class CommandLineTests(FixtureTestCase):
         self.assertEqual(completed.returncode, 2)
         self.assertIn("error:", completed.stderr)
 
+    def test_no_render_skips_the_renderer(self):
+        self.write("scripts/render_catalog.py", 'import sys\nprint("references/controls/A.md: stale")\nsys.exit(1)\n')
+        self.assertEqual(self.cli(str(self.root)).returncode, 1)
+        completed = self.cli(str(self.root), "--no-render")
+        self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
+        self.assertIn("--no-render", completed.stdout)
+
     def test_unknown_option_is_a_usage_error(self):
         self.assertEqual(self.cli("--no-such-option").returncode, 2)
 
@@ -1013,6 +1351,33 @@ class WorkflowTests(FixtureTestCase):
         code, revision = self.select("push", before="a" * 40)
         self.assertNotEqual(code, 0)
         self.assertIsNone(revision)
+
+    def test_base_that_is_not_an_ancestor_fails_clearly(self):
+        # A force push leaves the previous head in the object store but outside HEAD's history.
+        self.git("init", "-q")
+        self.commit("Fixture")
+        self.git("checkout", "-q", "-b", "rewritten")
+        self.append("CONTRIBUTING.md", "\nOld history.\n")
+        old_head = self.commit("Old head")
+        self.git("checkout", "-q", "main")
+        self.append("CONTRIBUTING.md", "\nNew history.\n")
+        self.commit("New head")
+        if shutil.which("bash") is None:
+            self.skipTest("bash unavailable")
+        output = self.base / "github-output"
+        output.write_text("", encoding="utf-8")
+        env = dict(os.environ, EVENT_NAME="push", PUSH_BEFORE=old_head, PR_BASE="", GITHUB_OUTPUT=str(output),
+                   GIT_CEILING_DIRECTORIES=str(self.base))
+        completed = subprocess.run(["bash", "-e", "-c", workflow_step("Select the ledger base revision")],
+                                   cwd=self.root, capture_output=True, text=True, timeout=60, env=env)
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn("is not an ancestor of HEAD", completed.stdout)
+        self.assertNotIn("revision=", output.read_text(encoding="utf-8"))
+
+    def test_missing_base_is_not_fetched_shallowly(self):
+        step = workflow_step("Select the ledger base revision")
+        self.assertNotIn("git fetch", step)
+        self.assertIn("is not in the repository history", step)
 
     def test_malformed_base_fails(self):
         self.git("init", "-q")

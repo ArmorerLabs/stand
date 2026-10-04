@@ -1,6 +1,6 @@
 # Conformance, evidence and the release gate
 
-This file defines the normative language, the evidence-scope and status enums, the severity rubric and release gate, the critical-boundary set, and what a conformance or progress statement may claim. [profile-and-levels.md](profile-and-levels.md) defines the capability profile, applicability, levels and change triage that this file relies on. Control IDs refer to catalog entries listed in [controls/index.md](controls/index.md).
+This file defines the normative language, the evidence-scope and status enums, the severity rubric and release gate, the critical-boundary set, the confidentiality and integrity of the security record, and what a conformance or progress statement may claim. [profile-and-levels.md](profile-and-levels.md) defines the capability profile, applicability, levels and change triage that this file relies on. Control IDs refer to catalog entries listed in [controls/index.md](controls/index.md).
 
 ## Normative language
 
@@ -56,6 +56,7 @@ Every record entry has exactly one status from this closed enum.
 | not-assessed | The control was not examined for this record: outside a SCOPED change, before a baseline exists, or not yet reached in a brownfield adoption. |
 
 - Lifecycle states of catalog entries (active, deprecated, withdrawn) are never record statuses.
+- Claim audit. Before an entry is recorded implemented-and-verified, the record lists every required case of the control by label (`<ID>/C<n>`, the authorized twin included; a case shown as `(C<n>: retired)` is not required), each with its result at the recorded commit and the evidence scope it ran at; a case recorded not applicable states its verifiable absence. A case that did not run, or ran below the control's minimum evidence scope, keeps the status implemented-but-unverified, and a case that failed makes it failing. A count of passing tests without case labels does not satisfy the audit.
 - Use one exclusion phrase: a verifiable architectural absence.
 - Every status other than implemented-and-verified and not-applicable-with-reason is open and is rated with the severity rubric below.
 
@@ -102,15 +103,22 @@ Apply the rubric to every applicable control that is failing, implemented-but-un
 
 ### Default severities
 
-- Each control has a default failure severity, carried in the catalog field `failure_severity`, which is normative. Rationale text may explain it but is informative.
-- A rationale sentence that names when severity rises is guidance for raters. No rationale sentence lowers a severity; lowering follows the rule below.
-- A rater may raise it freely.
-- Lowering it requires a recorded precondition that makes the attack unreachable in this system.
+- Each control has a default failure severity, carried in the catalog field `failure_severity`, which is normative. A control statement can also set a floor for a stated failure ("A failure of this control MUST be rated critical when ..."), which is normative too. Rationale text may explain either but is informative and never lowers a severity.
+- The recorded severity is the highest of the default, any floor the statement sets for the failure found, and the rubric cell (D-06). The rubric can raise a severity above the default; it never lowers one.
+- For a control that is implemented-but-unverified, planned or not-assessed, no failure has been found, so a floor applies when the profile or register shows the floor's precondition: T-07 in a multi-tenant context with memory, A-05 where a registered operation moves funds, A-09 where an auto-run tool can reach the network, A-12 where a context that holds all three properties relies on A-08 option (a), T-26 where the application collects credentials, MFA codes or payment details, and A-22 where the record shows no provider spend cap, or no per-principal and per-tenant limit, so that cost is unbounded. A floor whose condition is the failure itself (S-01, S-02, S-03, T-04) applies when that failure is found (D-06). Every control whose statement sets a floor is in one of these two lists; the validator checks this against the catalog.
+- A rater may raise a severity freely.
+- A precondition that only constrains the attack (Constrained in Step 2) does not lower the default or a floor. Lowering below them requires a recorded precondition that makes the attack unreachable in this system; the record states the precondition, how it was verified and the resulting severity.
 - Severity MUST NOT be lowered on the basis of current model behavior ("the model refuses today"), detector or classifier coverage, prompt instructions, or unverified provider claims.
+
+Examples:
+
+- N-01 (default high) is failing because effects through a legacy batch path that only an administrator can enable write no audit record. The rubric gives H-degrade and Constrained, which is Medium. The recorded severity is High, the default, because the precondition constrains the attack but does not make it unreachable.
+- N-04 (default medium) is failing because no signal reaches an owner when the dispatcher denies a burst of proposals, in a system where any user can trigger such a burst. The rubric gives H-degrade and Reachable, which is High, so the recorded severity is High.
+- A-05 (default high) is failing in a payments adapter. The statement's floor applies because the effect moves funds, so the recorded severity is Critical whatever the rubric cell.
 
 ## Critical-boundary set
 
-The critical-boundary set is every Level 1 control whose default failure severity is critical. It is derived from the catalog, not chosen, and changes only when a control's level or default severity changes. [SKILL.md](../SKILL.md) lists the same set as its always-on invariants.
+The critical-boundary set is every Level 1 control whose default failure severity is critical and that is not withdrawn. It is derived from the catalog, not chosen, and changes only when a control's level, default severity or lifecycle changes. [SKILL.md](../SKILL.md) lists the same set as its always-on invariants.
 
 <!-- critical-boundary:start -->
 T-01, T-02, T-05, T-06, T-08, T-09, T-10, T-11, T-12, T-13, T-14, T-15, T-17, T-19, T-23, A-01, A-02, A-03, A-04, A-06, A-07, A-08, A-10, A-11, A-15, A-16, A-19, A-23, A-24, A-25, N-06, D-06
@@ -137,17 +145,42 @@ Readiness values (closed enum):
 
 | Value | Meaning |
 |---|---|
-| ready-within-scope | The accountable owner is recorded (S-01); every applicable critical-boundary control is implemented-and-verified; no critical is open; every open high carries an unexpired owner exception; every open item has a severity and rationale. Ready applies only to the stated scope and is not a conformance claim. |
+| ready-within-scope | The accountable owner is recorded (S-01); every applicable critical-boundary control is implemented-and-verified; S-02, S-05 where it applies, and A-12 for every confirmation surface that an applicable critical-boundary control relies on are implemented-and-verified; no critical is open; every open high carries an owner exception that has not expired at the time of the claim; every open item has a severity and rationale. Ready applies only to the stated scope and is not a conformance claim. |
 | confined-prototype | The system runs only with synthetic data and no production credentials. Open criticals are listed by ID. |
 | blocked | Any other state. The record lists the open IDs that block. |
 
 A readiness claim means the value ready-within-scope. confined-prototype and blocked are recorded states, not claims.
 
-A SCOPED change rates only its routed controls and any new finding. With a baseline record, readiness is computed as the baseline value with the routed rows updated (the record itself is append-only: the baseline Controls table stays unchanged and the compact change record carries the routed rows), and it is blocked if a routed control is failing or a routed critical-boundary control is not implemented-and-verified. With "Baseline: missing", readiness is blocked (baseline missing: critical-boundary set not assessed), and the individual not-assessed controls are not rated.
+A SCOPED change rates only its routed controls and any new finding. With a baseline record, readiness is computed as the baseline value with the routed rows updated (the record itself is append-only: the baseline Controls table stays unchanged and the compact change record carries the routed rows), and it is blocked if a routed control is failing or a routed critical-boundary control is not implemented-and-verified. The baseline value is rechecked at the time of the change: it is blocked when the accountable owner is unassigned or an owner exception it relies on has expired, and the compact Readiness line names the earliest exception expiry it relies on. The baseline is read as a claim, at the commit the change starts from, never from a version the change edits (see "Record and catalog integrity" below). With "Baseline: missing", readiness is blocked (baseline missing: critical-boundary set not assessed), and the individual not-assessed controls are not rated.
 
 - A human may still choose to deploy a blocked system. The record then states "blocked" with the open IDs, and the coding agent does not describe the release as ready.
 - The coding agent may draft an exception, but it MUST NOT record acceptance, enter an owner who has not been provided, or suppress or weaken a failing check. Where the owner is unknown it writes "unassigned", and an unassigned owner blocks ready-within-scope (S-01).
+- The coding agent may draft a conformance or progress statement, marked as pending owner review, but it MUST NOT publish one or record one as published.
 - OWASP AIVSS scores (v0.8, pre-1.0) may be recorded alongside as related scoring. They never change the gate.
+
+## The security record
+
+The record ([agent-security-record.md](../assets/agent-security-record.md)) holds the profile, the control statuses, the severities and the readiness value. Two rules protect it.
+
+### Record confidentiality
+
+The record locates and rates weaknesses, so a record that others can read can disclose unfixed vulnerabilities.
+
+- Where the record is readable beyond the people authorized to see unfixed vulnerabilities (for example in a public repository or a widely shared wiki), it MUST NOT carry the details of an open item rated critical or high: its location, failing test or reproduction, attack path or suggested fix. Unknown visibility counts as readable beyond them.
+- Such an item appears by reference only, as `<ID>: open, details in <private reference>`, with its status and severity in the usual columns. Its details go to the project's private vulnerability channel: the process its SECURITY.md names, a private security advisory or a private tracker.
+- A coding agent that cannot write to that channel returns the details in its response, tells the user where they belong, and never commits them to a readable location.
+- The ID, status and severity stay in the record, so redaction never hides an open item from the release gate or from a reader of the readiness value. Open medium and low items, closed items and the profile MAY be recorded in full.
+- The record states its visibility: `Record visibility: private` or `Record visibility: public (details redacted)`.
+- An assessor who verifies a claim needs the private details; the record names who holds them. After the fix is released, the details MAY be added to the record.
+
+### Record and catalog integrity
+
+The record is a claim about the system, so the framework treats it like any other claim and never as configuration that can lower a requirement.
+
+- The record names the commit at which each assessment was made, and each compact change record names its change.
+- Changes to the record's profile, level, status, severity, readiness, owner and exception lines MUST go through the repository's human review for security-relevant paths (for example a code-owner rule that covers the record path). A change that a coding agent makes to those lines is a proposal until a human has reviewed it.
+- A later change reads the baseline record as a claim: at the commit the change starts from, with the level recomputed from the recorded profile and checked against the code, using the highest level found ([profile-and-levels.md](profile-and-levels.md#scoped)).
+- A conformance or progress statement names a published catalog version. Controls, routing rules or the critical-boundary set edited in an installed copy of the skill or the catalog are not that version, and a statement made with an edited copy is invalid. Changes to an installed copy go through the same review as the record.
 
 ## Conformance statement
 
@@ -157,17 +190,32 @@ A system that satisfies every condition below may publish this statement:
 <System and version> at <commit>, for the stated scope <agents, entry points, deployments, environments>, meets Level <N> of <catalog name> v<X.Y> (computed level <M> from profile <summary>), self-declared on <date> by <accountable owner>; to be re-established by <date>.
 ```
 
-`<catalog name>` is the name recorded in the catalog metadata, and `v<X.Y>` is the catalog MAJOR.MINOR. The statement is valid only when all of the following hold:
+`<catalog name>` is the name recorded in the catalog metadata (STAND), and `v<X.Y>` is the catalog MAJOR.MINOR. The statement is valid only when all of the following hold:
 
-1. **Scope.** The scope names the system, components, environments and commit. It includes every component on the enforcement path that in-scope agents rely on (dispatcher, policy engine, adapters, credential broker, sandbox, egress proxy, approval UI, audit store). A claim cannot exclude a component it depends on.
+1. **Scope.** The scope names the system, components, environments and commit. It includes every component on the enforcement path that in-scope agents rely on (dispatcher, policy engine, adapters, credential broker, sandbox, egress proxy, approval UI, audit store). A claim cannot exclude a component it depends on; a component that another team or a vendor operates is covered as "Shared responsibility" below describes.
 2. **Profile.** S-02 records the profile of every context in scope, and N is at least the computed level M. A claim below M is invalid.
 3. **Controls.** Every control of Levels 1 through N has status implemented-and-verified, or not-applicable-with-reason because its `applies_when` matches no agent context in scope or the subject of every required case is architecturally absent (see "Status"). The reason is a verifiable architectural absence; reliance on a library, vendor or provider is not a reason.
 4. **Excluded statuses.** No applicable control is failing, implemented-but-unverified, planned or not-assessed, and no SHOULD clause rests on an unaccepted deviation. Owner exceptions are release decisions under D-06 and never count toward conformance.
 5. **Evidence.** Each implemented-and-verified entry cites a test or review that ran at the claimed commit, at or above the control's minimum evidence scope (D-03). It drives the real execution path (D-01) and pairs each denial with an authorized twin (D-02).
 6. **Findings.** No finding rated critical or high is open within the scope.
 7. **Metadata.** The record names the catalog version, the accountable owner (S-01) and a re-establish date no later than 12 months after the claim.
+8. **Review.** A human reviewed the profile, the not-applicable reasons, and the hostile-case and twin inventory for the critical-boundary set, and the record cites that review (reviewer, date and commit); a review by a coding agent does not count. The accountable owner, or a delegate the owner named, publishes the statement; a coding agent may draft it but MUST NOT publish it.
 
-The statement and its record live in the security record ([agent-security-record.md](../assets/agent-security-record.md)). A SCOPED change record can state that the changed controls were re-verified. It cannot support a level claim unless the baseline record satisfies conditions 1 to 7.
+The statement and its record live in the security record ([agent-security-record.md](../assets/agent-security-record.md)). A SCOPED change record can state that the changed controls were re-verified. It cannot support a level claim unless the baseline record satisfies conditions 1 to 8.
+
+### Shared responsibility
+
+Condition 1 keeps every enforcement component that an in-scope agent relies on inside the claim, whoever operates it. A component owned by another team or a vendor (a policy engine in another repository, a hosted agent platform's tool runtime, a managed egress proxy) is in scope when the record cites both of the following:
+
+1. Evidence from the component's owner: another record against this catalog that covers the component at a named commit, with the relevant entries implemented-and-verified, or a vendor attestation, listed as an attestation with its date and scope.
+2. The adopter's own hostile cases and authorized twins for the control, driving the component through the adopter's real entry point (D-01, D-02).
+
+Rules:
+
+- The control counts at the evidence scope that the adopter's own cases exercised. A cited record or attestation does not raise it.
+- A cited record or vendor attestation alone never makes a control implemented-and-verified, and reliance on it is never a not-applicable reason (see "Status").
+- The record lists each such component under "External enforcement components", with the component, its owner, and the evidence reference with its commit or date.
+- A new version of an external component is a change to the enforcement path: the controls it enforces lapse until the adopter's cases pass again (see "Lapse"). Where the owner does not announce versions, the record states how often the adopter's cases re-run.
 
 ### Lapse
 
@@ -193,6 +241,7 @@ Adopting <catalog name> v<X.Y>: <k> of <m> applicable Level 1 controls implement
 ## Nature of the claim
 
 - A conformance statement is a self-declared engineering conformance statement about this catalog's controls only.
+- Much of its evidence can be produced by the same coding agent that wrote the code. Such evidence shows that the cited cases ran and passed; it does not show that they are the right cases or that the profile is right. Condition 8 is the minimum human check on that; Level 3 adds independent adversarial review (D-09).
 - It is not a certification, an audit opinion, an attestation or a guarantee of security. Zero observed failures is not a guarantee.
 - It is not a statement of conformance to, or certification against, any of the following: the OWASP Top 10 for Agentic Applications 2026, OWASP AISVS or any other OWASP project; AIUC-1; NIST AI RMF 1.0 or its Generative AI Profile (NIST AI 600-1); ISO/IEC 42001.
 - ASI identifiers on a control show which OWASP risks it is designed to address, govern or verify; controls tagged with every category are cross-cutting governance or verification controls. All references to those sources, including [mappings.md](mappings.md), are engineering mappings and do not claim coverage.

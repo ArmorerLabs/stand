@@ -3,17 +3,25 @@
 """Validate the repository and its installable skill bundle without network access.
 
 Standard library only, Python 3.10 or newer. The checks cover the repository
-layout, Agent Skills frontmatter, the control catalog and its ledger, the
-generated catalog views, Markdown links and anchors, OWASP ASI identifiers and
-titles, and portability rules for every text file. Passing does not establish
-agent behavior or application security.
+layout, Agent Skills frontmatter, the control catalog and its ledger, the NIST
+and AIUC-1 identifier registries, the generated catalog views, the counts and
+lists that prose restates from the catalog, Markdown links and anchors, OWASP
+ASI identifiers and titles, workflow hygiene, and portability rules for every
+text file. Passing does not establish agent behavior or application security.
 
 Usage:
   python3 scripts/validate.py [ROOT]            validate the repository
   python3 scripts/validate.py --stage DIR       copy the bundle to DIR (or DIR/<name>) and validate it alone
   python3 scripts/validate.py --ledger-base REV also reject ledger entries removed and retired
                                                 case numbers dropped, reused or cited since REV,
-                                                counting every commit in REV..HEAD
+                                                counting every commit in REV..HEAD, and require every
+                                                control changed since REV to be named in the newest
+                                                CHANGELOG section, with weakenings stated as such
+  python3 scripts/validate.py --no-render       skip running ROOT/scripts/render_catalog.py --check
+
+Repository mode runs ROOT/scripts/render_catalog.py --check, so it executes code
+from the checked-out tree. Validate an untrusted checkout with --no-render, or
+in a sandbox.
 
 Exit codes: 0 without findings, 1 with findings, 2 for usage or staging errors.
 """
@@ -31,12 +39,15 @@ import shlex
 import shutil
 import subprocess
 import sys
-import unicodedata
 from urllib.parse import unquote, urlsplit
 
-
-# The framework name. It must never appear in control text.
-FRAMEWORK_NAME = "STAND"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from catalog_model import (  # noqa: E402
+    AIUC_CONTROL, AIUC_ID, AIUC_REGISTRY, CONTROLS_JSON as CATALOG, EVIDENCE_SCOPES, FAILURE_SEVERITIES,
+    FRAMEWORK_NAME, LEDGER_JSON as LEDGER, LIFECYCLES, MAPPINGS_JSON as MAPPINGS, NIST_ACTION, NIST_CITATION,
+    NIST_REGISTRY, NIST_SUBCATEGORY, PILLARS, RELATIONS, STATUS_ENUM, is_critical, is_withdrawn,
+    nist_function, slugify,
+)
 
 # The installable skill bundle. docs/install.md copies exactly these entries, and
 # links inside bundle files must resolve inside the bundle.
@@ -45,10 +56,8 @@ BUNDLE = (
     "LICENSE", "LICENSES", "THIRD_PARTY_NOTICES.md",
 )
 
-CATALOG = "catalog/controls.json"
-LEDGER = "catalog/ledger.json"
-MAPPINGS = "catalog/mappings.json"
 RENDERER = "scripts/render_catalog.py"
+CATALOG_MODEL = "scripts/catalog_model.py"
 INSTALL_DOC = "docs/install.md"
 CHANGELOG = "CHANGELOG.md"
 OWASP_VIEW = "references/owasp-agentic-top-10.md"
@@ -71,7 +80,13 @@ FEATURE_ROUTES = {
 # Internal evaluation references and viewer page labels do not belong in normative control text.
 INTERNAL_CITATION = re.compile(r"\bprobe P\d|\bPDF p\.")
 IDENTITY_FILES = ("SKILL.md", "README.md", "docs/pillars.md")
-SNAPSHOT_FILES = ("references/frameworks.md", CATALOG, MAPPINGS)
+SNAPSHOT_FILES = ("references/frameworks.md", CATALOG, MAPPINGS, NIST_REGISTRY, AIUC_REGISTRY)
+PROFILE_DOC = "references/profile-and-levels.md"
+SNIPPET = "assets/AGENTS-snippet.md"
+INFOGRAPHIC = "docs/stand-infographic.svg"
+EVAL_CASES = "evals/cases.json"
+# The SKILL.md Step 2 routing table: a table whose first two header cells are these.
+ROUTING_HEADER = ("Trigger location", "Control IDs")
 
 # Rendered by scripts/render_catalog.py and never edited by hand.
 GENERATED = (
@@ -95,9 +110,9 @@ REQUIRED_BUNDLE = (
 REQUIRED_REPO = REQUIRED_BUNDLE + (
     "README.md", "CONTRIBUTING.md", "SECURITY.md", CHANGELOG,
     "docs/pillars.md", INSTALL_DOC,
-    "evals/README.md", "evals/cases.json",
-    CATALOG, LEDGER, MAPPINGS,
-    RENDERER, "scripts/validate.py", "tests/test_validate.py",
+    "evals/README.md", EVAL_CASES,
+    CATALOG, LEDGER, MAPPINGS, NIST_REGISTRY, AIUC_REGISTRY,
+    RENDERER, CATALOG_MODEL, "scripts/validate.py", "tests/test_validate.py", "tests/test_render_catalog.py",
     ".github/workflows/validate.yml", ".github/dependabot.yml",
 )
 
@@ -110,13 +125,6 @@ TEXT_NAMES = {"LICENSE", ".gitignore", ".gitattributes", "CODEOWNERS"}
 TITLE_SUFFIXES = {".md", ".yaml", ".yml", ".json"}
 
 PRINCIPLE = "The model proposes. The application enforces."
-PILLARS = {
-    "S": "Scope & Stewardship",
-    "T": "Trust & Isolation",
-    "A": "Authority & Access",
-    "N": "Notice & Neutralize",
-    "D": "Demonstrated Defenses",
-}
 
 # OWASP Top 10 for Agentic Applications 2026, published December 9, 2025:
 # https://genai.owasp.org/download/52117/ (checked 2026-10-03). The "&" forms of
@@ -135,15 +143,12 @@ ASI_TITLES = {
     "ASI10": "Rogue Agents",
 }
 
-STATUS_ENUM = (
-    "implemented-and-verified", "implemented-but-unverified", "planned",
-    "not-applicable-with-reason", "failing", "not-assessed",
-)
-# Weakest to strongest; "at or above" uses this order.
-EVIDENCE_SCOPES = ("inspection", "unit", "simulation", "integration", "isolated-runtime", "deployed")
-FAILURE_SEVERITIES = ("critical", "high", "medium", "low")
-RELATIONS = ("direct", "partial", "supports")
-LIFECYCLES = ("active", "deprecated", "withdrawn")
+# The OWASP Top 10 for LLM Applications 2025 titles start with these words. Written after an ASI
+# identifier ("ASI01 Prompt Injection"), they show a title taken from the wrong list.
+TITLE_START_WORDS = {title.split()[0] for title in ASI_TITLES.values()} | {
+    "Goal", "Prompt", "Sensitive", "Supply", "Data", "Improper", "Excessive", "System", "Vector",
+    "Misinformation", "Unbounded", "Memory", "Insecure", "Rogue", "Cascading",
+}
 # Fallback when the catalog does not declare its closed applicability vocabulary.
 VOCABULARY = (
     "all", "untrusted-input", "sensitive-data", "external-effect", "tools",
@@ -168,6 +173,12 @@ MAX_DESCRIPTION = 1024
 MAX_COMPATIBILITY = 500
 MAX_BODY_LINES = 500
 TOKEN_BUDGET = 5000
+TOKEN_WARN = 4500  # warn above this; the target for the body is TOKEN_TARGET or fewer
+TOKEN_TARGET = 4400
+# Words x 1.3 under-counts dense Markdown full of IDs and punctuation; characters / 4 is a
+# closer estimate there. The larger of the two is used, and a body over the budget fails.
+TOKENS_PER_WORD = 1.3
+CHARS_PER_TOKEN = 4
 
 # Codex skill metadata (agents/openai.yaml).
 OPENAI_TOP_KEYS = ("interface", "policy", "dependencies")
@@ -189,8 +200,13 @@ ASI_ANY = re.compile(r"\bASI(\d+)\b")
 ASI_FULL = re.compile(r"^ASI(0[1-9]|10)$")
 ASI_TITLE_USE = re.compile(
     r"\b(ASI(?:0[1-9]|10))\b(?:\*\*|__)?(?:[ \t]*:|[ \t]+[-\u2013][ \t]+)(?:\*\*|__)?[ \t]*")
-BCP14 = re.compile(r"\b(?:MUST|SHALL|SHOULD|REQUIRED|RECOMMENDED|MAY|OPTIONAL)\b")
-AIUC_ID = re.compile(r"^[A-F]\d{3}(?:\.\d+)?$")
+# "ASI01 Agent Goal Hijack" and "ASI01 (Agent Goal Hijack)": checked when the next word starts an ASI title,
+# or an OWASP Top 10 for LLM Applications 2025 title, so named scenarios after an identifier are left alone.
+ASI_TITLE_ALT = re.compile(r"\b(ASI(?:0[1-9]|10))\b(?:\*\*|__)?[ \t]+(?:\*\*|__)?\(?(?:\*\*|__)?(?=[A-Z])")
+# A statement states an obligation: MAY and OPTIONAL alone grant permissions and oblige nothing.
+BCP14_OBLIGATION = re.compile(r"\b(?:MUST|SHALL|SHOULD|REQUIRED)\b")
+STRONG_KEYWORD = re.compile(r"\b(?:MUST|SHALL|REQUIRED)\b")
+WEAK_KEYWORD = re.compile(r"\b(?:SHOULD|RECOMMENDED|MAY|OPTIONAL)\b")
 AIUC_HOST = "standard.aiuc-1.com"
 
 # Escapes keep the banned characters out of this source file.
@@ -263,6 +279,18 @@ class Catalog:
     cases: dict[str, int] = field(default_factory=dict)
     retired: dict[str, set[int]] = field(default_factory=dict)
     controls: list = field(default_factory=list)
+    asi_pages: dict[str, int] = field(default_factory=dict)
+
+    def listed(self) -> list:
+        """Controls that count and route: every control with a string ID except withdrawn tombstones."""
+        return [c for c in self.controls if isinstance(c.get("id"), str) and not is_withdrawn(c)]
+
+    def by_id(self) -> dict:
+        return {c["id"]: c for c in self.controls if isinstance(c.get("id"), str)}
+
+    def cross_cutting(self) -> set[str]:
+        """Listed controls that carry every ASI identifier."""
+        return {c["id"] for c in self.listed() if isinstance(c.get("asi"), list) and set(c["asi"]) >= set(ASI_TITLES)}
 
 
 class StageError(Exception):
@@ -350,25 +378,6 @@ def markdown_lines(text: str) -> tuple[list[str], int | None]:
 
 def strip_code_spans(line: str) -> str:
     return CODE_SPAN.sub(lambda match: " " * len(match.group(0)), line)
-
-
-def render_inline(text: str) -> str:
-    """Approximate the rendered text of a heading for anchor generation."""
-    text = re.sub(r"!?\[([^\]]*)\]\([^)]*\)", r"\1", text)
-    text = re.sub(r"\[([^\]]*)\]\[[^\]]*\]", r"\1", text)
-    text = re.sub(r"<[^>]+>", "", text)
-    text = text.replace("`", "")
-    text = re.sub(r"\\([!-/:-@\[-`{-~])", r"\1", text)
-    text = re.sub(r"(\*{1,3})(?=\S)(.+?)(?<=\S)\1", r"\2", text)
-    text = re.sub(r"(?<!\w)(_{1,3})(?=\S)(.+?)(?<=\S)\1(?!\w)", r"\2", text)
-    return text
-
-
-def slugify(heading: str) -> str:
-    """GitHub-style heading anchor."""
-    text = render_inline(heading).strip().lower()
-    kept = (ch for ch in text if ch.isalnum() or ch in "-_ " or unicodedata.category(ch).startswith("M"))
-    return "".join(kept).replace(" ", "-")
 
 
 def heading_anchors(lines: list[str]) -> set[str]:
@@ -721,6 +730,13 @@ def check_asi_titles(rep: Reporter, path: Path, text: str) -> None:
                 rep.report("asi-title", path,
                            f"Line {number}: use the exact title '{match.group(1)}: {title}', "
                            "or do not follow the identifier with a colon")
+        for match in ASI_TITLE_ALT.finditer(line):
+            rest = line[match.end():]
+            first = re.match(r"[A-Za-z]+(?:-[A-Za-z]+)?", rest)
+            title = ASI_TITLES[match.group(1)]
+            if first and first.group(0) in TITLE_START_WORDS and not title_matches(rest, title):
+                rep.report("asi-title", path, f"Line {number}: a title after {match.group(1)} must be its exact "
+                           f"title, '{title}'")
 
 
 # ---------------------------------------------------------------------------
@@ -743,9 +759,19 @@ class MarkdownDoc:
         return self._anchors
 
 
+HTML_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
+
+
+def blank_html_comments(lines: list[str]) -> list[str]:
+    """Blank HTML comments outside code, keeping line numbers: GitHub does not render them."""
+    joined = "\n".join(lines)
+    blanked = HTML_COMMENT.sub(lambda match: re.sub(r"[^\n]", " ", match.group(0)), joined)
+    return blanked.split("\n")
+
+
 def load_markdown(path: Path, relative: str, text: str) -> MarkdownDoc:
     lines, unclosed = markdown_lines(blank_frontmatter(text))
-    return MarkdownDoc(path, relative, text, lines, unclosed)
+    return MarkdownDoc(path, relative, text, blank_html_comments(lines), unclosed)
 
 
 def in_bundle(relative: str) -> bool:
@@ -926,10 +952,20 @@ def check_frontmatter(rep: Reporter, root: Path, text: str, bundle_mode: bool) -
     body_lines = len(body.splitlines())
     if body_lines >= MAX_BODY_LINES:
         rep.report("skill-size", path, f"The SKILL.md body has {body_lines} lines; keep it under {MAX_BODY_LINES}")
-    estimate = int(len(body.split()) * 1.3)
+    estimate = token_estimate(body)
     if estimate > TOKEN_BUDGET:
-        rep.warn("skill-tokens", path, f"The SKILL.md body is about {estimate} tokens; the specification recommends under {TOKEN_BUDGET}")
+        rep.report("skill-tokens", path, f"The SKILL.md body is about {estimate} tokens (the larger of words x "
+                   f"{TOKENS_PER_WORD} and characters / {CHARS_PER_TOKEN}); keep it under {TOKEN_BUDGET}, the "
+                   "specification's recommendation and the part a host keeps after compaction")
+    elif estimate > TOKEN_WARN:
+        rep.warn("skill-tokens", path, f"The SKILL.md body is about {estimate} tokens; the target is {TOKEN_TARGET} "
+                 f"or fewer, so that a denser real tokenizer still keeps the procedure under {TOKEN_BUDGET}")
     return data
+
+
+def token_estimate(body: str) -> int:
+    """Estimate the tokens of a skill body as max(words x 1.3, characters / 4)."""
+    return int(max(len(body.split()) * TOKENS_PER_WORD, len(body) / CHARS_PER_TOKEN))
 
 
 def check_license(rep: Reporter, root: Path, path: Path, value: str) -> None:
@@ -1028,9 +1064,10 @@ def catalog_controls(data: object) -> list | None:
 def read_catalog(root: Path) -> Catalog | None:
     """Load control IDs for citation checks without reporting (used when staging)."""
     try:
-        controls = catalog_controls(json.loads((root / CATALOG).read_text(encoding="utf-8")))
+        data = json.loads((root / CATALOG).read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError):
         return None
+    controls = catalog_controls(data)
     if controls is None:
         return None
     ids, critical, lifecycles, titles = set(), set(), {}, {}
@@ -1043,13 +1080,18 @@ def read_catalog(root: Path) -> Catalog | None:
                 titles[cid] = control["title"]
             if is_critical(control):
                 critical.add(cid)
-    return Catalog(ids, critical, None, lifecycles, titles)
+    return Catalog(ids, critical, None, lifecycles, titles,
+                   controls=[control for control in controls if isinstance(control, dict)],
+                   asi_pages=asi_pages(data))
 
 
-def is_critical(control: dict) -> bool:
-    level = control.get("level")
-    return type(level) is int and level == 1 and control.get("failure_severity") == "critical" \
-        and control.get("lifecycle", "active") != "withdrawn"
+def asi_pages(data: object) -> dict[str, int]:
+    """The start page of each ASI entry, from the catalog's asi_categories."""
+    categories = lookup(data, "asi_categories")
+    if not isinstance(categories, list):
+        return {}
+    return {item["id"]: item["page"] for item in categories
+            if isinstance(item, dict) and isinstance(item.get("id"), str) and type(item.get("page")) is int}
 
 
 def nonempty_string(value: object) -> bool:
@@ -1106,6 +1148,12 @@ def check_catalog(rep: Reporter, root: Path) -> Catalog | None:
             if isinstance(categories, list) else None
         if declared_asi != list(ASI_TITLES.items()):
             rep.report("asi-title", path, "asi_categories must list ASI01 to ASI10 in order with their exact titles")
+        if isinstance(categories, list) and len(asi_pages(data)) != len(ASI_TITLES):
+            rep.report("asi-title", path, "Give each asi_categories entry the printed start page of its entry ('page')")
+    namespace = data.get("namespace") if isinstance(data, dict) else None
+    if namespace != FRAMEWORK_NAME:
+        rep.report("catalog-field", path, f"The catalog namespace must be {FRAMEWORK_NAME!r}, not {namespace!r}; "
+                   "citations use it, for example 'STAND:A-06@0.1'")
 
     ids: list[str] = []
     critical: set[str] = set()
@@ -1137,8 +1185,12 @@ def check_catalog(rep: Reporter, root: Path) -> Catalog | None:
             if name in control and not nonempty_string(control[name]):
                 rep.report("catalog-field", path, f"{label}: {name} must be non-empty text")
         statement = control.get("statement")
-        if nonempty_string(statement) and not BCP14.search(statement):
-            rep.report("catalog-field", path, f"{label}: the statement needs a BCP 14 keyword (MUST, SHOULD, MAY ...)")
+        if nonempty_string(statement) and not BCP14_OBLIGATION.search(statement):
+            rep.report("catalog-field", path, f"{label}: the statement needs an obligation in BCP 14 language "
+                       "(MUST, MUST NOT, SHALL, SHOULD or REQUIRED); MAY and OPTIONAL alone oblige nothing")
+        exemption = control.get("twin_exempt")
+        if "twin_exempt" in control and not nonempty_string(exemption):
+            rep.report("catalog-field", path, f"{label}: twin_exempt must state why the control has no authorized twin")
         evidence = control.get("evidence")
         if "evidence" in control and not (
                 nonempty_string(evidence)
@@ -1232,7 +1284,8 @@ def check_catalog(rep: Reporter, root: Path) -> Catalog | None:
     version = data.get("version") if isinstance(data, dict) else None
     cases, retired = check_case_labels(rep, path, controls)
     return Catalog(known, critical, version if isinstance(version, str) else None, lifecycles, titles,
-                   cases, retired, [control for control in controls if isinstance(control, dict)])
+                   cases, retired, [control for control in controls if isinstance(control, dict)],
+                   asi_pages(data))
 
 
 def check_case_labels(rep: Reporter, path: Path, controls: list) -> tuple[dict[str, int], dict[str, set[int]]]:
@@ -1259,11 +1312,19 @@ def check_case_labels(rep: Reporter, path: Path, controls: list) -> tuple[dict[s
         retired[cid] = set(reserved)
         if control.get("lifecycle", "active") != "active":
             continue
-        if not labels:
-            if re.search(r"\b(?:Hostile|Twin)\b", text):
-                rep.report("case-label", path, f"{cid}: label each hostile case and twin in the verification "
-                           f"text as ({cid}/C1), (C2) and so on")
+        if "twin_exempt" in control:
+            if labels:
+                rep.report("case-label", path, f"{cid}: twin_exempt is only for a control verified by inspection "
+                           "with no labelled cases; label its authorized twin and remove twin_exempt")
             continue
+        if not labels:
+            rep.report("case-label", path, f"{cid}: label each hostile case and the authorized twin in the "
+                       f"verification text as ({cid}/C1), (C2) and so on, or record why there is no twin in "
+                       "twin_exempt")
+            continue
+        if not re.search(r"\bTwins?\b", text):
+            rep.report("case-label", path, f"{cid}: name the authorized twin ('Twin: ... (C<n>)') or record why "
+                       "there is none in twin_exempt")
         reused = sorted(set(numbers) & set(reserved))
         if reused:
             rep.report("case-label", path, f"{cid}: retired case numbers are never reused: "
@@ -1332,7 +1393,12 @@ def check_retired_cases(rep: Reporter, path: Path, catalog: Catalog, base: dict[
 
 
 def check_case_citations(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
-    """A cited case number exists in the catalog and is not retired, unless the citation marks it as local."""
+    """A cited catalog case exists and is not retired; a local case uses its own label, <ID>/L<n>.
+
+    Catalog case numbers are never reused or renumbered, so a local case never borrows a C number:
+    it takes the next L number of its control, defined once ('<ID>/L<n>:' or '<ID>/L<n> (twin):')
+    in exactly one place, and every citation of an L label points at a definition.
+    """
     for doc in docs.values():
         for match in TEST_ID.finditer(doc.text):
             cid, number = match.group(1).split("/C")
@@ -1342,30 +1408,126 @@ def check_case_citations(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: C
             after = doc.text[match.end():match.end() + 12]
             if after.startswith(": retired)"):
                 continue
-            local = re.match(r"\s*[(,]\s*local\b", after) is not None
-            if int(number) in catalog.retired.get(cid, set()):
+            if re.match(r"\s*[(,]\s*local\b", after) is not None:
+                rep.report("case-label", doc.path, f"{match.group(1)} is marked local; catalog case labels are "
+                           f"never local. Label a local case {cid}/L<n> and drop '(local)'")
+            elif int(number) in catalog.retired.get(cid, set()):
                 rep.report("case-label", doc.path, f"{match.group(1)} is a retired case; cite a live case, and "
-                           f"number local additions after C{count}")
-            elif int(number) > count and not local:
+                           f"label a local case {cid}/L<n>")
+            elif int(number) > count:
                 rep.report("case-label", doc.path, f"{match.group(1)} is not a case in the catalog ({cid} numbers "
-                           f"{count}); mark a local addition '(local)'")
-            elif int(number) <= count and local:
-                rep.report("case-label", doc.path, f"{match.group(1)} is marked local but is a catalog case; "
-                           f"number local additions after C{count}")
+                           f"{count}); label a local case {cid}/L<n>")
+    defined: dict[str, str] = {}
+    cited: list[tuple[MarkdownDoc, str]] = []
+    for doc in docs.values():
+        for match in LOCAL_DEF.finditer(doc.text):
+            label = match.group(1)
+            if label in defined:
+                rep.report("case-label", doc.path, f"{label} is defined twice (also in {defined[label]}); give each "
+                           "local case its own L number and never reuse one")
+            else:
+                defined[label] = doc.relative
+        cited.extend((doc, match.group(1)) for match in LOCAL_ID.finditer(doc.text))
+    for doc, label in cited:
+        cid = label.split("/L")[0]
+        if cid not in catalog.cases:
+            rep.report("case-label", doc.path, f"{label} names a control that is not in the catalog")
+        elif label not in defined:
+            rep.report("case-label", doc.path, f"{label} is cited but never defined; define it once as "
+                       f"'{label}: <case>'")
+
+
+FLOOR_SENTENCE = "MUST be rated"
+FLOOR_LISTS = (
+    ("references/conformance.md", "a floor applies when the profile or register shows the floor's precondition",
+     "applies when that failure is found"),
+    (CHANGELOG, "are now floors in the statements of", "."),
+)
+
+
+def floor_ids(text: str, start: str, end: str) -> set[str] | None:
+    """Return the control IDs between start and the next end marker after it, or None if start is absent."""
+    begin = text.find(start)
+    if begin < 0:
+        return None
+    stop = text.find(end, begin + len(start))
+    return set(CONTROL_ID.findall(text[begin:stop if stop >= 0 else len(text)]))
+
+
+def check_severity_floors(rep: Reporter, root: Path, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
+    """Every control whose statement sets a severity floor is named in the floor lists of D-06,
+    references/conformance.md and CHANGELOG.md, and those lists name no control without a floor."""
+    floors = {c["id"] for c in catalog.controls if isinstance(c.get("statement"), str)
+              and FLOOR_SENTENCE in c["statement"] and c.get("id") != "D-06"
+              and c.get("lifecycle", "active") == "active"}
+    gate = next((c for c in catalog.controls if c.get("id") == "D-06"), None)
+    sources: list[tuple[Path | str, str, set[str] | None]] = []
+    if gate is not None and isinstance(gate.get("statement"), str):
+        sources.append((root / CATALOG, "D-06 statement",
+                        floor_ids(gate["statement"], "a floor applies when", "applies when that failure is found")))
+    for relative, start, end in FLOOR_LISTS:
+        doc = docs.get(relative)
+        if doc is not None:
+            sources.append((doc.path, relative, floor_ids(doc.text, start, end)))
+    for path, where, named in sources:
+        if named is None:
+            if floors:
+                expect_fact(rep, path, f"the severity floor list in {where}", "... a floor applies when ...")
+            continue
+        missing, extra = sorted(floors - named), sorted(named - floors - {"A-08", "D-06"})
+        if missing:
+            rep.report("severity-floor", path, f"{where}: the floor list omits " + ", ".join(missing)
+                       + f", whose statements set a floor ('{FLOOR_SENTENCE}')")
+        if extra:
+            rep.report("severity-floor", path, f"{where}: the floor list names " + ", ".join(extra)
+                       + ", whose statements set no floor")
+
+
+def expect_fact(rep: Reporter, path: Path | str, what: str, form: str) -> None:
+    """Report a stated fact that a check needs but cannot find, so a rewording never disables a check."""
+    rep.report("expected-fact-missing", path, f"Cannot find {what}, so it cannot be checked against the catalog. "
+               f"Keep it in the form {form!r}, or update scripts/validate.py with the new wording")
+
+
+def level_split(controls: list) -> tuple[int, int, int]:
+    return tuple(sum(1 for c in controls if c.get("level") == level) for level in (1, 2, 3))
+
+
+def newest_section(doc: MarkdownDoc) -> tuple[str | None, list[tuple[int, str]]]:
+    """The heading and the numbered lines of the topmost '## ' release section of a changelog."""
+    heading, lines = None, []
+    for number, line in enumerate(doc.lines, 1):
+        if line.startswith("## "):
+            if heading is not None:
+                break
+            heading = line
+            continue
+        if heading is not None:
+            lines.append((number, line))
+    return heading, lines
 
 
 def check_changelog_summary(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
-    """The release notes' catalog summary matches the catalog: total, per-pillar ranges, levels, critical set."""
+    """The newest release section's catalog summary matches the catalog: version, total, per-pillar
+    ranges, levels and the critical-boundary count. Older sections describe older catalogs."""
     doc = docs.get(CHANGELOG)
-    controls = [c for c in catalog.controls if c.get("lifecycle", "active") != "withdrawn"
-                and isinstance(c.get("id"), str)]
+    controls = catalog.listed()
     if doc is None or not controls:
         return
-    for line in doc.lines:
-        found = re.search(r"Control catalog [\d.]+ with (\d+) controls", line)
+    heading, section = newest_section(doc)
+    if heading is None:
+        expect_fact(rep, doc.path, "a release section", "## [0.1.0] - Unreleased")
+        return
+    found_total = found_levels = found_critical = False
+    for number, line in section:
+        found = re.search(r"Control catalog ([\d.]+)(?: with|,) (\d+) controls", line)
         if found:
-            if int(found.group(1)) != len(controls):
-                rep.report("changelog-summary", doc.path, f"The catalog summary says {found.group(1)} controls; "
+            found_total = True
+            if catalog.version and found.group(1) != catalog.version:
+                rep.report("changelog-summary", doc.path, f"Line {number}: the catalog summary names version "
+                           f"{found.group(1)}; the catalog is {catalog.version}")
+            if int(found.group(2)) != len(controls):
+                rep.report("changelog-summary", doc.path, f"The catalog summary says {found.group(2)} controls; "
                            f"the catalog has {len(controls)}")
             for span in re.finditer(r"\b(S|T|A|N|D)-(\d{2}) to \1-(\d{2})\b", line):
                 serials = sorted(int(c["id"][2:]) for c in controls if c["id"][0] == span.group(1))
@@ -1374,59 +1536,82 @@ def check_changelog_summary(rep: Reporter, docs: dict[str, MarkdownDoc], catalog
                                f"from the catalog ({span.group(1)}-{serials[0]:02d} to {span.group(1)}-{serials[-1]:02d})")
         levels = re.search(r"Levels 1 to 3 \((\d+), (\d+) and (\d+) controls\)", line)
         if levels:
-            expected = tuple(sum(1 for c in controls if c.get("level") == level) for level in (1, 2, 3))
+            found_levels = True
+            expected = level_split(controls)
             if tuple(int(value) for value in levels.groups()) != expected:
                 rep.report("changelog-summary", doc.path, "The level split in the catalog summary differs from the "
                            "catalog (" + ", ".join(map(str, expected)) + ")")
         critical = re.search(r"the (\d+) Level 1 controls whose default failure severity is critical", line)
-        if critical and int(critical.group(1)) != len(catalog.critical):
-            rep.report("changelog-summary", doc.path, f"The catalog summary counts {critical.group(1)} critical-boundary "
-                       f"controls; the catalog has {len(catalog.critical)}")
+        if critical:
+            found_critical = True
+            if int(critical.group(1)) != len(catalog.critical):
+                rep.report("changelog-summary", doc.path, f"The catalog summary counts {critical.group(1)} "
+                           f"critical-boundary controls; the catalog has {len(catalog.critical)}")
+    if not found_total:
+        expect_fact(rep, doc.path, "the catalog total in the newest release section",
+                    f"Control catalog {catalog.version or 'X.Y.Z'} with N controls")
+    if not found_levels:
+        expect_fact(rep, doc.path, "the level split in the newest release section", "Levels 1 to 3 (A, B and C controls)")
+    if not found_critical:
+        expect_fact(rep, doc.path, "the critical-boundary count in the newest release section",
+                    "the N Level 1 controls whose default failure severity is critical")
 
 
 def check_readme_summary(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
     """The catalog counts stated in README.md (total, per pillar and per level) match the catalog."""
     doc = docs.get("README.md")
-    controls = [c for c in catalog.controls if c.get("lifecycle", "active") != "withdrawn"
-                and isinstance(c.get("id"), str)]
+    controls = catalog.listed()
     if doc is None or not controls:
         return
-    flat = " ".join(doc.text.split())
+    flat = " ".join(" ".join(doc.lines).split())
     letters = tuple(PILLARS)
     expected = (len(controls), *(sum(1 for c in controls if c["id"][0] == letter) for letter in letters))
     want = f"{expected[0]} controls (" + ", ".join(
         f"{letter} {count}" for letter, count in zip(letters, expected[1:])) + ")"
     # Any per-pillar count list, so a list in an outdated pillar order or with old letters is reported too.
-    for found in re.finditer(r"(\d+) controls \(((?:[A-Z] \d+, )+[A-Z] \d+)\)", flat):
+    lists = list(re.finditer(r"(\d+) controls \(((?:[A-Z] \d+, )+[A-Z] \d+)\)", flat))
+    for found in lists:
         stated = (int(found.group(1)), *(int(part.split()[1]) for part in found.group(2).split(", ")))
         named = tuple(part.split()[0] for part in found.group(2).split(", "))
         if named != letters or stated != expected:
             rep.report("readme-summary", doc.path, f"README.md states {found.group(0)}; the catalog has {want}")
-    split = tuple(sum(1 for c in controls if c.get("level") == level) for level in (1, 2, 3))
-    for found in re.finditer(r"(\d+) at Level 1, (\d+) at Level 2, (\d+) at Level 3", flat):
+    if not lists:
+        expect_fact(rep, doc.path, "the per-pillar control counts in README.md", want)
+    split = level_split(controls)
+    splits = list(re.finditer(r"(\d+) at Level 1, (\d+) at Level 2, (\d+) at Level 3", flat))
+    for found in splits:
         if tuple(int(value) for value in found.groups()) != split:
             rep.report("readme-summary", doc.path, f"README.md states {found.group(0)}; the catalog has "
                        + ", ".join(f"{count} at Level {level}" for level, count in zip((1, 2, 3), split)))
+    if not splits:
+        expect_fact(rep, doc.path, "the level split in README.md", "A at Level 1, B at Level 2, C at Level 3")
+    for found in re.finditer(r"\b(?:catalog of|[Ee]ach of the|holds|[Aa]ll) (\d+) controls\b"
+                             r"|\b(\d+) controls with stable IDs\b", flat):
+        stated = int(found.group(1) or found.group(2))
+        if stated != len(controls):
+            rep.report("readme-summary", doc.path, f"README.md states '{found.group(0)}'; the catalog has "
+                       f"{len(controls)} controls")
 
 
 def check_pillar_table(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
     """The per-pillar ASI count table in docs/pillars.md is recomputed from the catalog."""
     doc = docs.get(PILLARS_DOC)
-    controls = [c for c in catalog.controls if c.get("lifecycle", "active") != "withdrawn"
-                and isinstance(c.get("id"), str)]
+    controls = catalog.listed()
     if doc is None or not controls:
         return
+    found = False
     for header, rows in markdown_tables([strip_code_spans(line) for line in doc.lines]):
         names = [plain_cell(cell) for cell in header]
         if not names or "Controls (L1/L2/L3)" not in names:
             continue
+        found = True
         for number, cells in rows:
             values = [plain_cell(cell) for cell in cells]
             letter = values[0][:1] if values else ""
             items = [c for c in controls if c["id"][0] == letter]
             if not items:
                 continue
-            levels = [sum(1 for c in items if c.get("level") == level) for level in (1, 2, 3)]
+            levels = level_split(items)
             expected = {"Controls (L1/L2/L3)": f"{len(items)} ({levels[0]}/{levels[1]}/{levels[2]})"}
             for name in names:
                 if ASI_FULL.match(name):
@@ -1436,6 +1621,141 @@ def check_pillar_table(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Cat
             if wrong:
                 rep.report("pillar-table", doc.path, f"Line {number}: the {letter} row differs from the catalog: "
                            + "; ".join(wrong))
+    if not found:
+        expect_fact(rep, doc.path, "the per-pillar ASI table", "| Pillar | Controls (L1/L2/L3) | ASI01 | ... |")
+
+
+def check_level_table(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
+    """The count table and the per-level counts in references/profile-and-levels.md match the catalog."""
+    doc = docs.get(PROFILE_DOC)
+    controls = catalog.listed()
+    if doc is None or not controls:
+        return
+    columns = ["Pillar", "Level 1", "Level 2", "Level 3", "Total"]
+    found = False
+    for header, rows in markdown_tables([strip_code_spans(line) for line in doc.lines]):
+        if [plain_cell(cell) for cell in header] != columns:
+            continue
+        found = True
+        for number, cells in rows:
+            values = [plain_cell(cell) for cell in cells]
+            name = values[0] if values else ""
+            items = controls if name == "Total" else [c for c in controls if c["id"][0] == name[:1]
+                                                      and name[1:2] in ("", " ")]
+            if not items or name[:1] not in PILLARS and name != "Total":
+                continue
+            expected = [str(count) for count in level_split(items)] + [str(len(items))]
+            if values[1:5] != expected:
+                rep.report("count-drift", doc.path, f"Line {number}: the {name} row reads "
+                           f"{' | '.join(values[1:5])}; the catalog has {' | '.join(expected)}")
+    if not found:
+        expect_fact(rep, doc.path, "the count table", "| " + " | ".join(columns) + " |")
+    split = level_split(controls)
+    for number, line in enumerate(doc.lines, 1):
+        for stated in re.finditer(r"\bLevel ([123])\b[^()\n]{0,80}?\((\d+) controls\b", line):
+            level, count = int(stated.group(1)), int(stated.group(2))
+            if count != split[level - 1]:
+                rep.report("count-drift", doc.path, f"Line {number}: Level {level} is stated as {count} controls; "
+                           f"the catalog has {split[level - 1]}")
+
+
+def check_infographic(rep: Reporter, root: Path, catalog: Catalog) -> None:
+    """The per-pillar control counts drawn in, and described by, docs/stand-infographic.svg match the catalog."""
+    path = root / INFOGRAPHIC
+    controls = catalog.listed()
+    if not path.is_file() or not controls:
+        return
+    try:
+        text = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        return
+    expected = [sum(1 for c in controls if c["id"][0] == letter) for letter in PILLARS]
+    drawn = [int(value) for value in re.findall(r">\s*(\d+) controls?\s*</text>", text)]
+    if not drawn:
+        expect_fact(rep, path, "the per-pillar counts drawn in the SVG", "<text ...>6 controls</text>")
+    elif drawn != expected:
+        rep.report("count-drift", path, "The pillar counts drawn left to right read "
+                   + ", ".join(map(str, drawn)) + "; the catalog has " + ", ".join(map(str, expected)))
+    desc = re.search(r"<desc\b[^>]*>(.*?)</desc>", text, re.DOTALL)
+    described = re.findall(r"\b[Ll]etter ([A-Z])\b.*?\bIt has (\d+) controls?\b", desc.group(1), re.DOTALL) \
+        if desc else []
+    if not described:
+        expect_fact(rep, path, "the per-pillar counts in the SVG description",
+                    "Pillar 01, letter S, ... It has 6 controls.")
+    else:
+        stated = {letter: int(count) for letter, count in described}
+        wrong = [f"{letter} {stated.get(letter)} (catalog: {count})" for letter, count in zip(PILLARS, expected)
+                 if stated.get(letter) != count]
+        if wrong:
+            rep.report("count-drift", path, "The SVG description's pillar counts differ from the catalog: "
+                       + "; ".join(wrong))
+
+
+NUMBER_WORDS = {word: number for number, word in enumerate(
+    ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"))}
+
+
+def check_cross_cutting(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
+    """A sentence that lists the cross-cutting controls (those carrying every ASI identifier) lists all of them."""
+    expected = catalog.cross_cutting()
+    if not catalog.controls:
+        return
+    for relative, doc in docs.items():
+        if relative == CHANGELOG or relative in GENERATED:
+            continue
+        for number, line in enumerate(doc.lines, 1):
+            if "cross-cutting" not in line.lower():
+                continue
+            for sentence in re.split(r"(?<=[.!?])\s+(?=[A-Z])", strip_code_spans(line)):
+                if "cross-cutting" not in sentence.lower():
+                    continue
+                listed_ids = expand_ids(sentence)
+                if not listed_ids:
+                    continue
+                if listed_ids != expected:
+                    rep.report("cross-cutting", doc.path, f"Line {number}: the cross-cutting controls are "
+                               + ", ".join(sorted(expected)) + "; the sentence lists " + ", ".join(sorted(listed_ids)))
+                word = re.search(r"\b(" + "|".join(NUMBER_WORDS) + r")\b[\w\s-]{0,40}?cross-cutting",
+                                 sentence, re.IGNORECASE)
+                if word and NUMBER_WORDS[word.group(1).lower()] != len(expected):
+                    rep.report("cross-cutting", doc.path, f"Line {number}: '{word.group(1)}' cross-cutting "
+                               f"controls; the catalog has {len(expected)}")
+
+
+def check_eval_cases(rep: Reporter, root: Path, catalog: Catalog) -> None:
+    """Control IDs and case numbers cited in evals/cases.json exist; catalog_version is the catalog MAJOR.MINOR."""
+    path = root / EVAL_CASES
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return
+    strings: list[str] = []
+
+    def walk_json(value: object) -> None:
+        if isinstance(value, str):
+            strings.append(value)
+        elif isinstance(value, list):
+            for item in value:
+                walk_json(item)
+        elif isinstance(value, dict):
+            for key, item in value.items():
+                strings.append(str(key))
+                walk_json(item)
+    walk_json(data)
+    text = "\n".join(strings)
+    unknown = sorted({cid for cid in CONTROL_ID.findall(text) if cid not in catalog.ids})
+    if unknown:
+        rep.report("unknown-control", path, "Cited control IDs are not in the catalog: " + ", ".join(unknown))
+    for match in TEST_ID.finditer(text):
+        cid, number = match.group(1).split("/C")
+        if cid in catalog.cases and (int(number) > catalog.cases[cid] or int(number) in catalog.retired.get(cid, set())):
+            rep.report("case-label", path, f"{match.group(1)} is not a live case in the catalog")
+    stated = data.get("catalog_version") if isinstance(data, dict) else None
+    if stated is not None and catalog.version:
+        wanted = ".".join(catalog.version.split(".")[:2])
+        if stated != wanted:
+            rep.report("eval-cases", path, f"catalog_version is {stated!r}; claims cite the catalog MAJOR.MINOR, "
+                       f"{wanted!r}")
 
 
 def check_mapping_claims(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
@@ -1443,8 +1763,8 @@ def check_mapping_claims(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: C
     doc = docs.get(FRAMEWORKS_DOC)
     if doc is None or not catalog.controls:
         return
-    by_id = {c["id"]: c for c in catalog.controls if isinstance(c.get("id"), str)}
-    text = " ".join(doc.text.split())
+    by_id = catalog.by_id()
+    text = " ".join(" ".join(doc.lines).split())
     for claim in re.finditer(r"(?<![\w-])((?:S|T|A|N|D)-\d{2}) \(([^()]*?), direct\)", text):
         mappings = by_id.get(claim.group(1), {}).get("mappings") or {}
         for ref in (part.strip() for part in claim.group(2).split(",")):
@@ -1453,14 +1773,41 @@ def check_mapping_claims(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: C
             if relations != {"direct"}:
                 rep.report("mapping-claim", doc.path, f"{claim.group(1)} to {ref} is labelled direct, but the catalog "
                            "records " + (", ".join(sorted(map(str, relations))) or "no such mapping"))
-    empty = re.search(r"`nist` lists are empty: ([^.]*)\.", text)
-    if empty:
-        listed = expand_ids(empty.group(1))
-        actual = {cid for cid, c in by_id.items() if c.get("lifecycle", "active") != "withdrawn"
-                  and not (c.get("mappings") or {}).get("nist")}
-        if listed != actual:
+    actual = {c["id"] for c in catalog.listed() if not (c.get("mappings") or {}).get("nist")}
+    stated = list(re.finditer(r"`nist` lists are empty: ([^.]*)\.", text))
+    for empty in stated:
+        if expand_ids(empty.group(1)) != actual:
             rep.report("mapping-claim", doc.path, "The list of controls with empty nist mappings differs from the "
                        "catalog: " + ", ".join(sorted(actual)))
+    if actual and not stated:
+        expect_fact(rep, doc.path, "the list of controls with no NIST mapping", "`nist` lists are empty: A-03, ...")
+
+
+def check_relation_definitions(rep: Reporter, root: Path, docs: dict[str, MarkdownDoc]) -> None:
+    """frameworks.md, which is not rendered, defines each relation in the words of catalog/mappings.json."""
+    doc = docs.get(FRAMEWORKS_DOC)
+    if doc is None:
+        return
+    try:
+        declared = json.loads((root / MAPPINGS).read_text(encoding="utf-8")).get("relations")
+    except (OSError, UnicodeError, json.JSONDecodeError, AttributeError):
+        return
+    if not isinstance(declared, dict):
+        return
+    stated = {}
+    for line in doc.lines:
+        match = re.match(r"\s*- \*\*(direct|partial|supports)\*\*: (.+)$", line)
+        if match:
+            stated.setdefault(match.group(1), " ".join(match.group(2).split()))
+    for relation in RELATIONS:
+        wanted = declared.get(relation)
+        if not isinstance(wanted, str):
+            continue
+        if relation not in stated:
+            expect_fact(rep, doc.path, f"the definition of the {relation!r} relation", f"- **{relation}**: ...")
+        elif stated[relation] != " ".join(wanted.split()):
+            rep.report("mapping-claim", doc.path, f"The {relation!r} relation is defined differently from "
+                       f"{MAPPINGS} 'relations'; use the same text in both")
 
 
 def check_control_mappings(rep: Reporter, path: Path, label: str, mappings: object) -> None:
@@ -1709,10 +2056,13 @@ def read_history(root: Path, revision: str, base_has_ledger: bool) -> tuple[Hist
 @dataclass
 class Baseline:
     """What --ledger-base compares the working tree with: every ledger ID and retired case
-    number at the base revision or in a commit since. None means nothing to compare."""
+    number at the base revision or in a commit since, and the base catalog's controls and
+    version. None means nothing to compare."""
     ledger: list[str] | None = None
     retired: dict[str, set[int]] | None = None
     notes: list[str] = field(default_factory=list)
+    controls: list | None = None
+    version: str | None = None
 
 
 def read_baseline(root: Path, revision: str) -> tuple[Baseline, Finding | None]:
@@ -1726,6 +2076,15 @@ def read_baseline(root: Path, revision: str) -> tuple[Baseline, Finding | None]:
     if error:
         return baseline, Finding("case-label", CATALOG, f"Cannot compare with the base catalog: {error}")
     baseline.retired = retired
+    text, _ = read_base_file(root, revision, CATALOG)
+    if text is not None:
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError:
+            data = None
+        baseline.controls = catalog_controls(data)
+        version = data.get("version") if isinstance(data, dict) else None
+        baseline.version = version if isinstance(version, str) else None
     history, error = read_history(root, revision, base_has_ledger=ledger is not None)
     if history is None:
         return baseline, Finding("ledger-removed", LEDGER, f"Cannot compare with the commits since {revision}: {error}")
@@ -1854,6 +2213,163 @@ def check_requirement_application(rep: Reporter, root: Path, path: Path, key: st
 
 
 # ---------------------------------------------------------------------------
+# Identifier registries (catalog/nist-ids.json and catalog/aiuc1-controls.json)
+
+
+NIST_MENTION = re.compile(r"\b(?:GOVERN|MAP|MEASURE|MANAGE) \d+\.\d+\b|\b(?:GV|MP|MS|MG)-\d+\.\d+-\d{3}\b")
+ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+MONTH_DATE = re.compile(r"(January|February|March|April|May|June|July|August|September|October|November"
+                        r"|December) (\d{1,2}), (\d{4})")
+
+
+def mapping_entries(root: Path, framework: str) -> list[tuple[str, dict]]:
+    """(control ID, entry) for each mapping entry of a framework in catalog/mappings.json."""
+    try:
+        data = json.loads((root / MAPPINGS).read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return []
+    section = data.get(framework) if isinstance(data, dict) else None
+    refs = section.get("refs") if isinstance(section, dict) else None
+    if not isinstance(refs, dict):
+        return []
+    return [(cid, entry) for cid, entries in refs.items() if isinstance(entries, list)
+            for entry in entries if isinstance(entry, dict) and nonempty_string(entry.get("ref"))]
+
+
+def check_nist_registry(rep: Reporter, root: Path, docs: dict[str, MarkdownDoc]) -> None:
+    """Every NIST identifier is an AI RMF 1.0 subcategory or AI 600-1 action in the pinned registry,
+    and every nist justification ends with a citation whose table and page match the registry."""
+    path = root / NIST_REGISTRY
+    registry = load_json(rep, path, "nist-id")
+    if registry is None:
+        return
+    subcategories = registry.get("subcategories") if isinstance(registry, dict) else None
+    actions = registry.get("actions") if isinstance(registry, dict) else None
+    if not isinstance(subcategories, dict) or not isinstance(actions, dict):
+        rep.report("nist-id", path, "Expected 'subcategories' and 'actions' maps")
+        return
+    for ref, entry in subcategories.items():
+        if not NIST_SUBCATEGORY.match(ref) or not isinstance(entry, dict) \
+                or type(entry.get("table")) is not int or type(entry.get("page")) is not int:
+            rep.report("nist-id", path, f"{ref}: a subcategory needs the form 'GOVERN 1.1' and integer table and page")
+        elif entry["table"] != 1 + ("GOVERN", "MAP", "MEASURE", "MANAGE").index(ref.split()[0]):
+            rep.report("nist-id", path, f"{ref}: AI 100-1 lists its function in Table "
+                       f"{1 + ('GOVERN', 'MAP', 'MEASURE', 'MANAGE').index(ref.split()[0])}")
+    for ref, entry in actions.items():
+        if not NIST_ACTION.match(ref) or not isinstance(entry, dict) or type(entry.get("page")) is not int:
+            rep.report("nist-id", path, f"{ref}: an action needs the form 'GV-1.1-001' and an integer page")
+        elif nist_function(ref) not in subcategories:
+            rep.report("nist-id", path, f"{ref}: its subcategory {nist_function(ref)} is not in the registry")
+
+    for cid, entry in mapping_entries(root, "nist"):
+        ref, where = entry["ref"], f"nist.{cid} {entry['ref']}"
+        citation = NIST_CITATION.search(str(entry.get("justification", "")))
+        if NIST_SUBCATEGORY.match(ref):
+            known = subcategories.get(ref)
+            if not isinstance(known, dict):
+                rep.report("nist-id", root / MAPPINGS, f"{where}: not an AI RMF 1.0 subcategory in {NIST_REGISTRY}")
+            elif not citation or citation.group(1) != "100" \
+                    or (citation.group(2), citation.group(3)) != (str(known.get("table")), str(known.get("page"))):
+                rep.report("nist-id", root / MAPPINGS, f"{where}: end the justification with "
+                           f"[AI 100-1 Table {known.get('table')} p.{known.get('page')}]")
+        elif NIST_ACTION.match(ref):
+            known = actions.get(ref)
+            if not isinstance(known, dict):
+                rep.report("nist-id", root / MAPPINGS, f"{where}: not an AI 600-1 action in {NIST_REGISTRY}")
+            elif not citation or citation.group(1) != "600" or citation.group(2) is not None \
+                    or citation.group(3) != str(known.get("page")):
+                rep.report("nist-id", root / MAPPINGS, f"{where}: end the justification with "
+                           f"[AI 600-1 p.{known.get('page')}]")
+        else:
+            rep.report("nist-id", root / MAPPINGS, f"{where}: use an AI RMF 1.0 subcategory ('GOVERN 1.1') or an "
+                       "AI 600-1 action ID ('GV-1.1-001')")
+    for relative, doc in docs.items():
+        for found in sorted(set(NIST_MENTION.findall(" ".join(doc.lines)))):
+            if found not in subcategories and found not in actions:
+                rep.report("nist-id", doc.path, f"{found} is not an AI RMF 1.0 subcategory or AI 600-1 action "
+                           f"in {NIST_REGISTRY}")
+
+
+def release_date(text: object) -> str | None:
+    """The ISO date of an AIUC-1 release named like 'AIUC-1 release of July 15, 2026'."""
+    if not isinstance(text, str):
+        return None
+    match = MONTH_DATE.search(text)
+    if not match:
+        return None
+    try:
+        return dt.datetime.strptime(match.group(0), "%B %d, %Y").date().isoformat()
+    except ValueError:
+        return None
+
+
+def check_aiuc_registry(rep: Reporter, root: Path) -> None:
+    """Every cited AIUC-1 control is in the registry with its status, subject and checked release;
+    a justification that opens 'Core control' or 'Supplemental control' agrees with the status."""
+    path = root / AIUC_REGISTRY
+    registry = load_json(rep, path, "aiuc-registry")
+    if registry is None:
+        return
+    controls = registry.get("controls") if isinstance(registry, dict) else None
+    requirements = registry.get("requirements") if isinstance(registry, dict) else None
+    if not isinstance(controls, dict) or not isinstance(requirements, dict):
+        rep.report("aiuc-registry", path, "Expected 'requirements' and 'controls' maps")
+        return
+    for requirement, entry in requirements.items():
+        capabilities = entry.get("capabilities") if isinstance(entry, dict) else None
+        if not re.fullmatch(r"[A-F]\d{3}", requirement) or not isinstance(capabilities, list) or not capabilities \
+                or not all(nonempty_string(item) for item in capabilities):
+            rep.report("aiuc-registry", path, f"{requirement}: a requirement needs the form 'B006' and a non-empty "
+                       "capabilities list")
+    for ref, entry in controls.items():
+        if not AIUC_CONTROL.match(ref) or not isinstance(entry, dict):
+            rep.report("aiuc-registry", path, f"{ref}: a control needs the form 'B006.1' and an object")
+            continue
+        if entry.get("status") not in ("core", "supplemental"):
+            rep.report("aiuc-registry", path, f"{ref}: status must be core or supplemental")
+        if not nonempty_string(entry.get("title")):
+            rep.report("aiuc-registry", path, f"{ref}: give the subject in this project's own words")
+        if not isinstance(entry.get("release"), str) or not ISO_DATE.match(entry["release"]):
+            rep.report("aiuc-registry", path, f"{ref}: record the release it was checked against (YYYY-MM-DD)")
+        if ref.split(".")[0] not in requirements:
+            rep.report("aiuc-registry", path, f"{ref}: record the capabilities of requirement {ref.split('.')[0]}")
+
+    try:
+        mappings = json.loads((root / MAPPINGS).read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        mappings = {}
+    section = mappings.get("aiuc1") if isinstance(mappings, dict) else None
+    mapped_version = section.get("source_version") if isinstance(section, dict) else None
+    mapped_release = release_date(mapped_version)
+    if registry.get("source_version") != mapped_version:
+        rep.warn("aiuc-registry", path, f"The registry was checked against {registry.get('source_version')!r}, "
+                 f"but the mappings name {mapped_version!r}; recheck every control below")
+    cited: set[str] = set()
+    for cid, entry in mapping_entries(root, "aiuc1"):
+        ref = entry["ref"]
+        cited.add(ref)
+        known = controls.get(ref) if AIUC_CONTROL.match(ref) else requirements.get(ref)
+        if not isinstance(known, dict):
+            rep.report("aiuc-registry", root / MAPPINGS, f"aiuc1.{cid} {ref}: not in {AIUC_REGISTRY}; check the "
+                       "identifier against the AIUC-1 release and record it")
+            continue
+        opening = re.match(r"\s*(Core|Supplemental) control", str(entry.get("justification", "")))
+        if opening and AIUC_CONTROL.match(ref) and opening.group(1).lower() != known.get("status"):
+            rep.report("aiuc-registry", root / MAPPINGS, f"aiuc1.{cid} {ref}: the justification opens "
+                       f"'{opening.group(1)} control' but {AIUC_REGISTRY} records it as {known.get('status')}")
+    for ref, entry in controls.items():
+        if ref not in cited:
+            rep.report("aiuc-registry", path, f"{ref} is cited by no mapping; remove it from the registry")
+        elif mapped_release and isinstance(entry, dict) and entry.get("release") != mapped_release:
+            rep.warn("aiuc-registry", path, f"{ref} was last checked against the {entry.get('release')} release; "
+                     f"the mappings use {mapped_release}")
+    used = {ref.split(".")[0] for ref in cited}
+    for requirement in sorted(set(requirements) - used):
+        rep.report("aiuc-registry", path, f"{requirement} is cited by no mapping; remove it from the registry")
+
+
+
+# ---------------------------------------------------------------------------
 # Cross-file consistency
 
 
@@ -1864,6 +2380,61 @@ def expand_ids(text: str) -> set[str]:
         if start[0] == end[0] and int(start[2:]) <= int(end[2:]):
             found.update(f"{start[0]}-{serial:02d}" for serial in range(int(start[2:]), int(end[2:]) + 1))
     return found
+
+
+EXAMPLE_START = re.compile(r"^\*\*(\d+)\. [^*]+\*\* One context\.", re.MULTILINE)
+EXAMPLE_END = re.compile(r"^(?:\*\*\d+\. |#{1,6} )", re.MULTILINE)
+PROPERTY_LETTERS = (("untrusted-input", "U"), ("sensitive-data", "D"), ("external-effect", "X"))
+
+
+def applicable_ids(controls: list, tokens: set[str]) -> list:
+    """Listed controls with at least one applies_when alternative whose tokens all hold."""
+    return [c for c in controls if any(all(token in tokens for token in str(alternative).split("+"))
+                                       for alternative in c.get("applies_when") or [])]
+
+
+def check_worked_examples(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog) -> None:
+    """Each single-context worked example in references/profile-and-levels.md states counts and a
+    not-applicable list that the catalog reproduces from its stated properties and tags."""
+    doc = docs.get(PROFILE_DOC)
+    if doc is None:
+        return
+    listed = catalog.listed()
+    for start in EXAMPLE_START.finditer(doc.text):
+        after = EXAMPLE_END.search(doc.text, start.end())
+        block = doc.text[start.end():after.start() if after else len(doc.text)]
+        name = f"worked example {start.group(1)}"
+        tags = re.search(r"Tags: (.*?)\.(?:\s|$)", block)
+        if not tags:
+            expect_fact(rep, doc.path, f"the tags of {name}", "Tags: a, b, c.")
+            continue
+        tokens = {"all"} | {tag.strip() for tag in re.sub(r"\([^()]*\)", "", tags.group(1)).split(",")}
+        tokens |= {prop for prop, letter in PROPERTY_LETTERS if re.search(rf"\b{letter} present\b", block)}
+        found = applicable_ids(listed, tokens)
+        computed = [sum(1 for c in found if c.get("level", 0) <= level) for level in (1, 2, 3)]
+        stated = re.search(r"(\d+) applicable controls at Level 1, (\d+) through Level 2 and (\d+) through Level 3",
+                           block)
+        single = re.search(r"Level 1, with (\d+) applicable controls", block)
+        if stated:
+            claimed = [int(value) for value in stated.groups()]
+        elif single:
+            claimed = [int(single.group(1)), computed[1], computed[2]]
+        else:
+            expect_fact(rep, doc.path, f"the applicable-control counts of {name}",
+                        "N applicable controls at Level 1, N through Level 2 and N through Level 3")
+            continue
+        if claimed != computed:
+            rep.report("worked-example", doc.path, f"{name} states {claimed[0]}, {claimed[1]} and {claimed[2]} "
+                       f"applicable controls through Levels 1, 2 and 3; its properties and tags give {computed[0]}, "
+                       f"{computed[1]} and {computed[2]}")
+        absent = re.search(r"The other (\d+) controls are not applicable because their tags are absent: (.*?)\.\n",
+                           block)
+        if absent:
+            missing = sorted({c["id"] for c in listed} - {c["id"] for c in found})
+            named = sorted(expand_ids(absent.group(2)))
+            if named != missing or int(absent.group(1)) != len(missing):
+                rep.report("worked-example", doc.path, f"{name} lists not-applicable controls "
+                           f"{', '.join(named)}; its properties and tags leave {', '.join(missing)}")
 
 
 def check_control_citations(rep: Reporter, doc: MarkdownDoc, catalog: Catalog | None) -> None:
@@ -1931,7 +2502,9 @@ def check_control_headings(rep: Reporter, docs: dict[str, MarkdownDoc], catalog:
 
 
 TEST_ID = re.compile(r"(?<![\w-])((?:S|T|A|N|D)-\d{2}/C\d+)(?![\w/])")
-PATTERN_TWIN = re.compile(r"(?<![\w-])((?:S|T|A|N|D)-\d{2}/C\d+)\s*\((?:local )?twin\)")
+LOCAL_ID = re.compile(r"(?<![\w-])((?:S|T|A|N|D)-\d{2}/L\d+)(?![\w/])")
+LOCAL_DEF = re.compile(r"(?<![\w-])((?:S|T|A|N|D)-\d{2}/L\d+)(?: \(twin\))?:")
+PATTERN_TWIN = re.compile(r"(?<![\w-])((?:S|T|A|N|D)-\d{2}/[CL]\d+)\s*\(twin\)")
 
 
 def record_example(doc: MarkdownDoc) -> str | None:
@@ -1977,31 +2550,27 @@ def check_record_examples(rep: Reporter, docs: dict[str, MarkdownDoc]) -> None:
                                f"{test_id} is the {role} in {PATTERNS}; label it the same way")
 
 
-def check_feature_routes(rep: Reporter, root: Path, docs: dict[str, MarkdownDoc]) -> None:
-    """Routing rows for a feature list every Level 1 critical-boundary control tagged with it."""
-    doc = docs.get("SKILL.md")
+RECORD_TEMPLATE = "assets/agent-security-record.md"
+RECORD_FIELDS = (
+    ("T-12", "egress mode per tool", "<mode (allowlist or public-internet) and tool>"),
+    ("A-06", "read-tool exemption parameters", "Read-tool exemption"),
+    ("A-06", "per-run bound and ceiling", "<ceiling in bits"),
+    ("S-06", "secret class entropy", "<secret class: entropy in bits"),
+    ("A-12", "agent-capable principal browser", "Principal browser agent-capable"),
+    ("T-17", "browser context rule", "Browser context"),
+    ("S-05", "impact threshold", "impact threshold"),
+)
+
+
+def check_record_template(rep: Reporter, docs: dict[str, MarkdownDoc]) -> None:
+    """The record template carries a field for each record obligation that a control statement sets."""
+    doc = docs.get(RECORD_TEMPLATE)
     if doc is None:
         return
-    try:
-        controls = catalog_controls(json.loads((root / CATALOG).read_text(encoding="utf-8")))
-    except (OSError, UnicodeError, json.JSONDecodeError):
-        return
-    if not controls:
-        return
-    for header, rows in markdown_tables([strip_code_spans(line) for line in doc.lines]):
-        for number, cells in rows:
-            tag = FEATURE_ROUTES.get(plain_cell(cells[0])) if cells else None
-            if tag is None or len(cells) < 2:
-                continue
-            listed = expand_ids(cells[1])
-            missing = sorted(
-                control["id"] for control in controls
-                if isinstance(control, dict) and is_critical(control) and isinstance(control.get("id"), str)
-                and any(tag in str(clause).split("+") for clause in control.get("applies_when") or [])
-                and control["id"] not in listed)
-            if missing:
-                rep.report("routing", doc.path, f"Line {number}: the '{plain_cell(cells[0])}' row misses "
-                           "critical-boundary controls tagged " + tag + ": " + ", ".join(missing))
+    for cid, what, snippet in RECORD_FIELDS:
+        if snippet not in doc.text:
+            rep.report("record-template", doc.path, f"Add the {what} field that {cid} requires the record to state "
+                       f"(expected text: {snippet!r})")
 
 
 def check_enum_docs(rep: Reporter, docs: dict[str, MarkdownDoc]) -> None:
@@ -2030,7 +2599,142 @@ def check_identity(rep: Reporter, root: Path, docs: dict[str, MarkdownDoc], bund
                        + "; ".join(missing))
 
 
-def check_owasp_view(rep: Reporter, docs: dict[str, MarkdownDoc]) -> None:
+def check_feature_routes(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog | None) -> None:
+    """The SKILL.md Step 2 routing table is normative: each ID sits under its level ('L2:', 'L3:'), and each
+    feature row lists every control whose applies_when names the feature's tag, at every level."""
+    doc = docs.get("SKILL.md")
+    if doc is None or catalog is None or not catalog.controls:
+        return
+    by_id = catalog.by_id()
+    seen_rows: set[str] = set()
+    tables = 0
+    for header, rows in markdown_tables([strip_code_spans(line) for line in doc.lines]):
+        if tuple(plain_cell(cell) for cell in header[:2]) != ROUTING_HEADER:
+            continue
+        tables += 1
+        for number, cells in rows:
+            if len(cells) < 2:
+                continue
+            label = plain_cell(cells[0])
+            seen_rows.add(label)
+            for segment in cells[1].split(";"):
+                prefix = re.match(r"\s*L([123]):", segment)
+                level = int(prefix.group(1)) if prefix else 1
+                for cid in sorted(expand_ids(segment)):
+                    control = by_id.get(cid)
+                    if control is None:
+                        continue
+                    if is_withdrawn(control):
+                        rep.report("routing", doc.path, f"Line {number}: {cid} is withdrawn; route its successors")
+                    elif control.get("level") != level:
+                        rep.report("routing", doc.path, f"Line {number}: {cid} is a Level {control.get('level')} "
+                                   f"control; list it after 'L{control.get('level')}:'"
+                                   if control.get("level") != 1 else
+                                   f"Line {number}: {cid} is a Level 1 control; list it before any 'L2:' or 'L3:'")
+            tag = FEATURE_ROUTES.get(label)
+            if tag is None:
+                continue
+            listed_ids = expand_ids(cells[1])
+            missing = sorted(
+                c["id"] for c in catalog.listed()
+                if any(tag in str(clause).split("+") for clause in c.get("applies_when") or [])
+                and c["id"] not in listed_ids)
+            if missing:
+                rep.report("routing", doc.path, f"Line {number}: the '{label}' row misses controls whose "
+                           f"applies_when names {tag}: " + ", ".join(missing))
+    if not tables:
+        expect_fact(rep, doc.path, "the Step 2 routing table", "| Trigger location | Control IDs |")
+        return
+    for label in FEATURE_ROUTES:
+        if label not in seen_rows:
+            expect_fact(rep, doc.path, f"the routing row '{label}'", f"| {label} | <control IDs> |")
+
+
+GENERIC_WORDS = {
+    "a", "an", "and", "or", "the", "of", "by", "for", "to", "in", "on", "its", "their", "them", "they", "between",
+    "used", "code", "configuration", "config", "settings", "setting", "file", "handling", "version", "content",
+    "entry", "point", "mechanism", "boundary", "agent", "including", "other", "any", "all", "change", "new", "use",
+}
+
+
+def word_stem(word: str) -> str:
+    word = word.lower().strip("'")
+    if len(word) > 4 and word.endswith("ies"):
+        return word[:-3] + "y"
+    if word.endswith(("sses", "xes", "ches", "shes")):
+        return word[:-2]
+    if len(word) > 3 and word.endswith("s") and not word.endswith("ss"):
+        return word[:-1]
+    return word
+
+
+def stems(text: str) -> set[str]:
+    return {word_stem(word) for word in re.findall(r"[A-Za-z0-9]+", text)}
+
+
+def stem_matches(stem: str, vocabulary: set[str]) -> bool:
+    """True when the stem, or a word sharing its first five letters with it, occurs in the vocabulary."""
+    if stem in vocabulary:
+        return True
+    return len(stem) >= 5 and any(len(other) >= 5 and (other.startswith(stem) or stem.startswith(other))
+                                  for other in vocabulary)
+
+
+def trigger_items(bullet: str) -> list[str]:
+    """Split a Trigger locations bullet into the locations it names."""
+    text = re.sub(r"\([^)]*\)", " ", bullet).strip().rstrip(";.").strip()
+    text = re.sub(r",\s*including\b.*$", "", text)
+    items = []
+    for part in re.split(r"[,;]", text):
+        part = re.sub(r"^\s*(?:and|or)\s+", "", part).strip()
+        if part:
+            items.append(part)
+    return items
+
+
+def check_trigger_list(rep: Reporter, docs: dict[str, MarkdownDoc]) -> None:
+    """The AGENTS.md snippet decides whether the skill loads at all, so its trigger list either points to the
+    normative list in references/profile-and-levels.md or names every location that list names."""
+    profile, snippet = docs.get(PROFILE_DOC), docs.get(SNIPPET)
+    if profile is None or snippet is None:
+        return
+    bullets: list[str] = []
+    inside = False
+    for line in profile.lines:
+        heading = ATX.match(line)
+        if heading:
+            if inside:
+                break
+            inside = plain_cell(heading.group(2) or "").lower() == "trigger locations"
+            continue
+        if inside and LIST_ITEM.match(line):
+            bullets.append(re.sub(r"^\s*(?:[-*+]|\d+[.)])\s+", "", line))
+        elif inside and bullets and line.strip() and not line[:1].isspace():
+            break
+    if not bullets:
+        expect_fact(rep, profile.path, "the Trigger locations list", "### Trigger locations, then one bullet each")
+        return
+    text = " ".join(snippet.text.split())
+    if "profile-and-levels.md" in text and re.search(r"trigger locations?", text, re.IGNORECASE):
+        return
+    stated = re.search(r"[Tt]rigger locations (?:include|are)\b:?(.*?)(?:\.\s|\.$)", text)
+    if not stated:
+        rep.report("trigger-list", snippet.path, "Name every trigger location from references/profile-and-levels.md "
+                   "('Trigger locations include ...'), or point to that list by name")
+        return
+    vocabulary = stems(stated.group(1))
+    missing = []
+    for bullet in bullets:
+        for item in trigger_items(bullet):
+            words = {stem for stem in stems(item) if stem not in GENERIC_WORDS and len(stem) > 1}
+            if words and not any(stem_matches(stem, vocabulary) for stem in words):
+                missing.append(item)
+    if missing:
+        rep.report("trigger-list", snippet.path, "The trigger list names nothing for these locations from "
+                   f"{PROFILE_DOC}: " + "; ".join(missing) + ". Add them, or point to that list instead")
+
+
+def check_owasp_view(rep: Reporter, docs: dict[str, MarkdownDoc], catalog: Catalog | None = None) -> None:
     doc = docs.get(OWASP_VIEW)
     if doc is None:
         return
@@ -2039,23 +2743,27 @@ def check_owasp_view(rep: Reporter, docs: dict[str, MarkdownDoc]) -> None:
     for header, rows in markdown_tables(prose):
         title_column = next((i for i, cell in enumerate(header) if "title" in plain_cell(cell).lower()
                              or plain_cell(cell).lower() in {"risk", "name"}), None)
+        key_column = next((i for i, cell in enumerate(header) if plain_cell(cell).lower().startswith("key control")),
+                          None)
         entries = []
         for number, cells in rows:
-            match = re.match(r"^(ASI\d{2})\b(?:\s*:\s*(.+))?$", plain_cell(cells[0]))
+            match = re.match(r"^(ASI\d{2})\b(?:\s*:\s*(.+?))?(?:\s*\((?:pp?\.)[^)]*\))?$", plain_cell(cells[0]))
             if not match:
                 continue
             title = match.group(2)
             if title is None:
                 column = title_column if title_column not in (None, 0) else 1
                 title = plain_cell(cells[column]) if column < len(cells) else ""
-            entries.append((number, match.group(1), title.strip()))
+            entries.append((number, match.group(1), title.strip(), cells))
         if not entries:
             continue
-        if [identifier for _, identifier, _ in entries] != expected:
+        if [identifier for _, identifier, _, _ in entries] != expected:
             rep.report("coverage", doc.path, "The ASI table must list ASI01 to ASI10 once each, in order")
-        for number, identifier, title in entries:
+        for number, identifier, title, _ in entries:
             if identifier in ASI_TITLES and not title_matches(title, ASI_TITLES[identifier]):
                 rep.report("asi-title", doc.path, f"Line {number}: {identifier} must be titled '{ASI_TITLES[identifier]}'")
+        if catalog is not None and catalog.controls:
+            check_key_controls(rep, doc, catalog, entries, key_column)
         return
     headings = []
     for line in prose:
@@ -2065,6 +2773,53 @@ def check_owasp_view(rep: Reporter, docs: dict[str, MarkdownDoc]) -> None:
             headings.append(found.group(1))
     if headings != expected:
         rep.report("coverage", doc.path, "List ASI01 to ASI10 once each, in order, as table rows or headings")
+
+
+def check_key_controls(rep: Reporter, doc: MarkdownDoc, catalog: Catalog, entries: list, key_column: int | None) -> None:
+    """Each key control carries the row's ASI identifier, each row cites the entry's start page, and the
+    sentence naming the Level 2 and Level 3 key controls matches their catalog levels."""
+    by_id = catalog.by_id()
+    if key_column is None:
+        expect_fact(rep, doc.path, "the Key controls column of the ASI table", "| Risk | ... | Key controls |")
+        return
+    keyed: set[str] = set()
+    for number, identifier, _, cells in entries:
+        pages = re.search(r"\(pp?\. (\d+)", plain_cell(cells[0]))
+        start = catalog.asi_pages.get(identifier)
+        if not pages:
+            rep.report("asi-view", doc.path, f"Line {number}: give {identifier}'s pages in the publication, "
+                       f"'(pp. {start or 'N'}-M)'")
+        elif start is not None and int(pages.group(1)) != start:
+            rep.report("asi-view", doc.path, f"Line {number}: {identifier} starts on p. {start} (catalog "
+                       f"asi_categories), not p. {pages.group(1)}")
+        if key_column >= len(cells):
+            continue
+        for cid in sorted(expand_ids(cells[key_column])):
+            control = by_id.get(cid)
+            if control is None:
+                continue
+            keyed.add(cid)
+            if is_withdrawn(control):
+                rep.report("asi-view", doc.path, f"Line {number}: {cid} is withdrawn; list its successors")
+            elif identifier not in (control.get("asi") or []):
+                rep.report("asi-view", doc.path, f"Line {number}: {cid} does not carry {identifier} in its catalog "
+                           "asi field; tag it there or remove it from this row")
+    higher = {level: {cid for cid in keyed if by_id[cid].get("level") == level} for level in (2, 3)}
+    if not any(higher.values()):
+        return
+    sentence = next(((number, line) for number, line in enumerate(doc.lines, 1)
+                     if re.search(r"key controls are Level 2", line, re.IGNORECASE)), None)
+    if sentence is None:
+        expect_fact(rep, doc.path, "the sentence naming the Level 2 and Level 3 key controls",
+                    "Some key controls are Level 2 (A-13, ...) or Level 3 (A-14)")
+        return
+    number, line = sentence
+    stated = {int(level): expand_ids(ids) for level, ids in re.findall(r"\bLevel ([23]) \(([^)]*)\)", line)}
+    for level in (2, 3):
+        if stated.get(level, set()) != higher[level]:
+            rep.report("asi-view", doc.path, f"Line {number}: the Level {level} key controls are "
+                       + (", ".join(sorted(higher[level])) or "none") + "; the sentence lists "
+                       + (", ".join(sorted(stated.get(level, set()))) or "none"))
 
 
 def copy_commands(text: str):
@@ -2122,9 +2877,19 @@ def check_install_docs(rep: Reporter, root: Path, docs: dict[str, MarkdownDoc], 
                            + "; ".join(detail or ["duplicate entries"]) + ")")
 
 
-def check_version(rep: Reporter, root: Path, frontmatter: dict[str, object], docs: dict[str, MarkdownDoc]) -> None:
+def check_version(rep: Reporter, root: Path, frontmatter: dict[str, object], docs: dict[str, MarkdownDoc],
+                  catalog: Catalog | None = None) -> None:
     metadata = frontmatter.get("metadata")
     version = metadata.get("version") if isinstance(metadata, dict) else None
+    stated_catalog = metadata.get("catalog-version") if isinstance(metadata, dict) else None
+    if stated_catalog and catalog is not None and catalog.version \
+            and stated_catalog not in (catalog.version, ".".join(catalog.version.split(".")[:2])):
+        rep.report("version", root / "SKILL.md", f"metadata catalog-version {stated_catalog!r} differs from the "
+                   f"catalog version {catalog.version!r}")
+    for key, value in (("version", version), ("catalog-version", stated_catalog)):
+        if not value:
+            expect_fact(rep, root / "SKILL.md", f"metadata {key} in the SKILL.md frontmatter, which lets an installed "
+                        "copy name its revision", f'metadata:\n  {key}: "X.Y.Z"')
     changelog = docs.get(CHANGELOG)
     if not version or changelog is None:
         return
@@ -2145,7 +2910,14 @@ def check_workflows(rep: Reporter, root: Path) -> None:
         except (OSError, UnicodeError):
             continue
         if not re.search(r"(?m)^permissions:", text):
-            rep.report("workflow-permissions", path, "Declare top-level least-privilege permissions")
+            rep.report("workflow-permissions", path, "Declare top-level permissions, read-only unless a job needs more")
+        for found in re.finditer(r"(?m)^\s*permissions:\s*(write-all|read-all)\b", text):
+            rep.report("workflow-permissions", path, f"Line {text.count(chr(10), 0, found.start()) + 1}: replace "
+                       f"'permissions: {found.group(1)}' with the scopes the job needs")
+        if re.search(r"(?m)^\s*(?:-\s*)?['\"]?pull_request_target['\"]?\s*(?::|$)|\bpull_request_target\b\s*[,\]]", text):
+            rep.report("workflow-trigger", path, "Do not trigger on pull_request_target: it runs with the base "
+                       "repository's secrets and write token on code from the pull request")
+        check_workflow_steps(rep, path, text)
         for number, line in enumerate(text.split("\n"), 1):
             match = USES.match(line)
             if not match:
@@ -2155,6 +2927,37 @@ def check_workflows(rep: Reporter, root: Path) -> None:
                 continue
             if not PINNED_ACTION.match(action):
                 rep.report("workflow-pin", path, f"Line {number}: pin {action} to a full commit SHA")
+
+
+def check_workflow_steps(rep: Reporter, path: Path, text: str) -> None:
+    """Checkout steps do not persist credentials, and run scripts take expressions only through env."""
+    lines = text.split("\n")
+    for number, line in enumerate(lines, 1):
+        match = re.match(r"^(\s*)(?:-\s+)?uses:\s*['\"]?actions/checkout@", line)
+        if match:
+            step_indent = len(line) - len(line.lstrip(" -"))
+            step = []
+            for later in lines[number:]:
+                if later.strip() and (len(later) - len(later.lstrip(" ")) < step_indent
+                                      or re.match(rf"^\s{{{max(step_indent - 2, 0)}}}-\s", later)):
+                    break
+                step.append(later)
+            if not re.search(r"(?m)^\s*persist-credentials:\s*false\b", "\n".join(step)):
+                rep.report("workflow-credentials", path, f"Line {number}: set persist-credentials: false on the "
+                           "checkout, so later steps cannot read the token from .git/config")
+        run = re.match(r"^(\s*)(?:-\s+)?run:\s*(.*)$", line)
+        if not run:
+            continue
+        indent = len(run.group(1)) + (2 if line.lstrip().startswith("-") else 0)
+        script = [run.group(2)]
+        if run.group(2).strip()[:1] in ("|", ">"):
+            for later in lines[number:]:
+                if later.strip() and len(later) - len(later.lstrip(" ")) <= indent:
+                    break
+                script.append(later)
+        if "${{" in "\n".join(script):
+            rep.report("workflow-injection", path, f"Line {number}: pass expressions to run scripts through env, "
+                       "never inline as ${{ ... }}, so event data cannot become shell code")
 
 
 def check_renderer(rep: Reporter, root: Path) -> None:
@@ -2224,11 +3027,127 @@ def check_orphans(rep: Reporter, root: Path, docs: dict[str, MarkdownDoc]) -> No
 
 
 # ---------------------------------------------------------------------------
+# Normative changes since the base revision (--ledger-base)
+
+NORMATIVE_FIELDS = ("statement", "applies_when", "level", "failure_severity", "min_evidence_scope", "lifecycle",
+                    "twin_exempt")
+WEAKENING_WORDS = re.compile(r"\b(?:weaken\w*|relax\w*|downgrad\w*|narrow\w*|lower\w*|loosen\w*)\b", re.IGNORECASE)
+
+
+def case_numbers(control: dict) -> tuple[set[int], set[int]]:
+    """Live and retired case numbers in a control's verification text."""
+    text = control.get("verification") if isinstance(control.get("verification"), str) else ""
+    return ({int(m.group(2)) for m in CASE_LABEL.finditer(text)},
+            {int(m.group(2)) for m in RETIRED_CASE.finditer(text)})
+
+
+def normative_differences(before: dict, after: dict) -> list[str]:
+    """The normative fields that differ between two versions of a control."""
+    changed = [name for name in NORMATIVE_FIELDS
+               if (before.get(name, "active" if name == "lifecycle" else None)
+                   != after.get(name, "active" if name == "lifecycle" else None))]
+    if case_numbers(before) != case_numbers(after):
+        changed.append("cases")
+    elif " ".join(str(before.get("verification", "")).split()) != " ".join(str(after.get("verification", "")).split()):
+        # The verification text is normative as to the cases it requires, so editing a hostile case or its
+        # authorized twin under an unchanged label is a normative change too.
+        changed.append("verification")
+    return changed
+
+
+def applies_narrowed(before: list, after: list) -> bool:
+    """True when some situation the old applies_when covered is no longer covered."""
+    old = [set(str(clause).split("+")) for clause in before or []]
+    new = [set(str(clause).split("+")) for clause in after or []]
+    if any("all" in clause for clause in new):
+        return False
+    return any(not any(clause <= previous for clause in new) for previous in old)
+
+
+def weakenings(before: dict, after: dict) -> list[str]:
+    """Describe the ways a control became weaker: MUST to SHOULD or MAY, a higher level, a lower default
+    severity or evidence scope, narrower applicability, or a removed twin."""
+    found = []
+    old_statement, new_statement = str(before.get("statement", "")), str(after.get("statement", ""))
+    strong = (len(STRONG_KEYWORD.findall(old_statement)), len(STRONG_KEYWORD.findall(new_statement)))
+    weak = (len(WEAK_KEYWORD.findall(old_statement)), len(WEAK_KEYWORD.findall(new_statement)))
+    if strong[1] < strong[0] and weak[1] > weak[0]:
+        found.append(f"statement moves from MUST to SHOULD or MAY ({strong[0]} to {strong[1]} MUST/SHALL/REQUIRED, "
+                     f"{weak[0]} to {weak[1]} SHOULD/MAY)")
+    elif strong[0] and not strong[1]:
+        found.append("statement drops every MUST, SHALL and REQUIRED")
+    elif strong[1] < strong[0]:
+        # A removed requirement is a weakening even when other requirements remain.
+        found.append(f"statement loses {strong[0] - strong[1]} of its MUST, SHALL and REQUIRED keywords "
+                     f"({strong[0]} to {strong[1]})")
+    if isinstance(before.get("level"), int) and isinstance(after.get("level"), int) \
+            and after["level"] > before["level"]:
+        found.append(f"level {before['level']} to {after['level']}")
+    if before.get("failure_severity") in FAILURE_SEVERITIES and after.get("failure_severity") in FAILURE_SEVERITIES \
+            and FAILURE_SEVERITIES.index(after["failure_severity"]) > FAILURE_SEVERITIES.index(before["failure_severity"]):
+        found.append(f"default severity {before['failure_severity']} to {after['failure_severity']}")
+    if before.get("min_evidence_scope") in EVIDENCE_SCOPES and after.get("min_evidence_scope") in EVIDENCE_SCOPES \
+            and EVIDENCE_SCOPES.index(after["min_evidence_scope"]) < EVIDENCE_SCOPES.index(before["min_evidence_scope"]):
+        found.append(f"minimum evidence scope {before['min_evidence_scope']} to {after['min_evidence_scope']}")
+    if isinstance(before.get("applies_when"), list) and isinstance(after.get("applies_when"), list) \
+            and applies_narrowed(before["applies_when"], after["applies_when"]):
+        found.append("applies_when covers fewer situations")
+    if "twin_exempt" in after and "twin_exempt" not in before and case_numbers(before)[0]:
+        found.append("labelled cases are replaced by twin_exempt")
+    return found
+
+
+def check_normative_changes(rep: Reporter, root: Path, docs: dict[str, MarkdownDoc], catalog: Catalog,
+                            base_controls: list, base_version: str | None) -> None:
+    """Every control added or normatively changed since the base revision is named in the newest CHANGELOG
+    section, a weakening is named there with a word that says so, and a released section needs a new
+    catalog version."""
+    path = root / CATALOG
+    before = {c["id"]: c for c in base_controls if isinstance(c, dict) and isinstance(c.get("id"), str)}
+    changed: dict[str, list[str]] = {}
+    weakened: dict[str, list[str]] = {}
+    for control in catalog.controls:
+        cid = control.get("id")
+        if not isinstance(cid, str):
+            continue
+        if cid not in before:
+            changed[cid] = ["new control"]
+            continue
+        differences = normative_differences(before[cid], control)
+        if differences:
+            changed[cid] = differences
+        found = weakenings(before[cid], control)
+        if found:
+            weakened[cid] = found
+    if not changed:
+        return
+    doc = docs.get(CHANGELOG)
+    heading, section = newest_section(doc) if doc is not None else (None, [])
+    named = set().union(*(expand_ids(line) for _, line in section)) if section else set()
+    for cid, fields in sorted(changed.items()):
+        if cid not in named:
+            rep.report("normative-change", path, f"{cid} changed since the base revision ({', '.join(fields)}); "
+                       f"name it in the newest {CHANGELOG} section")
+    for cid, found in sorted(weakened.items()):
+        acknowledged = any(cid in expand_ids(line) and WEAKENING_WORDS.search(line) for _, line in section)
+        if not acknowledged:
+            rep.report("normative-weakening", path, f"{cid} is weaker than at the base revision ({'; '.join(found)}). "
+                       f"If that is intended, say so on a {CHANGELOG} line that names {cid} (for example "
+                       "'relaxes' or 'lowers'); otherwise restore the obligation")
+    if heading is not None and "unreleased" not in heading.lower() and base_version \
+            and catalog.version == base_version:
+        rep.report("normative-change", path, f"Normative changes after the {heading.strip('# ').strip()} release "
+                   f"need a new catalog version and a new {CHANGELOG} section; the version is still {base_version}")
+
+
+
+# ---------------------------------------------------------------------------
 # Entry points
 
 
 def run(root: Path, *, bundle_mode: bool = False, catalog_root: Path | None = None,
         base_ledger: list[str] | None = None, base_retired: dict[str, set[int]] | None = None,
+        base_controls: list | None = None, base_version: str | None = None,
         today: dt.date | None = None, run_renderer: bool = True) -> Result:
     root = Path(root).resolve()
     rep = Reporter(root)
@@ -2274,23 +3193,36 @@ def run(root: Path, *, bundle_mode: bool = False, catalog_root: Path | None = No
     check_openai_yaml(rep, root, name)
     check_orphans(rep, root, docs)
     check_identity(rep, root, docs, bundle_mode)
-    check_owasp_view(rep, docs)
+    check_owasp_view(rep, docs, catalog)
     check_enum_docs(rep, docs)
+    check_record_template(rep, docs)
     check_record_examples(rep, docs)
-    check_feature_routes(rep, catalog_root if bundle_mode and catalog_root else root, docs)
+    check_feature_routes(rep, docs, catalog)
+    check_trigger_list(rep, docs)
     if catalog is not None:
         check_critical_blocks(rep, root, docs, catalog)
         check_control_headings(rep, docs, catalog)
+        check_cross_cutting(rep, docs, catalog)
         if not bundle_mode:
             check_case_citations(rep, docs, catalog)
             check_changelog_summary(rep, docs, catalog)
+            check_severity_floors(rep, root, docs, catalog)
+            check_worked_examples(rep, docs, catalog)
             check_readme_summary(rep, docs, catalog)
             check_pillar_table(rep, docs, catalog)
+            check_level_table(rep, docs, catalog)
+            check_infographic(rep, root, catalog)
+            check_eval_cases(rep, root, catalog)
             check_mapping_claims(rep, docs, catalog)
+            check_relation_definitions(rep, root, docs)
+            if base_controls is not None:
+                check_normative_changes(rep, root, docs, catalog, base_controls, base_version)
 
     if not bundle_mode:
+        check_nist_registry(rep, root, docs)
+        check_aiuc_registry(rep, root)
         check_install_docs(rep, root, docs, name)
-        check_version(rep, root, frontmatter, docs)
+        check_version(rep, root, frontmatter, docs, catalog)
         check_workflows(rep, root)
         check_snapshot_age(rep, root, today or dt.date.today())
         if run_renderer:
@@ -2377,7 +3309,11 @@ def main(argv: list[str] | None = None) -> int:
                              "(DIR absent or empty), and validate it on its own")
     parser.add_argument("--ledger-base", metavar="REV",
                         help="git revision; every ledger entry present at it or in any commit since must still "
-                             "be present, and every case number marked retired there must stay retired")
+                             "be present, every case number marked retired there must stay retired, and every "
+                             "control changed since must be named in the newest CHANGELOG section")
+    parser.add_argument("--no-render", action="store_true",
+                        help="do not run ROOT/scripts/render_catalog.py --check (it executes code from ROOT); "
+                             "use it for an untrusted checkout")
     args = parser.parse_args(argv)
     root = args.root.resolve()
 
@@ -2397,10 +3333,14 @@ def main(argv: list[str] | None = None) -> int:
         for note in baseline.notes:
             print(f"note: {note}")
         if failure:
-            result = run(root, base_ledger=baseline.ledger, base_retired=baseline.retired)
+            result = run(root, base_ledger=baseline.ledger, base_retired=baseline.retired,
+                         run_renderer=not args.no_render)
             result.findings.append(failure)
             return print_result(result, "", "Repository validation failed")
-    result = run(root, base_ledger=baseline.ledger, base_retired=baseline.retired)
+    if args.no_render:
+        print(f"note: --no-render: {RENDERER} --check was not run, so generated views are unchecked")
+    result = run(root, base_ledger=baseline.ledger, base_retired=baseline.retired,
+                 base_controls=baseline.controls, base_version=baseline.version, run_renderer=not args.no_render)
     return print_result(result, "Repository layout, skill metadata, catalog, links and portability checks passed.",
                         "Repository validation failed")
 

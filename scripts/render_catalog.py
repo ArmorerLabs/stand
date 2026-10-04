@@ -2,14 +2,20 @@
 # SPDX-License-Identifier: MIT
 """Render the control catalog into its generated Markdown views.
 
-The normative source is catalog/controls.json (with catalog/ledger.json and
-catalog/mappings.json). This script writes, and with --check verifies:
+The normative source is catalog/controls.json (with catalog/ledger.json,
+catalog/mappings.json and the capability scopes in catalog/aiuc1-controls.json).
+The control lifecycle and the critical-boundary rule come from
+scripts/catalog_model.py, which the validator shares. This script writes, and
+with --check verifies:
 
     references/controls/index.md
     references/controls/S.md, T.md, A.md, N.md, D.md
     references/mappings.md
 
-Rendering is deterministic and uses only the Python standard library.
+Deprecated controls carry a Lifecycle line. Withdrawn controls are rendered as
+tombstones under a Withdrawn heading and are left out of the routing tables,
+the critical-boundary set, the counts and the mapping tables. Rendering is
+deterministic and uses only the Python standard library.
 """
 
 from __future__ import annotations
@@ -20,14 +26,14 @@ import re
 import sys
 from pathlib import Path
 
-CONTROLS_JSON = "catalog/controls.json"
-LEDGER_JSON = "catalog/ledger.json"
-MAPPINGS_JSON = "catalog/mappings.json"
+from catalog_model import (
+    AIUC_CONTROL, AIUC_REGISTRY, CONTROLS_JSON, FRAMEWORK_LABELS, FRAMEWORKS, ID_PATTERN, LEDGER_JSON,
+    LIFECYCLES, MAPPINGS_JSON, NIST_ACTION, NIST_ACTION_PREFIXES, NIST_FUNCTIONS, NIST_SUBCATEGORY,
+    is_critical, is_withdrawn, lifecycle, listed, slugify, superseded_ids,
+)
+
 CONTROLS_DIR = "references/controls"
 MAPPINGS_MD = "references/mappings.md"
-FRAMEWORKS = ("aiuc1", "nist", "aisvs")
-FRAMEWORK_LABELS = {"aiuc1": "AIUC-1", "nist": "NIST", "aisvs": "AISVS"}
-ID_PATTERN = re.compile(r"^(S|T|A|N|D)-[0-9]{2}$")
 CONTROL_FIELDS = (
     "id", "pillar", "title", "level", "applies_when", "failure_severity", "min_evidence_scope",
     "critical_boundary", "asi", "statement", "rationale", "verification", "evidence", "mappings",
@@ -76,13 +82,6 @@ def cell(text: str) -> str:
     return inline(text).replace("|", "\\|")
 
 
-def slug(heading: str) -> str:
-    """GitHub-style anchor for a Markdown heading."""
-    anchor = heading.strip().lower()
-    anchor = re.sub(r"[^\w\- ]", "", anchor)
-    return anchor.replace(" ", "-")
-
-
 def applies(clauses: list) -> str:
     return " or ".join(f"`{clause}`" for clause in clauses)
 
@@ -95,11 +94,53 @@ def count_phrase(number: int, noun: str) -> str:
     return f"{number} {noun}" + ("" if number == 1 else "s")
 
 
+def and_list(items: list) -> str:
+    items = list(items)
+    if len(items) < 3:
+        return " and ".join(items)
+    return ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def or_list(items: list) -> str:
+    items = list(items)
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " or " + items[-1]
+
+
+def lifecycle_note(control: dict) -> str:
+    """'deprecated in 0.3.0; superseded by A-26' style text for a non-active control."""
+    state = lifecycle(control)
+    version = control.get("withdrawn_in") if state == "withdrawn" else control.get("deprecated_in")
+    text = state + (f" in {version}" if version else "")
+    successors = superseded_ids(control)
+    if successors:
+        text += "; superseded by " + and_list(successors)
+    return text
+
+
+def capability_scope(control_ref: str, registry: dict) -> str:
+    """'Code-generation only' for an AIUC-1 control whose requirement is not Universal, else ''."""
+    requirement = control_ref.split(".")[0]
+    capabilities = registry.get("requirements", {}).get(requirement, {}).get("capabilities") or []
+    if not capabilities or "Universal" in capabilities:
+        return ""
+    if len(capabilities) > 1 and all(item.endswith("-generation") for item in capabilities):
+        heads = [item[:-len("generation")] for item in capabilities]
+        return or_list(heads[:-1] + [capabilities[-1]]) + " only"
+    return or_list(capabilities) + " only"
+
+
+def mapping_label(framework: str, ref: dict, registry: dict) -> str:
+    """'A008.3 (supports; Code-generation only)' or 'GOVERN 1.1 (partial)'."""
+    scope = capability_scope(ref["ref"], registry) if framework == "aiuc1" else ""
+    return f"{ref['ref']} ({ref['relation']}{'; ' + scope if scope else ''})"
+
+
 # ------------------------------------------------------------- validation
 
 
-def check_sources(catalog: dict, ledger: dict, mappings: dict) -> list:
+def check_sources(catalog: dict, ledger: dict, mappings: dict, registry: dict | None = None) -> list:
     """Return consistency errors that would make rendering misleading."""
+    registry = registry if registry is not None else {}
     errors = []
     required = (
         "catalog", "version", "status", "license", "pillars", "levels",
@@ -112,6 +153,14 @@ def check_sources(catalog: dict, ledger: dict, mappings: dict) -> list:
     if errors:
         return errors
 
+    for pillar in catalog["pillars"]:
+        if not isinstance(pillar, dict) or not all(pillar.get(key) for key in ("letter", "name", "question")):
+            errors.append(f"{CONTROLS_JSON}: each pillar needs a letter, a name and a question")
+    for category in catalog["asi_categories"]:
+        if not isinstance(category, dict) or not category.get("id") or not category.get("title"):
+            errors.append(f"{CONTROLS_JSON}: each asi_categories entry needs an id and a title")
+    if errors:
+        return errors
     pillars = {pillar["letter"] for pillar in catalog["pillars"]}
     vocabulary = set(catalog["applicability_vocabulary"])
     asi_ids = {entry["id"] for entry in catalog["asi_categories"]}
@@ -136,9 +185,14 @@ def check_sources(catalog: dict, ledger: dict, mappings: dict) -> list:
             errors.append(f"{where}: unknown failure_severity")
         if control.get("min_evidence_scope") not in catalog["evidence_scope_enum"]:
             errors.append(f"{where}: unknown min_evidence_scope")
-        expected = control.get("level") == 1 and control.get("failure_severity") == "critical"
+        if lifecycle(control) not in LIFECYCLES:
+            errors.append(f"{where}: lifecycle must be one of {', '.join(LIFECYCLES)}")
+        if is_withdrawn(control) and (not control.get("withdrawn_in") or not superseded_ids(control)):
+            errors.append(f"{where}: a withdrawn control needs withdrawn_in and superseded_by")
+        expected = is_critical(control)
         if control.get("critical_boundary") is not expected:
-            errors.append(f"{where}: critical_boundary must be {str(expected).lower()}")
+            errors.append(f"{where}: critical_boundary must be {str(expected).lower()} "
+                          "(Level 1, default severity critical, not withdrawn)")
         for clause in control.get("applies_when", []):
             for token in clause.split("+"):
                 if token not in vocabulary:
@@ -157,6 +211,14 @@ def check_sources(catalog: dict, ledger: dict, mappings: dict) -> list:
             for ref in control.get("mappings", {}).get(framework, []):
                 if ref.get("relation") not in catalog["relation_enum"]:
                     errors.append(f"{where}: unknown relation in {framework} mapping {ref.get('ref')!r}")
+                if framework == "aiuc1" and AIUC_CONTROL.match(str(ref.get("ref"))) \
+                        and ref["ref"].split(".")[0] not in registry.get("requirements", {}):
+                    errors.append(f"{AIUC_REGISTRY}: no capabilities recorded for {ref['ref'].split('.')[0]}, "
+                                  f"which {cid} cites")
+    for control in catalog["controls"]:
+        for successor in superseded_ids(control):
+            if successor not in seen:
+                errors.append(f"{CONTROLS_JSON}: {control.get('id')}: superseded_by names unknown control {successor}")
 
     ledger_ids = {}
     for entry in ledger.get("entries", []):
@@ -169,8 +231,11 @@ def check_sources(catalog: dict, ledger: dict, mappings: dict) -> list:
         entry = ledger_ids.get(control["id"])
         if entry is None:
             errors.append(f"{LEDGER_JSON}: {control['id']} is missing")
-        elif entry.get("title") != control["title"]:
+            continue
+        if entry.get("title") != control["title"]:
             errors.append(f"{LEDGER_JSON}: {control['id']} title differs from the catalog")
+        if entry.get("status", "active") != lifecycle(control):
+            errors.append(f"{LEDGER_JSON}: {control['id']} status differs from the catalog lifecycle")
     for cid, entry in ledger_ids.items():
         if entry.get("status") == "active" and cid not in seen:
             errors.append(f"{LEDGER_JSON}: active ID {cid} is not in the catalog")
@@ -203,7 +268,8 @@ def check_sources(catalog: dict, ledger: dict, mappings: dict) -> list:
             if cid not in seen:
                 errors.append(f"{MAPPINGS_JSON}: {framework} maps unknown control {cid}")
 
-    for name, data in ((CONTROLS_JSON, catalog), (LEDGER_JSON, ledger), (MAPPINGS_JSON, mappings)):
+    sources = ((CONTROLS_JSON, catalog), (LEDGER_JSON, ledger), (MAPPINGS_JSON, mappings), (AIUC_REGISTRY, registry))
+    for name, data in sources:
         if EM_DASH in json.dumps(data, ensure_ascii=False):
             errors.append(f"{name}: contains an em dash (U+2014)")
     return errors
@@ -212,21 +278,28 @@ def check_sources(catalog: dict, ledger: dict, mappings: dict) -> list:
 # -------------------------------------------------------------- rendering
 
 
-def render_pillar(catalog: dict, pillar: dict) -> str:
+def render_pillar(catalog: dict, pillar: dict, registry: dict | None = None) -> str:
+    registry = registry if registry is not None else {}
     letter = pillar["letter"]
-    controls = [c for c in catalog["controls"] if c["pillar"] == letter]
+    everything = [c for c in catalog["controls"] if c["pillar"] == letter]
+    controls = listed(everything)
+    withdrawn = [c for c in everything if is_withdrawn(c)]
     by_level = {level: [c for c in controls if c["level"] == level] for level in catalog["levels"]}
     level_counts = ", ".join(
         f"{len(items)} at Level {level}" for level, items in by_level.items() if items
     )
+    summary = f"This pillar has {count_phrase(len(controls), 'control')}"
+    summary += f": {level_counts}." if level_counts else "."
+    if withdrawn:
+        summary += (f" {count_phrase(len(withdrawn), 'withdrawn control')} "
+                    f"{'is' if len(withdrawn) == 1 else 'are'} kept as a tombstone under Withdrawn and not counted.")
     lines = [
         HEADER,
         f"# {letter}: {pillar['name']}",
         "",
         f"**{pillar['question']}**",
         "",
-        f"Catalog version {catalog['version']} ({catalog['status']}). "
-        f"This pillar has {count_phrase(len(controls), 'control')}: {level_counts}. "
+        f"Catalog version {catalog['version']} ({catalog['status']}). {summary} "
         "Routing tables, the critical-boundary set and counts are in [index.md](index.md).",
         "",
         "\"Applies when\" lists alternatives; `+` joins tags that must all hold in the same agent context "
@@ -240,14 +313,31 @@ def render_pillar(catalog: dict, pillar: dict) -> str:
             continue
         lines += [f"## Level {level}", ""]
         for control in items:
-            lines += render_control(control)
+            lines += render_control(control, registry)
+    if withdrawn:
+        lines += [
+            "## Withdrawn",
+            "",
+            "Tombstones of withdrawn controls. Their IDs are never reused. Do not select, apply or claim them; "
+            "apply their successors instead.",
+            "",
+        ]
+        for control in withdrawn:
+            lines += [
+                f"### {control['id']} {control['title']}",
+                "",
+                f"- **Lifecycle:** {lifecycle_note(control)}.",
+                "",
+            ]
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
-def render_control(control: dict) -> list:
-    lines = [
-        f"### {control['id']} {control['title']}",
-        "",
+def render_control(control: dict, registry: dict | None = None) -> list:
+    registry = registry if registry is not None else {}
+    lines = [f"### {control['id']} {control['title']}", ""]
+    if lifecycle(control) != "active":
+        lines.append(f"- **Lifecycle:** {lifecycle_note(control)}. Claims should migrate before it is withdrawn.")
+    lines += [
         f"- **Level:** {control['level']}",
         f"- **Applies when:** {applies(control['applies_when'])}",
         f"- **Failure severity:** {control['failure_severity']}",
@@ -268,16 +358,16 @@ def render_control(control: dict) -> list:
     lines += ["", "**Mappings:**", ""]
     for framework in FRAMEWORKS:
         refs = control["mappings"].get(framework, [])
-        rendered = ", ".join(f"{r['ref']} ({r['relation']})" for r in refs) if refs else "none"
+        rendered = ", ".join(mapping_label(framework, r, registry) for r in refs) if refs else "none"
         lines.append(f"- {FRAMEWORK_LABELS[framework]}: {rendered}")
     lines.append("")
     return lines
 
 
 def tag_routes(catalog: dict, tag: str) -> dict:
-    """Map level to entries for controls whose applies_when names the tag."""
+    """Map level to entries for controls whose applies_when names the tag (withdrawn controls excluded)."""
     routes = {level: [] for level in catalog["levels"]}
-    for control in catalog["controls"]:
+    for control in listed(catalog["controls"]):
         clauses = [clause.split("+") for clause in control["applies_when"] if tag in clause.split("+")]
         if not clauses:
             continue
@@ -292,16 +382,25 @@ def tag_routes(catalog: dict, tag: str) -> dict:
     return routes
 
 
+def cross_cutting(catalog: dict) -> list:
+    """IDs of listed controls that carry every ASI identifier."""
+    every_category = {entry["id"] for entry in catalog["asi_categories"]}
+    return [c["id"] for c in listed(catalog["controls"]) if set(c["asi"]) >= every_category]
+
+
 def render_index(catalog: dict) -> str:
-    controls = catalog["controls"]
+    controls = listed(catalog["controls"])
+    withdrawn = [c for c in catalog["controls"] if is_withdrawn(c)]
     levels = catalog["levels"]
-    critical = [c for c in controls if c["critical_boundary"]]
+    critical = [c for c in controls if is_critical(c)]
+    total = f"{len(controls)} controls in {len(catalog['pillars'])} pillars"
+    if withdrawn:
+        total += f", plus {count_phrase(len(withdrawn), 'withdrawn control')} kept as tombstones and not counted"
     lines = [
         HEADER,
         "# Control catalog index",
         "",
-        f"Catalog version {catalog['version']} ({catalog['status']}). "
-        f"{len(controls)} controls in {len(catalog['pillars'])} pillars. "
+        f"Catalog version {catalog['version']} ({catalog['status']}). {total}. "
         "Control IDs are stable: they are never reused or renumbered. "
         "Framework mappings are listed in [mappings.md](../mappings.md).",
         "",
@@ -325,17 +424,28 @@ def render_index(catalog: dict) -> str:
             "| --- | --- | --- | --- | --- |",
         ]
         for control in (c for c in controls if c["pillar"] == letter):
-            anchor = slug(f"{control['id']} {control['title']}")
+            anchor = slugify(f"{control['id']} {control['title']}")
+            title = cell(control["title"])
+            if lifecycle(control) != "active":
+                title += f" ({cell(lifecycle_note(control))})"
             lines.append(
-                f"| [{control['id']}]({letter}.md#{anchor}) | {cell(control['title'])} | "
+                f"| [{control['id']}]({letter}.md#{anchor}) | {title} | "
                 f"{control['level']} | {applies(control['applies_when'])} | {control['failure_severity']} |"
             )
         lines.append("")
+        tombstones = [c for c in withdrawn if c["pillar"] == letter]
+        if tombstones:
+            lines += [
+                f"Withdrawn, not selected or counted (tombstones in [{letter}.md]({letter}.md#withdrawn)): "
+                + "; ".join(f"{c['id']} ({lifecycle_note(c)})" for c in tombstones) + ".",
+                "",
+            ]
 
     lines += [
         "## Critical-boundary set",
         "",
-        f"Every Level 1 control whose failure severity is critical ({len(critical)} controls). "
+        "Every Level 1 control whose failure severity is critical"
+        + (", except withdrawn controls" if withdrawn else "") + f" ({len(critical)} controls). "
         "[conformance.md](../conformance.md) defines how the set gates readiness and conformance claims.",
         "",
     ]
@@ -346,23 +456,28 @@ def render_index(catalog: dict) -> str:
 
     level_columns = " | ".join(f"Level {level}" for level in levels)
     level_rule = " | ".join("---" for _ in levels)
+    rows = []
+    for tag in catalog["applicability_vocabulary"]:
+        routes = tag_routes(catalog, tag)
+        rows.append(f"| `{tag}` | " + " | ".join(join_ids(routes[level]) for level in levels) + " |")
+    example = next((entry for tag in catalog["applicability_vocabulary"]
+                    for level, entries in tag_routes(catalog, tag).items() for entry in entries if "(+" in entry), None)
     lines += [
         "## Routing by applicability tag",
         "",
-        "Controls whose applies_when names the tag. An entry such as `A-06 (+external-effect)` applies only "
-        "when the listed tags also hold in the same agent context. Controls tagged `all` apply to every system "
-        "in scope. Tags are defined in [profile-and-levels.md](../profile-and-levels.md).",
+        "Controls whose applies_when names the tag. "
+        + (f"An entry such as `{example}` applies only when the listed tags also hold in the same agent context. "
+           if example else "")
+        + "Controls tagged `all` apply to every system in scope. Tags are defined in "
+        "[profile-and-levels.md](../profile-and-levels.md).",
         "",
         f"| Tag | {level_columns} |",
         f"| --- | {level_rule} |",
+        *rows,
+        "",
     ]
-    for tag in catalog["applicability_vocabulary"]:
-        routes = tag_routes(catalog, tag)
-        lines.append(f"| `{tag}` | " + " | ".join(join_ids(routes[level]) for level in levels) + " |")
-    lines.append("")
 
-    every_category = {entry["id"] for entry in catalog["asi_categories"]}
-    cross_cutting = [c["id"] for c in controls if set(c["asi"]) >= every_category]
+    shared = cross_cutting(catalog)
     lines += [
         "## Routing by ASI category",
         "",
@@ -371,8 +486,8 @@ def render_index(catalog: dict) -> str:
         "OWASP Top 10 for Agentic Applications 2026 by the OWASP GenAI Security Project, used under "
         "CC BY-SA 4.0 (see [owasp-agentic-top-10.md](../owasp-agentic-top-10.md)).",
         "",
-        "Cross-cutting (every category): " + join_ids(cross_cutting) + ". These governance and verification "
-        "controls carry every ASI identifier and are not repeated in the rows below.",
+        "Cross-cutting (every category): " + join_ids(shared) + ". These controls carry every ASI identifier "
+        "and are not repeated in the rows below.",
         "",
         f"| ASI | Title | {level_columns} |",
         f"| --- | --- | {level_rule} |",
@@ -381,7 +496,7 @@ def render_index(catalog: dict) -> str:
         row = []
         for level in levels:
             ids = [c["id"] for c in controls if c["level"] == level and category["id"] in c["asi"]
-                   and c["id"] not in cross_cutting]
+                   and c["id"] not in shared]
             row.append(join_ids(ids))
         lines.append(f"| {category['id']} | {cell(category['title'])} | " + " | ".join(row) + " |")
     lines.append("")
@@ -397,7 +512,7 @@ def render_index(catalog: dict) -> str:
         per_level = " | ".join(str(sum(1 for c in items if c["level"] == level)) for level in levels)
         lines.append(
             f"| {pillar['letter']}: {pillar['name']} | {per_level} | {len(items)} | "
-            f"{sum(1 for c in items if c['critical_boundary'])} |"
+            f"{sum(1 for c in items if is_critical(c))} |"
         )
     totals = " | ".join(str(sum(1 for c in controls if c["level"] == level)) for level in levels)
     lines.append(f"| Total | {totals} | {len(controls)} | {len(critical)} |")
@@ -407,23 +522,23 @@ def render_index(catalog: dict) -> str:
         for severity in catalog["severity_enum"]
     )
     lines += [f"Default failure severity: {severities}.", ""]
+    if withdrawn:
+        lines += ["Withdrawn controls, not counted: " + ", ".join(c["id"] for c in withdrawn) + ".", ""]
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
 def ref_key(framework: str, ref: str) -> tuple:
     if framework == "aiuc1":
-        match = re.match(r"^([A-F])(\d{3})\.(\d+)$", ref)
+        match = AIUC_CONTROL.match(ref)
         if match:
             return (0, match.group(1), int(match.group(2)), int(match.group(3)))
     elif framework == "nist":
-        functions = ("GOVERN", "MAP", "MEASURE", "MANAGE")
-        actions = ("GV", "MP", "MS", "MG")
-        match = re.match(r"^(GOVERN|MAP|MEASURE|MANAGE) (\d+)\.(\d+)$", ref)
+        match = NIST_SUBCATEGORY.match(ref)
         if match:
-            return (0, functions.index(match.group(1)), int(match.group(2)), int(match.group(3)), 0)
-        match = re.match(r"^(GV|MP|MS|MG)-(\d+)\.(\d+)-(\d{3})$", ref)
+            return (0, NIST_FUNCTIONS.index(match.group(1)), int(match.group(2)), int(match.group(3)), 0)
+        match = NIST_ACTION.match(ref)
         if match:
-            return (1, actions.index(match.group(1)), int(match.group(2)), int(match.group(3)),
+            return (1, NIST_ACTION_PREFIXES.index(match.group(1)), int(match.group(2)), int(match.group(3)),
                     int(match.group(4)))
     elif framework == "aisvs":
         match = re.match(r"^v1\.0-C(\d+)\.(\d+)\.(\d+)$", ref)
@@ -435,16 +550,17 @@ def ref_key(framework: str, ref: str) -> tuple:
     return (9, ref)
 
 
-def ref_table(catalog: dict, framework: str, refs: list, label: str, url_for=None) -> list:
+def ref_table(controls: list, framework: str, refs: set, label: str, url_for=None, note_for=None) -> list:
     rows = {}
-    for control in catalog["controls"]:
+    for control in controls:
         for ref in control["mappings"].get(framework, []):
             if ref["ref"] in refs:
                 rows.setdefault(ref["ref"], []).append(f"{control['id']} ({ref['relation']})")
     lines = [f"| {label} | Catalog controls (relation) |", "| --- | --- |"]
     for ref in sorted(rows, key=lambda r: ref_key(framework, r)):
         name = f"[{ref}]({url_for(ref)})" if url_for and url_for(ref) else ref
-        lines.append(f"| {name} | {', '.join(rows[ref])} |")
+        note = note_for(ref) if note_for else ""
+        lines.append(f"| {name}{f' ({note})' if note else ''} | {', '.join(rows[ref])} |")
     return lines + [""]
 
 
@@ -462,16 +578,16 @@ def render_by_pillar(catalog: dict) -> list:
     ]
     for pillar in catalog["pillars"]:
         refs = {framework: set() for framework in FRAMEWORKS}
-        for control in catalog["controls"]:
+        for control in listed(catalog["controls"]):
             if control["pillar"] != pillar["letter"]:
                 continue
             for framework in FRAMEWORKS:
                 refs[framework].update(r["ref"] for r in control["mappings"].get(framework, []))
         requirements = sorted({ref.split(".")[0] for ref in refs["aiuc1"]},
                               key=lambda ref: ref_key("aiuc1", ref + ".0"))
-        subcategories = sorted((ref for ref in refs["nist"] if not re.match(r"^(GV|MP|MS|MG)-", ref)),
+        subcategories = sorted((ref for ref in refs["nist"] if not NIST_ACTION.match(ref)),
                                key=lambda ref: ref_key("nist", ref))
-        actions = [ref for ref in refs["nist"] if re.match(r"^(GV|MP|MS|MG)-", ref)]
+        actions = [ref for ref in refs["nist"] if NIST_ACTION.match(ref)]
         chapters = set()
         for ref in refs["aisvs"]:
             match = re.match(r"^v1\.0-(C\d+|AC)\.", ref)
@@ -485,8 +601,9 @@ def render_by_pillar(catalog: dict) -> list:
     return lines + [""]
 
 
-def render_mappings(catalog: dict, mappings: dict) -> str:
-    controls = catalog["controls"]
+def render_mappings(catalog: dict, mappings: dict, registry: dict | None = None) -> str:
+    registry = registry if registry is not None else {}
+    controls = listed(catalog["controls"])
     lines = [
         MAPPINGS_HEADER,
         "# Framework mappings",
@@ -496,7 +613,8 @@ def render_mappings(catalog: dict, mappings: dict) -> str:
         f"Catalog version {catalog['version']} ({catalog['status']}); mappings checked {mappings['checked']}. "
         "This file lists identifiers and relations. The justification for every mapping is recorded in "
         "`catalog/mappings.json` in the source repository. Control entries are listed in "
-        "[controls/index.md](controls/index.md).",
+        "[controls/index.md](controls/index.md)."
+        + (" Withdrawn controls are not listed." if len(controls) < len(catalog["controls"]) else ""),
         "",
         "Relations:",
         "",
@@ -537,17 +655,19 @@ def render_mappings(catalog: dict, mappings: dict) -> str:
         if framework == "aiuc1":
             urls = section.get("requirement_urls", {})
             lines += [f"### {section['framework']} references", ""]
-            lines += ref_table(catalog, framework, all_refs, "AIUC-1 control", lambda ref: urls.get(ref.split(".")[0]))
+            lines += ref_table(controls, framework, all_refs, "AIUC-1 control",
+                               lambda ref: urls.get(ref.split(".")[0]),
+                               lambda ref: capability_scope(ref, registry))
         elif framework == "nist":
-            subcategories = {r for r in all_refs if not re.match(r"^(GV|MP|MS|MG)-", r)}
+            subcategories = {r for r in all_refs if not NIST_ACTION.match(r)}
             actions = all_refs - subcategories
             lines += ["### AI RMF 1.0 subcategories (NIST AI 100-1)", ""]
-            lines += ref_table(catalog, framework, subcategories, "Subcategory")
+            lines += ref_table(controls, framework, subcategories, "Subcategory")
             lines += ["### Generative AI Profile actions (NIST AI 600-1)", ""]
-            lines += ref_table(catalog, framework, actions, "Action")
+            lines += ref_table(controls, framework, actions, "Action")
         else:
             lines += [f"### {section['framework']} references", ""]
-            lines += ref_table(catalog, framework, all_refs, "Requirement")
+            lines += ref_table(controls, framework, all_refs, "Requirement")
         unmapped = [c["id"] for c in controls if not c["mappings"].get(framework)]
         supports_only = [
             c["id"] for c in controls
@@ -568,12 +688,13 @@ def render_mappings(catalog: dict, mappings: dict) -> str:
     return "\n".join(lines).rstrip("\n") + "\n"
 
 
-def render_all(catalog: dict, mappings: dict) -> dict:
+def render_all(catalog: dict, mappings: dict, registry: dict | None = None) -> dict:
     """Return the generated files as {relative path: text}."""
+    registry = registry if registry is not None else {}
     outputs = {f"{CONTROLS_DIR}/index.md": render_index(catalog)}
     for pillar in catalog["pillars"]:
-        outputs[f"{CONTROLS_DIR}/{pillar['letter']}.md"] = render_pillar(catalog, pillar)
-    outputs[MAPPINGS_MD] = render_mappings(catalog, mappings)
+        outputs[f"{CONTROLS_DIR}/{pillar['letter']}.md"] = render_pillar(catalog, pillar, registry)
+    outputs[MAPPINGS_MD] = render_mappings(catalog, mappings, registry)
     return outputs
 
 
@@ -598,17 +719,18 @@ def main(argv=None) -> int:
         catalog = load(root, CONTROLS_JSON)
         ledger = load(root, LEDGER_JSON)
         mappings = load(root, MAPPINGS_JSON)
+        registry = load(root, AIUC_REGISTRY)
     except (OSError, ValueError) as error:
         print(f"render_catalog: cannot read catalog sources: {error}", file=sys.stderr)
         return 2
-    errors = check_sources(catalog, ledger, mappings)
+    errors = check_sources(catalog, ledger, mappings, registry)
     if errors:
         for error in errors:
             print(f"render_catalog: {error}", file=sys.stderr)
         print(f"render_catalog: {len(errors)} catalog error(s); nothing rendered.", file=sys.stderr)
         return 2
 
-    outputs = render_all(catalog, mappings)
+    outputs = render_all(catalog, mappings, registry)
     controls_dir = root / CONTROLS_DIR
     unexpected = []
     if controls_dir.is_dir():
