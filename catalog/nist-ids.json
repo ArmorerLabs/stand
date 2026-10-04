@@ -1,0 +1,955 @@
+{
+ "registry": "NIST AI RMF 1.0 subcategories and AI 600-1 suggested actions",
+ "license": "CC-BY-SA-4.0",
+ "purpose": "Pinned list of the NIST identifiers that catalog mappings may cite, with the table and printed page of each AI RMF 1.0 subcategory and the printed page on which each AI 600-1 action ID appears. scripts/validate.py rejects a nist mapping whose ref is not listed here, or whose trailing citation names another table or page. Identifiers, table numbers and page numbers are facts about the publications; no NIST text is reproduced.",
+ "sources": {
+  "AI 100-1": {
+   "title": "NIST AI 100-1, Artificial Intelligence Risk Management Framework (AI RMF 1.0)",
+   "published": "2023-01",
+   "doi": "10.6028/NIST.AI.100-1",
+   "url": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf",
+   "citation_form": "[AI 100-1 Table <n> p.<page>]"
+  },
+  "AI 600-1": {
+   "title": "NIST AI 600-1, Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile",
+   "published": "2024-07",
+   "doi": "10.6028/NIST.AI.600-1",
+   "url": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf",
+   "citation_form": "[AI 600-1 p.<page>]"
+  }
+ },
+ "checked": "2026-10-04",
+ "method": "Extracted from the publication PDFs with pdftotext -layout. A page is the number printed in the page footer (AI 100-1 'Page N'; AI 600-1 the bare footer number), not the PDF viewer index. A subcategory's page is where its identifier starts in Tables 1 to 4; an action's page is where its Action ID is printed. AI 600-1 lists actions for only some subcategories. It prints GV-4.3-001 as 'GV4.3--001' (recorded under printed_as); GV-1.1-002 appears only in the explanatory text as an example and is not an action.",
+ "recheck_when": "NIST publishes the announced revision of AI RMF 1.0 or a revised Generative AI Profile; rebuild this file from the new edition before changing any nist mapping.",
+ "subcategory_count": 72,
+ "action_count": 212,
+ "subcategories": {
+  "GOVERN 1.1": {
+   "table": 1,
+   "page": 22
+  },
+  "GOVERN 1.2": {
+   "table": 1,
+   "page": 22
+  },
+  "GOVERN 1.3": {
+   "table": 1,
+   "page": 22
+  },
+  "GOVERN 1.4": {
+   "table": 1,
+   "page": 22
+  },
+  "GOVERN 1.5": {
+   "table": 1,
+   "page": 23
+  },
+  "GOVERN 1.6": {
+   "table": 1,
+   "page": 23
+  },
+  "GOVERN 1.7": {
+   "table": 1,
+   "page": 23
+  },
+  "GOVERN 2.1": {
+   "table": 1,
+   "page": 23
+  },
+  "GOVERN 2.2": {
+   "table": 1,
+   "page": 23
+  },
+  "GOVERN 2.3": {
+   "table": 1,
+   "page": 23
+  },
+  "GOVERN 3.1": {
+   "table": 1,
+   "page": 23
+  },
+  "GOVERN 3.2": {
+   "table": 1,
+   "page": 23
+  },
+  "GOVERN 4.1": {
+   "table": 1,
+   "page": 23
+  },
+  "GOVERN 4.2": {
+   "table": 1,
+   "page": 24
+  },
+  "GOVERN 4.3": {
+   "table": 1,
+   "page": 24
+  },
+  "GOVERN 5.1": {
+   "table": 1,
+   "page": 24
+  },
+  "GOVERN 5.2": {
+   "table": 1,
+   "page": 24
+  },
+  "GOVERN 6.1": {
+   "table": 1,
+   "page": 24
+  },
+  "GOVERN 6.2": {
+   "table": 1,
+   "page": 24
+  },
+  "MAP 1.1": {
+   "table": 2,
+   "page": 26
+  },
+  "MAP 1.2": {
+   "table": 2,
+   "page": 26
+  },
+  "MAP 1.3": {
+   "table": 2,
+   "page": 26
+  },
+  "MAP 1.4": {
+   "table": 2,
+   "page": 26
+  },
+  "MAP 1.5": {
+   "table": 2,
+   "page": 26
+  },
+  "MAP 1.6": {
+   "table": 2,
+   "page": 26
+  },
+  "MAP 2.1": {
+   "table": 2,
+   "page": 26
+  },
+  "MAP 2.2": {
+   "table": 2,
+   "page": 26
+  },
+  "MAP 2.3": {
+   "table": 2,
+   "page": 27
+  },
+  "MAP 3.1": {
+   "table": 2,
+   "page": 27
+  },
+  "MAP 3.2": {
+   "table": 2,
+   "page": 27
+  },
+  "MAP 3.3": {
+   "table": 2,
+   "page": 27
+  },
+  "MAP 3.4": {
+   "table": 2,
+   "page": 27
+  },
+  "MAP 3.5": {
+   "table": 2,
+   "page": 27
+  },
+  "MAP 4.1": {
+   "table": 2,
+   "page": 27
+  },
+  "MAP 4.2": {
+   "table": 2,
+   "page": 27
+  },
+  "MAP 5.1": {
+   "table": 2,
+   "page": 27
+  },
+  "MAP 5.2": {
+   "table": 2,
+   "page": 28
+  },
+  "MEASURE 1.1": {
+   "table": 3,
+   "page": 29
+  },
+  "MEASURE 1.2": {
+   "table": 3,
+   "page": 29
+  },
+  "MEASURE 1.3": {
+   "table": 3,
+   "page": 29
+  },
+  "MEASURE 2.1": {
+   "table": 3,
+   "page": 29
+  },
+  "MEASURE 2.2": {
+   "table": 3,
+   "page": 29
+  },
+  "MEASURE 2.3": {
+   "table": 3,
+   "page": 29
+  },
+  "MEASURE 2.4": {
+   "table": 3,
+   "page": 29
+  },
+  "MEASURE 2.5": {
+   "table": 3,
+   "page": 29
+  },
+  "MEASURE 2.6": {
+   "table": 3,
+   "page": 30
+  },
+  "MEASURE 2.7": {
+   "table": 3,
+   "page": 30
+  },
+  "MEASURE 2.8": {
+   "table": 3,
+   "page": 30
+  },
+  "MEASURE 2.9": {
+   "table": 3,
+   "page": 30
+  },
+  "MEASURE 2.10": {
+   "table": 3,
+   "page": 30
+  },
+  "MEASURE 2.11": {
+   "table": 3,
+   "page": 30
+  },
+  "MEASURE 2.12": {
+   "table": 3,
+   "page": 30
+  },
+  "MEASURE 2.13": {
+   "table": 3,
+   "page": 30
+  },
+  "MEASURE 3.1": {
+   "table": 3,
+   "page": 30
+  },
+  "MEASURE 3.2": {
+   "table": 3,
+   "page": 30
+  },
+  "MEASURE 3.3": {
+   "table": 3,
+   "page": 31
+  },
+  "MEASURE 4.1": {
+   "table": 3,
+   "page": 31
+  },
+  "MEASURE 4.2": {
+   "table": 3,
+   "page": 31
+  },
+  "MEASURE 4.3": {
+   "table": 3,
+   "page": 31
+  },
+  "MANAGE 1.1": {
+   "table": 4,
+   "page": 32
+  },
+  "MANAGE 1.2": {
+   "table": 4,
+   "page": 32
+  },
+  "MANAGE 1.3": {
+   "table": 4,
+   "page": 32
+  },
+  "MANAGE 1.4": {
+   "table": 4,
+   "page": 32
+  },
+  "MANAGE 2.1": {
+   "table": 4,
+   "page": 32
+  },
+  "MANAGE 2.2": {
+   "table": 4,
+   "page": 32
+  },
+  "MANAGE 2.3": {
+   "table": 4,
+   "page": 32
+  },
+  "MANAGE 2.4": {
+   "table": 4,
+   "page": 32
+  },
+  "MANAGE 3.1": {
+   "table": 4,
+   "page": 32
+  },
+  "MANAGE 3.2": {
+   "table": 4,
+   "page": 32
+  },
+  "MANAGE 4.1": {
+   "table": 4,
+   "page": 33
+  },
+  "MANAGE 4.2": {
+   "table": 4,
+   "page": 33
+  },
+  "MANAGE 4.3": {
+   "table": 4,
+   "page": 33
+  }
+ },
+ "actions": {
+  "GV-1.1-001": {
+   "page": 13
+  },
+  "GV-1.2-001": {
+   "page": 14
+  },
+  "GV-1.2-002": {
+   "page": 14
+  },
+  "GV-1.3-001": {
+   "page": 14
+  },
+  "GV-1.3-002": {
+   "page": 14
+  },
+  "GV-1.3-003": {
+   "page": 14
+  },
+  "GV-1.3-004": {
+   "page": 15
+  },
+  "GV-1.3-005": {
+   "page": 15
+  },
+  "GV-1.3-006": {
+   "page": 15
+  },
+  "GV-1.3-007": {
+   "page": 15
+  },
+  "GV-1.4-001": {
+   "page": 15
+  },
+  "GV-1.4-002": {
+   "page": 15
+  },
+  "GV-1.5-001": {
+   "page": 16
+  },
+  "GV-1.5-002": {
+   "page": 16
+  },
+  "GV-1.5-003": {
+   "page": 16
+  },
+  "GV-1.6-001": {
+   "page": 16
+  },
+  "GV-1.6-002": {
+   "page": 16
+  },
+  "GV-1.6-003": {
+   "page": 16
+  },
+  "GV-1.7-001": {
+   "page": 17
+  },
+  "GV-1.7-002": {
+   "page": 17
+  },
+  "GV-2.1-001": {
+   "page": 17
+  },
+  "GV-2.1-002": {
+   "page": 17
+  },
+  "GV-2.1-003": {
+   "page": 17
+  },
+  "GV-2.1-004": {
+   "page": 17
+  },
+  "GV-2.1-005": {
+   "page": 17
+  },
+  "GV-3.2-001": {
+   "page": 18
+  },
+  "GV-3.2-002": {
+   "page": 18
+  },
+  "GV-3.2-003": {
+   "page": 18
+  },
+  "GV-3.2-004": {
+   "page": 18
+  },
+  "GV-3.2-005": {
+   "page": 18
+  },
+  "GV-4.1-001": {
+   "page": 18
+  },
+  "GV-4.1-002": {
+   "page": 18
+  },
+  "GV-4.1-003": {
+   "page": 19
+  },
+  "GV-4.2-001": {
+   "page": 19
+  },
+  "GV-4.2-002": {
+   "page": 19
+  },
+  "GV-4.2-003": {
+   "page": 19
+  },
+  "GV-4.3-001": {
+   "page": 19,
+   "printed_as": "GV4.3--001"
+  },
+  "GV-4.3-002": {
+   "page": 19
+  },
+  "GV-4.3-003": {
+   "page": 20
+  },
+  "GV-5.1-001": {
+   "page": 20
+  },
+  "GV-5.1-002": {
+   "page": 20
+  },
+  "GV-6.1-001": {
+   "page": 20
+  },
+  "GV-6.1-002": {
+   "page": 20
+  },
+  "GV-6.1-003": {
+   "page": 20
+  },
+  "GV-6.1-004": {
+   "page": 20
+  },
+  "GV-6.1-005": {
+   "page": 21
+  },
+  "GV-6.1-006": {
+   "page": 21
+  },
+  "GV-6.1-007": {
+   "page": 21
+  },
+  "GV-6.1-008": {
+   "page": 21
+  },
+  "GV-6.1-009": {
+   "page": 21
+  },
+  "GV-6.1-010": {
+   "page": 21
+  },
+  "GV-6.2-001": {
+   "page": 21
+  },
+  "GV-6.2-002": {
+   "page": 21
+  },
+  "GV-6.2-003": {
+   "page": 22
+  },
+  "GV-6.2-004": {
+   "page": 22
+  },
+  "GV-6.2-005": {
+   "page": 22
+  },
+  "GV-6.2-006": {
+   "page": 22
+  },
+  "GV-6.2-007": {
+   "page": 22
+  },
+  "MP-1.1-001": {
+   "page": 22
+  },
+  "MP-1.1-002": {
+   "page": 23
+  },
+  "MP-1.1-003": {
+   "page": 23
+  },
+  "MP-1.1-004": {
+   "page": 23
+  },
+  "MP-1.2-001": {
+   "page": 23
+  },
+  "MP-1.2-002": {
+   "page": 23
+  },
+  "MP-2.1-001": {
+   "page": 24
+  },
+  "MP-2.1-002": {
+   "page": 24
+  },
+  "MP-2.2-001": {
+   "page": 24
+  },
+  "MP-2.2-002": {
+   "page": 24
+  },
+  "MP-2.3-001": {
+   "page": 24
+  },
+  "MP-2.3-002": {
+   "page": 25
+  },
+  "MP-2.3-003": {
+   "page": 25
+  },
+  "MP-2.3-004": {
+   "page": 25
+  },
+  "MP-2.3-005": {
+   "page": 25
+  },
+  "MP-3.4-001": {
+   "page": 25
+  },
+  "MP-3.4-002": {
+   "page": 25
+  },
+  "MP-3.4-003": {
+   "page": 25
+  },
+  "MP-3.4-004": {
+   "page": 25
+  },
+  "MP-3.4-005": {
+   "page": 25
+  },
+  "MP-3.4-006": {
+   "page": 25
+  },
+  "MP-4.1-001": {
+   "page": 26
+  },
+  "MP-4.1-002": {
+   "page": 26
+  },
+  "MP-4.1-003": {
+   "page": 26
+  },
+  "MP-4.1-004": {
+   "page": 26
+  },
+  "MP-4.1-005": {
+   "page": 26
+  },
+  "MP-4.1-006": {
+   "page": 26
+  },
+  "MP-4.1-007": {
+   "page": 26
+  },
+  "MP-4.1-008": {
+   "page": 26
+  },
+  "MP-4.1-009": {
+   "page": 26
+  },
+  "MP-4.1-010": {
+   "page": 27
+  },
+  "MP-5.1-001": {
+   "page": 27
+  },
+  "MP-5.1-002": {
+   "page": 27
+  },
+  "MP-5.1-003": {
+   "page": 27
+  },
+  "MP-5.1-004": {
+   "page": 27
+  },
+  "MP-5.1-005": {
+   "page": 27
+  },
+  "MP-5.1-006": {
+   "page": 27
+  },
+  "MP-5.2-001": {
+   "page": 28
+  },
+  "MP-5.2-002": {
+   "page": 28
+  },
+  "MS-1.1-001": {
+   "page": 28
+  },
+  "MS-1.1-002": {
+   "page": 28
+  },
+  "MS-1.1-003": {
+   "page": 28
+  },
+  "MS-1.1-004": {
+   "page": 28
+  },
+  "MS-1.1-005": {
+   "page": 28
+  },
+  "MS-1.1-006": {
+   "page": 29
+  },
+  "MS-1.1-007": {
+   "page": 29
+  },
+  "MS-1.1-008": {
+   "page": 29
+  },
+  "MS-1.1-009": {
+   "page": 29
+  },
+  "MS-1.3-001": {
+   "page": 29
+  },
+  "MS-1.3-002": {
+   "page": 29
+  },
+  "MS-1.3-003": {
+   "page": 29
+  },
+  "MS-2.2-001": {
+   "page": 30
+  },
+  "MS-2.2-002": {
+   "page": 30
+  },
+  "MS-2.2-003": {
+   "page": 30
+  },
+  "MS-2.2-004": {
+   "page": 30
+  },
+  "MS-2.3-001": {
+   "page": 30
+  },
+  "MS-2.3-002": {
+   "page": 30
+  },
+  "MS-2.3-003": {
+   "page": 30
+  },
+  "MS-2.3-004": {
+   "page": 31
+  },
+  "MS-2.5-001": {
+   "page": 31
+  },
+  "MS-2.5-002": {
+   "page": 31
+  },
+  "MS-2.5-003": {
+   "page": 31
+  },
+  "MS-2.5-004": {
+   "page": 31
+  },
+  "MS-2.5-005": {
+   "page": 31
+  },
+  "MS-2.5-006": {
+   "page": 31
+  },
+  "MS-2.6-001": {
+   "page": 32
+  },
+  "MS-2.6-002": {
+   "page": 32
+  },
+  "MS-2.6-003": {
+   "page": 32
+  },
+  "MS-2.6-004": {
+   "page": 32
+  },
+  "MS-2.6-005": {
+   "page": 32
+  },
+  "MS-2.6-006": {
+   "page": 32
+  },
+  "MS-2.6-007": {
+   "page": 32
+  },
+  "MS-2.7-001": {
+   "page": 33
+  },
+  "MS-2.7-002": {
+   "page": 33
+  },
+  "MS-2.7-003": {
+   "page": 33
+  },
+  "MS-2.7-004": {
+   "page": 33
+  },
+  "MS-2.7-005": {
+   "page": 33
+  },
+  "MS-2.7-006": {
+   "page": 33
+  },
+  "MS-2.7-007": {
+   "page": 33
+  },
+  "MS-2.7-008": {
+   "page": 33
+  },
+  "MS-2.7-009": {
+   "page": 34
+  },
+  "MS-2.8-001": {
+   "page": 34
+  },
+  "MS-2.8-002": {
+   "page": 34
+  },
+  "MS-2.8-003": {
+   "page": 34
+  },
+  "MS-2.8-004": {
+   "page": 34
+  },
+  "MS-2.9-001": {
+   "page": 35
+  },
+  "MS-2.9-002": {
+   "page": 35
+  },
+  "MS-2.10-001": {
+   "page": 35
+  },
+  "MS-2.10-002": {
+   "page": 35
+  },
+  "MS-2.10-003": {
+   "page": 35
+  },
+  "MS-2.11-001": {
+   "page": 36
+  },
+  "MS-2.11-002": {
+   "page": 36
+  },
+  "MS-2.11-003": {
+   "page": 36
+  },
+  "MS-2.11-004": {
+   "page": 36
+  },
+  "MS-2.11-005": {
+   "page": 37
+  },
+  "MS-2.12-001": {
+   "page": 37
+  },
+  "MS-2.12-002": {
+   "page": 37
+  },
+  "MS-2.12-003": {
+   "page": 37
+  },
+  "MS-2.12-004": {
+   "page": 37
+  },
+  "MS-2.13-001": {
+   "page": 38
+  },
+  "MS-3.2-001": {
+   "page": 38
+  },
+  "MS-3.3-001": {
+   "page": 38
+  },
+  "MS-3.3-002": {
+   "page": 38
+  },
+  "MS-3.3-003": {
+   "page": 38
+  },
+  "MS-3.3-004": {
+   "page": 39
+  },
+  "MS-3.3-005": {
+   "page": 39
+  },
+  "MS-4.2-001": {
+   "page": 39
+  },
+  "MS-4.2-002": {
+   "page": 39
+  },
+  "MS-4.2-003": {
+   "page": 39
+  },
+  "MS-4.2-004": {
+   "page": 39
+  },
+  "MS-4.2-005": {
+   "page": 39
+  },
+  "MG-1.3-001": {
+   "page": 40
+  },
+  "MG-1.3-002": {
+   "page": 40
+  },
+  "MG-2.2-001": {
+   "page": 40
+  },
+  "MG-2.2-002": {
+   "page": 40
+  },
+  "MG-2.2-003": {
+   "page": 40
+  },
+  "MG-2.2-004": {
+   "page": 40
+  },
+  "MG-2.2-005": {
+   "page": 40
+  },
+  "MG-2.2-006": {
+   "page": 41
+  },
+  "MG-2.2-007": {
+   "page": 41
+  },
+  "MG-2.2-008": {
+   "page": 41
+  },
+  "MG-2.2-009": {
+   "page": 41
+  },
+  "MG-2.3-001": {
+   "page": 41
+  },
+  "MG-2.4-001": {
+   "page": 41
+  },
+  "MG-2.4-002": {
+   "page": 42
+  },
+  "MG-2.4-003": {
+   "page": 42
+  },
+  "MG-2.4-004": {
+   "page": 42
+  },
+  "MG-3.1-001": {
+   "page": 42
+  },
+  "MG-3.1-002": {
+   "page": 42
+  },
+  "MG-3.1-003": {
+   "page": 42
+  },
+  "MG-3.1-004": {
+   "page": 42
+  },
+  "MG-3.1-005": {
+   "page": 43
+  },
+  "MG-3.2-001": {
+   "page": 43
+  },
+  "MG-3.2-002": {
+   "page": 43
+  },
+  "MG-3.2-003": {
+   "page": 43
+  },
+  "MG-3.2-004": {
+   "page": 43
+  },
+  "MG-3.2-005": {
+   "page": 43
+  },
+  "MG-3.2-006": {
+   "page": 43
+  },
+  "MG-3.2-007": {
+   "page": 44
+  },
+  "MG-3.2-008": {
+   "page": 44
+  },
+  "MG-3.2-009": {
+   "page": 44
+  },
+  "MG-4.1-001": {
+   "page": 44
+  },
+  "MG-4.1-002": {
+   "page": 44
+  },
+  "MG-4.1-003": {
+   "page": 44
+  },
+  "MG-4.1-004": {
+   "page": 44
+  },
+  "MG-4.1-005": {
+   "page": 44
+  },
+  "MG-4.1-006": {
+   "page": 44
+  },
+  "MG-4.1-007": {
+   "page": 45
+  },
+  "MG-4.2-001": {
+   "page": 45
+  },
+  "MG-4.2-002": {
+   "page": 45
+  },
+  "MG-4.2-003": {
+   "page": 45
+  },
+  "MG-4.3-001": {
+   "page": 45
+  },
+  "MG-4.3-002": {
+   "page": 45
+  },
+  "MG-4.3-003": {
+   "page": 46
+  }
+ }
+}

@@ -1,0 +1,46 @@
+# Machine-readable per-path licensing, in the REUSE.toml format of the
+# REUSE Specification 3.3 (https://reuse.software/spec-3.3/).
+# THIRD_PARTY_NOTICES.md is the human-readable summary of the same rules.
+# The LICENSE and LICENSES/ files hold the license texts and are not annotated.
+# "aggregate" keeps any SPDX header a file carries and adds the entry below.
+version = 1
+
+# Documentation and data: CC BY-SA 4.0.
+[[annotations]]
+path = [
+  "*.md",
+  "agents/**",
+  "assets/**",
+  "catalog/**",
+  "docs/**",
+  "evals/**",
+  "references/**",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 the project contributors"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# The ASI view adapts the OWASP Top 10 for Agentic Applications 2026
+# (OWASP GenAI Security Project), licensed under CC BY-SA 4.0.
+[[annotations]]
+path = "references/owasp-agentic-top-10.md"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025 OWASP Foundation, Inc."
+SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+# Code and repository configuration: MIT.
+[[annotations]]
+path = [
+  ".github/**",
+  ".gitattributes",
+  ".gitignore",
+  "scripts/**",
+  "tests/**",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 the project contributors"
+SPDX-License-Identifier = "MIT"
+
+# The Developer Certificate of Origin 1.1 text quoted in CONTRIBUTING.md is
+# reproduced verbatim under its own terms. It is marked in that file as a
+# snippet (REUSE Specification 3.3, snippet comments) under LicenseRef-DCO-1.1.

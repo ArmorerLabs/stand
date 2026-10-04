@@ -9,9 +9,9 @@ Catalog version 0.1.0 (draft); mappings checked 2026-10-03. This file lists iden
 
 Relations:
 
-- **direct:** The external requirement covers essentially the same obligation as the control.
-- **partial:** The external requirement covers part of the control, or the same obligation in a narrower scope.
-- **supports:** The external requirement helps implement or evidence the control but is not equivalent to it.
+- **direct:** The control and the external item state essentially the same obligation.
+- **partial:** The control and the external item overlap, and at least one of them includes obligations the other lacks. Where the external item is broader, as AI RMF subcategories and AI 600-1 actions usually are, the control achieves part of it; where the external item is narrower (for example limited to MCP, or to products that generate code), the control can achieve all of it and go further.
+- **supports:** Implementing the control contributes to, or produces evidence toward, the external item without achieving it.
 
 ## Source versions
 
@@ -25,8 +25,8 @@ Relations:
 
 | Framework | References | Direct | Partial | Supports | Controls mapped | Controls unmapped |
 | --- | --- | --- | --- | --- | --- | --- |
-| AIUC-1 | 203 | 0 | 72 | 131 | 77 | 1 |
-| NIST AI RMF 1.0 (NIST AI 100-1) with NIST AI 600-1 | 232 | 0 | 49 | 183 | 68 | 10 |
+| AIUC-1 | 205 | 0 | 71 | 134 | 77 | 1 |
+| NIST AI RMF 1.0 (NIST AI 100-1) with NIST AI 600-1 | 235 | 0 | 49 | 186 | 68 | 10 |
 | OWASP AISVS 1.0 | 186 | 0 | 91 | 95 | 64 | 14 |
 
 ## By pillar
@@ -35,17 +35,17 @@ Distinct AIUC-1 requirements, AI RMF 1.0 subcategories and AISVS chapters, and t
 
 | Pillar | AIUC-1 requirements | AI RMF 1.0 subcategories | AI 600-1 actions | AISVS chapters |
 | --- | --- | --- | --- | --- |
-| S: Scope & Stewardship | A001, A003, A006, B006, C001, C002, D003, E004, E005, E008, E011, E017 | GOVERN 1.1, GOVERN 1.3, GOVERN 1.6, GOVERN 2.1, GOVERN 3.2, GOVERN 6.1, MAP 1.1, MAP 3.3, MAP 3.5, MAP 4.1, MAP 4.2, MAP 5.1, MEASURE 2.6, MEASURE 2.10, MANAGE 1.3, MANAGE 1.4, MANAGE 2.1 | 14 | C3, C5, C9, Appendix C |
-| T: Trust & Isolation | A001, A003, A004, A005, A006, A008, B002, B006, B007, B008, B010, C002, C006, C009, D003, E004, E006, E009, E011, E015, E017 | GOVERN 6.1, MAP 3.5, MAP 4.1, MAP 4.2, MEASURE 2.6, MEASURE 2.10, MEASURE 3.3, MANAGE 2.4, MANAGE 3.1, MANAGE 3.2, MANAGE 4.1 | 20 | C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C12, Appendix C |
+| S: Scope & Stewardship | A001, A003, A006, B006, C001, C002, C007, D003, E004, E005, E008, E011, E017 | GOVERN 1.1, GOVERN 1.3, GOVERN 1.6, GOVERN 2.1, GOVERN 3.2, GOVERN 6.1, MAP 1.1, MAP 3.3, MAP 3.5, MAP 4.1, MAP 4.2, MAP 5.1, MEASURE 2.6, MEASURE 2.10, MANAGE 1.3, MANAGE 1.4, MANAGE 2.1 | 14 | C3, C5, C9, Appendix C |
+| T: Trust & Isolation | A001, A003, A004, A005, A006, A008, B002, B006, B007, B008, B010, C002, C006, C009, D003, E004, E006, E009, E011, E015, E017 | GOVERN 6.1, MAP 3.5, MAP 4.1, MAP 4.2, MEASURE 2.6, MEASURE 2.10, MEASURE 3.3, MANAGE 2.4, MANAGE 3.1, MANAGE 3.2, MANAGE 4.1 | 21 | C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C12, Appendix C |
 | A: Authority & Access | A003, A005, B004, B006, B007, B008, C006, C007, D003, E015 | GOVERN 1.6, GOVERN 3.2, MAP 3.4, MAP 3.5, MAP 4.2, MEASURE 2.6, MEASURE 2.10, MANAGE 2.4, MANAGE 3.1 | 3 | C2, C5, C7, C9, C10, C11, C12, Appendix C |
-| N: Notice & Neutralize | A006, A008, B002, B004, B006, C002, C008, C009, D003, E001, E004, E008, E009, E013, E015 | GOVERN 1.5, GOVERN 2.1, GOVERN 6.2, MEASURE 1.2, MEASURE 2.4, MEASURE 2.6, MEASURE 2.8, MEASURE 2.9, MEASURE 3.1, MEASURE 3.3, MANAGE 2.3, MANAGE 2.4, MANAGE 3.2, MANAGE 4.1, MANAGE 4.3 | 18 | C3, C8, C9, C12, Appendix C |
-| D: Demonstrated Defenses | B001, B004, C001, C002, C012, D004, E004 | MEASURE 1.1, MEASURE 1.2, MEASURE 1.3, MEASURE 2.1, MEASURE 2.3, MEASURE 2.6, MEASURE 2.7, MEASURE 2.13, MANAGE 1.1, MANAGE 1.2, MANAGE 1.3, MANAGE 1.4, MANAGE 3.2, MANAGE 4.1, MANAGE 4.2 | 22 | C3, C6, C11, Appendix C |
+| N: Notice & Neutralize | A006, A008, B002, B004, B006, C002, C008, C009, D003, E001, E004, E008, E009, E013, E015 | GOVERN 1.5, GOVERN 2.1, GOVERN 6.2, MEASURE 1.2, MEASURE 2.4, MEASURE 2.6, MEASURE 2.8, MEASURE 2.9, MEASURE 3.1, MEASURE 3.3, MANAGE 2.3, MANAGE 2.4, MANAGE 3.2, MANAGE 4.1, MANAGE 4.3 | 19 | C3, C8, C9, C12, Appendix C |
+| D: Demonstrated Defenses | B001, B004, C001, C002, C012, D004, E004 | MEASURE 1.1, MEASURE 1.2, MEASURE 1.3, MEASURE 2.1, MEASURE 2.3, MEASURE 2.6, MEASURE 2.7, MEASURE 2.13, MANAGE 1.1, MANAGE 1.2, MANAGE 1.3, MANAGE 1.4, MANAGE 3.2, MANAGE 4.1, MANAGE 4.2 | 23 | C3, C6, C11, Appendix C |
 
 ## AIUC-1
 
 Notes:
 
-- Snapshot: the AIUC-1 release of July 15, 2026, which was still the most recent release when checked against the public changelog on 2026-10-03. The next release is announced for October 15, 2026. Recheck every identifier after each quarterly release, because releases can renumber controls (the July 2026 release renumbered controls under A003, A006, B008 and C008). Retired E007 and E014 are not cited.
+- Snapshot: the AIUC-1 release of July 15, 2026, which was still the most recent release when checked against the public changelog on 2026-10-03. The next release is announced for October 15, 2026. Recheck every identifier after each quarterly release, because releases can renumber controls (the July 2026 release renumbered or restructured controls under A003, A006, B008, C008 and E017: E017.1 is now the core transparency documentation control, the sharing policy became supplemental E017.2 and a supplemental E017.3 on platform and deployer security responsibilities was added; the DLP control became supplemental A006.2; agentic interface data integrity, now B008.3, became supplemental; and a supplemental A003 control on alerting for authentication failures was retired). Retired E007 and E014 are not cited.
 - Structure: AIUC-1 requirements are mandatory or optional, and a requirement becomes optional when the agent lacks the capability it addresses. Each requirement lists core controls and supplemental controls. Each justification says whether the cited control is core or supplemental. Whether each cited requirement is mandatory or optional is recorded in the application map of catalog/mappings.json, which the validator checks against the Application column of the requirement table in references/frameworks.md; justifications do not repeat it. C008, E013 and E017, like B002, C007 and C009, are optional requirements.
 - Capability scoping: D003, D004 and B006 carry the Automation capability. C006 applies to text-, voice- or code-generating products. A008 and B010 (Code-generation) apply only when the assessed product generates code for its users, so they are never evidence for a coding agent that builds the application. They appear only as capability-scoped supports: A008.3 on T-05 and T-23, A008.5 on N-01, and B010.3 on T-24.
 - Relations: no AIUC-1 relation is direct. D003.1, B006.1 and B006.3 each cover parts of A-01, A-02 and S-05, but none requires one non-bypassable dispatcher, canonicalization or fail-closed behavior. B001, D004 and C012 require third-party testers while D-04 and D-08 do not, so those links are partial or supports.
@@ -65,41 +65,43 @@ Notes:
 | [A005.2](https://standard.aiuc-1.com/data-and-privacy/prevent-cross-customer-data-exposure) | T-06 (partial), T-07 (partial), T-27 (supports), A-19 (supports) |
 | [A006.1](https://standard.aiuc-1.com/data-and-privacy/prevent-pii-leakage) | S-06 (supports), N-01 (supports) |
 | [A006.2](https://standard.aiuc-1.com/data-and-privacy/prevent-pii-leakage) | T-10 (supports) |
-| [A008.3](https://standard.aiuc-1.com/data-and-privacy/prevent-secrets-leakage) | T-05 (supports), T-23 (supports) |
-| [A008.5](https://standard.aiuc-1.com/data-and-privacy/prevent-secrets-leakage) | N-01 (supports) |
+| [A008.3](https://standard.aiuc-1.com/data-and-privacy/prevent-secrets-leakage) (Code-generation only) | T-05 (supports), T-23 (supports) |
+| [A008.5](https://standard.aiuc-1.com/data-and-privacy/prevent-secrets-leakage) (Code-generation only) | N-01 (supports) |
 | [B001.1](https://standard.aiuc-1.com/security/test-adversarial-robustness) | D-02 (supports), D-04 (partial), D-07 (supports), D-08 (partial), D-09 (partial) |
 | [B002.2](https://standard.aiuc-1.com/security/detect-adversarial-input) | N-04 (supports), N-08 (supports) |
 | [B002.4](https://standard.aiuc-1.com/security/detect-adversarial-input) | T-01 (supports), T-03 (supports) |
 | [B004.1](https://standard.aiuc-1.com/security/prevent-ai-endpoint-scraping) | N-05 (supports) |
 | [B004.2](https://standard.aiuc-1.com/security/prevent-ai-endpoint-scraping) | A-22 (partial) |
 | [B004.3](https://standard.aiuc-1.com/security/prevent-ai-endpoint-scraping) | D-09 (supports) |
-| [B006.1](https://standard.aiuc-1.com/security/enforce-contextual-access-controls) | S-03 (partial), S-04 (supports), T-11 (partial), T-12 (partial), T-17 (supports), T-18 (partial), A-01 (supports), A-07 (supports), A-08 (supports), A-09 (partial), A-23 (supports) |
-| [B006.2](https://standard.aiuc-1.com/security/enforce-contextual-access-controls) | N-04 (partial), N-05 (partial) |
-| [B006.3](https://standard.aiuc-1.com/security/enforce-contextual-access-controls) | T-05 (partial), T-12 (supports), T-15 (partial), T-16 (supports), T-17 (supports), T-18 (partial), T-19 (partial), T-23 (partial), T-24 (supports), T-27 (supports), A-01 (partial), A-04 (supports), A-23 (supports) |
+| [B006.1](https://standard.aiuc-1.com/security/enforce-contextual-access-controls) (Automation only) | S-03 (partial), S-04 (supports), T-11 (partial), T-12 (partial), T-17 (supports), T-18 (partial), A-01 (supports), A-07 (supports), A-08 (supports), A-09 (partial), A-23 (supports) |
+| [B006.2](https://standard.aiuc-1.com/security/enforce-contextual-access-controls) (Automation only) | N-04 (partial), N-05 (partial) |
+| [B006.3](https://standard.aiuc-1.com/security/enforce-contextual-access-controls) (Automation only) | T-05 (partial), T-12 (supports), T-15 (partial), T-16 (supports), T-17 (supports), T-18 (partial), T-19 (partial), T-23 (partial), T-24 (supports), T-27 (supports), A-01 (partial), A-04 (supports), A-23 (supports) |
 | [B007.1](https://standard.aiuc-1.com/security/enforce-ai-access-privileges) | T-19 (supports), T-23 (supports), A-23 (partial) |
 | [B008.1](https://standard.aiuc-1.com/security/protect-model-deployment-environment) | T-21 (partial), A-15 (supports), A-16 (partial), A-18 (supports) |
 | [B008.2](https://standard.aiuc-1.com/security/protect-model-deployment-environment) | T-05 (supports), T-21 (partial), A-16 (supports), A-18 (supports) |
 | [B008.3](https://standard.aiuc-1.com/security/protect-model-deployment-environment) | T-09 (supports), T-18 (supports), T-21 (partial), A-02 (partial) |
 | [B008.4](https://standard.aiuc-1.com/security/protect-model-deployment-environment) | T-15 (supports), T-16 (supports), T-27 (supports) |
 | [B008.5](https://standard.aiuc-1.com/security/protect-model-deployment-environment) | T-25 (partial) |
-| [B010.3](https://standard.aiuc-1.com/security/promote-secure-code-patterns) | T-24 (supports) |
+| [B010.3](https://standard.aiuc-1.com/security/promote-secure-code-patterns) (Code-generation only) | T-24 (supports) |
 | [C001.1](https://standard.aiuc-1.com/safety/define-ai-risk-taxonomy) | S-02 (supports), S-04 (supports), D-06 (supports) |
 | [C002.1](https://standard.aiuc-1.com/safety/conduct-pre-deployment-testing) | S-01 (partial), N-09 (partial), D-01 (partial), D-02 (supports), D-03 (supports), D-04 (supports), D-05 (supports), D-06 (partial), D-10 (partial) |
 | [C002.2](https://standard.aiuc-1.com/safety/conduct-pre-deployment-testing) | S-04 (supports), T-23 (supports), D-06 (supports), D-07 (partial) |
 | [C002.3](https://standard.aiuc-1.com/safety/conduct-pre-deployment-testing) | T-24 (supports) |
-| [C006.1](https://standard.aiuc-1.com/safety/prevent-output-vulnerabilities) | T-13 (partial), T-14 (partial), A-02 (supports), A-24 (supports) |
-| [C006.2](https://standard.aiuc-1.com/safety/prevent-output-vulnerabilities) | T-01 (partial), T-02 (supports), T-03 (supports), T-07 (supports), T-17 (supports), T-20 (supports), T-26 (supports), A-06 (supports), A-08 (supports), A-12 (partial), A-19 (supports) |
-| [C006.3](https://standard.aiuc-1.com/safety/prevent-output-vulnerabilities) | T-14 (supports) |
+| [C006.1](https://standard.aiuc-1.com/safety/prevent-output-vulnerabilities) (Code-, Text- or Voice-generation only) | T-13 (partial), T-14 (partial), A-02 (supports), A-24 (supports) |
+| [C006.2](https://standard.aiuc-1.com/safety/prevent-output-vulnerabilities) (Code-, Text- or Voice-generation only) | T-01 (partial), T-02 (supports), T-03 (supports), T-07 (supports), T-17 (supports), T-20 (supports), T-26 (supports), A-06 (supports), A-08 (supports), A-12 (partial), A-19 (supports) |
+| [C006.3](https://standard.aiuc-1.com/safety/prevent-output-vulnerabilities) (Code-, Text- or Voice-generation only) | T-14 (supports) |
+| [C007.1](https://standard.aiuc-1.com/safety/flag-high-risk-recommendations) | S-05 (supports) |
+| [C007.2](https://standard.aiuc-1.com/safety/flag-high-risk-recommendations) | A-10 (supports) |
 | [C007.3](https://standard.aiuc-1.com/safety/flag-high-risk-recommendations) | A-13 (supports) |
 | [C008.3](https://standard.aiuc-1.com/safety/monitor-ai-risk-categories) | N-04 (supports) |
 | [C009.1](https://standard.aiuc-1.com/safety/collect-real-time-feedback) | T-26 (supports), N-04 (supports), N-06 (partial) |
 | [C012.1](https://standard.aiuc-1.com/safety/3rd-party-testing-for-other-risk) | D-08 (supports) |
-| [D003.1](https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls) | S-05 (partial), T-08 (supports), T-18 (supports), A-01 (partial), A-02 (partial), A-03 (partial), A-04 (partial), A-06 (supports), A-07 (supports), A-09 (partial), A-24 (supports), A-25 (supports) |
-| [D003.2](https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls) | S-05 (partial), T-20 (supports), T-22 (partial), A-05 (supports), A-09 (partial), A-20 (partial), A-21 (supports), A-22 (supports) |
-| [D003.3](https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls) | T-11 (supports), N-01 (partial), N-04 (partial) |
-| [D003.4](https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls) | S-05 (partial), A-06 (supports), A-08 (partial), A-10 (partial), A-11 (partial), A-12 (supports), A-14 (supports), A-25 (supports) |
-| [D003.5](https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls) | S-03 (supports), A-13 (supports), N-05 (supports) |
-| [D004.1](https://standard.aiuc-1.com/reliability/3rd-party-testing-of-tool-calls) | D-01 (supports), D-08 (supports), D-09 (partial) |
+| [D003.1](https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls) (Automation only) | S-05 (partial), T-08 (supports), T-18 (supports), A-01 (partial), A-02 (partial), A-03 (partial), A-04 (partial), A-06 (supports), A-07 (supports), A-09 (partial), A-24 (supports), A-25 (supports) |
+| [D003.2](https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls) (Automation only) | S-05 (partial), T-20 (supports), T-22 (partial), A-05 (supports), A-09 (partial), A-20 (partial), A-21 (supports), A-22 (supports) |
+| [D003.3](https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls) (Automation only) | T-11 (supports), N-01 (partial), N-04 (partial) |
+| [D003.4](https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls) (Automation only) | S-05 (partial), A-06 (supports), A-08 (partial), A-10 (partial), A-11 (partial), A-12 (supports), A-14 (supports), A-25 (supports) |
+| [D003.5](https://standard.aiuc-1.com/reliability/restrict-unsafe-tool-calls) (Automation only) | S-03 (supports), A-13 (supports), N-05 (supports) |
+| [D004.1](https://standard.aiuc-1.com/reliability/3rd-party-testing-of-tool-calls) (Automation only) | D-01 (supports), D-08 (supports), D-09 (partial) |
 | [E001.1](https://standard.aiuc-1.com/accountability/ai-failure-plan-for-security-breaches) | N-06 (supports), N-07 (supports), N-08 (partial) |
 | [E004.1](https://standard.aiuc-1.com/accountability/assign-accountability) | S-01 (partial), N-09 (partial), D-10 (supports) |
 | [E004.2](https://standard.aiuc-1.com/accountability/assign-accountability) | T-24 (supports), T-25 (supports) |
@@ -108,7 +110,7 @@ Notes:
 | [E008.1](https://standard.aiuc-1.com/accountability/review-internal-processes) | S-01 (supports), N-09 (supports) |
 | [E009.1](https://standard.aiuc-1.com/accountability/monitor-3rd-party-access) | T-11 (partial) |
 | [E009.2](https://standard.aiuc-1.com/accountability/monitor-3rd-party-access) | N-04 (supports), N-05 (supports) |
-| [E011.1](https://standard.aiuc-1.com/accountability/record-processing-locations) | S-04 (supports), S-06 (supports), T-10 (partial) |
+| [E011.1](https://standard.aiuc-1.com/accountability/record-processing-locations) | S-04 (supports), S-06 (supports), T-10 (supports) |
 | [E013.2](https://standard.aiuc-1.com/accountability/implement-quality-management-system) | N-09 (supports) |
 | [E015.1](https://standard.aiuc-1.com/accountability/log-model-activity) | N-01 (partial), N-03 (supports) |
 | [E015.2](https://standard.aiuc-1.com/accountability/log-model-activity) | T-22 (supports), A-11 (supports), A-15 (supports), N-01 (partial), N-03 (partial) |
@@ -131,10 +133,10 @@ Notes:
 
 - Sources: AI RMF 1.0 subcategories come from NIST AI 100-1 Tables 1 to 4, cited with the printed page where each subcategory ends. Suggested actions come from NIST AI 600-1 Section 3, cited with the printed page where each action starts. In the justifications in catalog/mappings.json, text in single quotes is quoted from the NIST publication, apart from whitespace, ligatures and dash normalization. NIST CSF is not used.
 - Revision: NIST states that AI RMF 1.0 is being revised. Recheck these identifiers when a revision is published.
-- Relations: no AI RMF subcategory and no AI 600-1 action is marked direct. Each subcategory includes organization-level outcomes that no single control meets, and the AI 600-1 actions cited are broader or differently scoped than the control.
-- Generic anchors: every control recorded as implemented supports MAP 4.2 (internal risk controls identified and documented) and MANAGE 1.3 (risk responses documented). They are listed per control only where the control itself produces that documentation or response. Controls with no NIST reference are runtime authorization, credential, isolation and state mechanisms for which neither publication has a subcategory or action more specific than these anchors.
+- Relations: no AI RMF subcategory and no AI 600-1 action is marked direct. Each subcategory includes organization-level outcomes that no single control meets, and the AI 600-1 actions cited are broader or differently scoped than the control. Relations read from the control toward the NIST item: partial means that the control achieves part of the subcategory or action, and supports means that it contributes to it or produces evidence toward it. A record under this catalog never evidences a whole subcategory or action.
+- Generic anchors: every control recorded as implemented supports MAP 4.2 (internal risk controls identified and documented) and MANAGE 1.3 (risk responses documented). They are listed per control only where the control itself produces that documentation or response. Controls with no NIST reference are runtime authorization, credential, isolation and state mechanisms for which neither publication has a subcategory or action more specific than these anchors. MAP 3.5 ('Processes for human oversight are defined, assessed, and documented in accordance with organizational policies from the GOVERN function') is cited as supports on each control that defines or protects one point of human oversight, and each justification names that point. Only A-13 assesses oversight, so only A-13 carries it as partial; the organizational policy and assessment parts stay with the organization.
 - Exclusions: GOVERN 1.7 (decommissioning) is not mapped, because stop and revocation map to MANAGE 2.4 with MG-2.4-002 and MG-2.4-004, and no control covers system retirement. MS-2.8-003 (tamper-proof content history) concerns digital content transparency, not audit logs, and is not used for N-02 or N-10. AI 600-1 Information Integrity actions about synthetic-content provenance are cited only where the wording fits data lineage (MP-2.1-001, MP-2.1-002, MG-2.2-007, MG-4.1-006, MP-3.4-001), and those justifications note the different framing.
-- Context, not cited as references: AI 600-1 section 2.9 (Information Security) describes indirect prompt injection and is relevant to T-01, A-06, A-08 and D-04; section 2.7 (Human-AI Configuration) to A-13; section 2.12 (Value Chain and Component Integration) to T-18, T-24 and T-25; and section 2.4 (Data Privacy) to S-06 and T-10.
+- Context, not cited as references: AI 600-1 section 2.9 (Information Security) is relevant only in part: its indirect prompt injection to T-01, T-02, A-06, A-08 and D-04, and its data poisoning, which AI 600-1 defines as compromise of a training dataset, to T-25 for fine-tuning and adapter data and, by analogy, to T-07 for agent memory; the GAI-enabled offensive cyber capability it describes and the confidentiality of model weights are outside this catalog's scope. Section 2.12 (Value Chain and Component Integration) is relevant to T-18, T-24 and T-25; section 2.7 (Human-AI Configuration) to A-12, A-13 and T-26; and section 2.4 (Data Privacy) to S-06, T-06 and T-10.
 - Source quirks: AI 600-1 has no suggested actions for some subcategories used here (for example MAP 3.5, MAP 4.2, MEASURE 2.4, MANAGE 1.1 and MANAGE 1.4), so those carry only AI 100-1 references. AI 600-1 prints GV-4.3-001 as 'GV4.3--001'; that action is not used here.
 
 ### AI RMF 1.0 subcategories (NIST AI 100-1)
@@ -199,6 +201,7 @@ Notes:
 | GV-6.1-001 | S-06 (supports) |
 | GV-6.1-007 | S-04 (supports), S-06 (supports), T-10 (partial) |
 | GV-6.1-009 | T-11 (supports), T-18 (supports), T-24 (supports) |
+| GV-6.2-001 | T-10 (supports) |
 | GV-6.2-003 | N-08 (partial) |
 | GV-6.2-004 | T-18 (supports) |
 | GV-6.2-006 | T-10 (supports) |
@@ -237,6 +240,7 @@ Notes:
 | MS-4.2-002 | D-08 (supports) |
 | MS-4.2-004 | A-13 (supports), N-01 (supports) |
 | MG-1.3-001 | S-01 (supports), D-06 (supports) |
+| MG-1.3-002 | N-05 (supports), D-07 (supports) |
 | MG-2.2-007 | T-07 (supports) |
 | MG-2.3-001 | N-08 (partial) |
 | MG-2.4-002 | N-06 (supports) |

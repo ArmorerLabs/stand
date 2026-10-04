@@ -63,9 +63,15 @@ jobs:
             echo "::error::Unexpected base revision: $base"
             exit 1
           fi
-          # A force push can leave the previous head outside the fetched history.
+          # A force push can leave the previous head outside the fetched history. A shallow fetch
+          # of it would graft unrelated history into BASE..HEAD, so fail with a clear message instead.
           if ! git cat-file -e "$base^{commit}" 2>/dev/null; then
-            git fetch --no-tags --depth=1 origin "$base"
+            echo "::error::Base revision $base is not in the repository history (likely a force push); the ledger cannot be compared."
+            exit 1
+          fi
+          if ! git merge-base --is-ancestor "$base" HEAD; then
+            echo "::error::Base revision $base is not an ancestor of HEAD (likely a force push); the ledger cannot be compared."
+            exit 1
           fi
           echo "revision=$base" >> "$GITHUB_OUTPUT"
       - name: Validate repository
@@ -80,5 +86,5 @@ jobs:
           fi
       - name: Validate staged skill bundle
         run: python scripts/validate.py --stage "$RUNNER_TEMP/stand"
-      - name: Run validator tests
+      - name: Run validator and renderer tests
         run: python -m unittest discover -s tests -v

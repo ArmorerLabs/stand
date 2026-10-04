@@ -34,7 +34,7 @@ What must stay separate and trustworthy? Full entries: [T.md](T.md).
 | [T-03](T.md#t-03-hidden-text-normalization-and-reviewer-view) | Hidden-text normalization and reviewer view | 2 | `untrusted-input` | medium |
 | [T-04](T.md#t-04-system-prompts-hold-no-secrets-or-enforcement) | System prompts hold no secrets or enforcement | 1 | `all` | high |
 | [T-05](T.md#t-05-no-ambient-credentials-or-enforcement-access-in-model-influenced-processes) | No ambient credentials or enforcement access in model-influenced processes | 1 | `tools` or `code-execution` or `browser-agent` or `mcp` or `coding-agent` | critical |
-| [T-06](T.md#t-06-retrieval-authorization-before-context) | Retrieval authorization before context | 1 | `retrieval` | critical |
+| [T-06](T.md#t-06-retrieval-authorization-before-context) | Retrieval authorization before context | 1 | `retrieval` or `multi-tenant` | critical |
 | [T-07](T.md#t-07-memory-provenance-scope-expiry-and-revocation) | Memory provenance, scope, expiry and revocation | 1 | `memory` | high |
 | [T-08](T.md#t-08-system-of-record-for-consequential-facts) | System of record for consequential facts | 1 | `external-effect` | critical |
 | [T-09](T.md#t-09-server-held-conversation-state) | Server-held conversation state | 1 | `client-conversation` | critical |
@@ -135,7 +135,7 @@ Every Level 1 control whose failure severity is critical (32 controls). [conform
 
 ## Routing by applicability tag
 
-Controls whose applies_when names the tag. An entry such as `A-06 (+external-effect)` applies only when the listed tags also hold in the same agent context. Controls tagged `all` apply to every system in scope. Tags are defined in [profile-and-levels.md](../profile-and-levels.md).
+Controls whose applies_when names the tag. An entry such as `T-13 (+rendered-output)` applies only when the listed tags also hold in the same agent context. Controls tagged `all` apply to every system in scope. Tags are defined in [profile-and-levels.md](../profile-and-levels.md).
 
 | Tag | Level 1 | Level 2 | Level 3 |
 | --- | --- | --- | --- |
@@ -151,7 +151,7 @@ Controls whose applies_when names the tag. An entry such as `A-06 (+external-eff
 | `queued-work` | A-01, A-04, A-21 | T-22 | - |
 | `triggered-runs` | A-19, A-24 (+external-effect) | - | - |
 | `shared-context` | A-19, A-24 (+external-effect) | - | - |
-| `multi-tenant` | T-27 (+code-execution) | - | - |
+| `multi-tenant` | T-06, T-27 (+code-execution) | - | - |
 | `approvals` | A-11, A-12 | A-13 | A-14 |
 | `code-execution` | T-05, T-15, T-27 (+multi-tenant) | T-16 (+untrusted-input) | - |
 | `browser-agent` | T-05, T-17, A-12 | - | - |
@@ -169,20 +169,20 @@ Controls whose applies_when names the tag. An entry such as `A-06 (+external-eff
 
 Controls whose asi field names the category. The asi field shows which risks a control is designed to address, govern or verify; it is not a coverage claim. ASI identifiers and titles are from the OWASP Top 10 for Agentic Applications 2026 by the OWASP GenAI Security Project, used under CC BY-SA 4.0 (see [owasp-agentic-top-10.md](../owasp-agentic-top-10.md)).
 
-Cross-cutting (every category): S-01, S-04, D-01, D-06. These governance and verification controls carry every ASI identifier and are not repeated in the rows below.
+Cross-cutting (every category): S-01, S-04, N-04, D-01, D-06. These controls carry every ASI identifier and are not repeated in the rows below.
 
 | ASI | Title | Level 1 | Level 2 | Level 3 |
 | --- | --- | --- | --- | --- |
-| ASI01 | Agent Goal Hijack | S-02, S-03, S-05, T-01, T-02, T-04, T-07, T-09, T-11, T-13, T-17, T-20, T-23, A-01, A-03, A-06, A-07, A-08, A-12, A-19, A-23, A-24, A-25, N-01, N-04, N-09, D-02, D-04 | T-03, N-03, D-08 | D-09 |
-| ASI02 | Tool Misuse & Exploitation | S-02, S-03, S-05, S-06, T-02, T-10, T-11, T-12, T-13, T-14, T-17, T-18, A-01, A-02, A-04, A-05, A-06, A-07, A-08, A-09, A-10, A-20, A-24, N-01, N-04, D-02, D-03, D-04 | A-22, N-05, D-08 | D-09 |
+| ASI01 | Agent Goal Hijack | S-02, S-03, S-05, T-01, T-02, T-04, T-07, T-09, T-11, T-13, T-17, T-20, T-23, A-01, A-03, A-06, A-07, A-08, A-12, A-19, A-23, A-24, A-25, N-01, N-09, D-02, D-04 | T-03, T-26, N-03, D-08 | D-09 |
+| ASI02 | Tool Misuse & Exploitation | S-02, S-03, S-05, S-06, T-02, T-10, T-11, T-12, T-13, T-14, T-17, T-18, A-01, A-02, A-04, A-05, A-06, A-07, A-08, A-09, A-10, A-20, A-24, N-01, D-02, D-03, D-04 | A-22, N-05, D-08 | D-09 |
 | ASI03 | Identity & Privilege Abuse | S-02, S-03, S-06, T-04, T-05, T-06, T-07, T-09, T-15, T-17, T-21, T-23, T-27, A-01, A-02, A-03, A-04, A-09, A-11, A-15, A-16, A-19, A-21, A-23, A-24, A-25, N-01, D-02, D-05 | T-16, A-17, N-07 | A-14, A-18, D-09 |
-| ASI04 | Agentic Supply Chain Vulnerabilities | T-10, T-11, T-18, T-19, T-23, T-24, T-25, N-04, N-06, N-09, D-07 | N-07, N-08 | D-10 |
+| ASI04 | Agentic Supply Chain Vulnerabilities | T-10, T-11, T-18, T-19, T-23, T-24, T-25, N-06, N-09, D-07 | N-07, N-08 | D-10 |
 | ASI05 | Unexpected Code Execution (RCE) | T-05, T-12, T-14, T-15, T-19, T-23, T-24, T-27, A-02, A-10, D-03 | T-16 | - |
-| ASI06 | Memory & Context Poisoning | S-02, S-05, S-06, T-01, T-02, T-06, T-07, T-08, T-25, A-06, A-08, N-04, D-04 | T-03, T-22, N-03, N-08, D-08 | - |
+| ASI06 | Memory & Context Poisoning | S-02, S-05, S-06, T-01, T-02, T-06, T-07, T-08, T-25, A-06, A-08, D-04 | T-03, T-22, N-03, N-05, N-08, D-08 | - |
 | ASI07 | Insecure Inter-Agent Communication | T-01, T-12, T-18, T-21, A-01, A-15, A-16 | T-22, A-17 | - |
-| ASI08 | Cascading Failures | S-02, T-01, T-08, T-20, A-01, A-04, A-05, A-15, A-20, A-21, N-01, N-02, N-04, N-06, D-05, D-07 | T-22, A-13, A-22, N-03, N-05, N-07, N-08 | N-10, D-10 |
-| ASI09 | Human-Agent Trust Exploitation | S-05, T-08, T-09, T-14, T-17, T-20, A-06, A-11, A-12, A-19, A-25, N-01, N-04, D-02, D-04 | T-03, T-26, A-13, N-05, D-08 | A-14, D-09 |
-| ASI10 | Rogue Agents | S-02, S-03, T-05, A-07, A-08, A-09, A-10, A-15, A-20, A-23, N-01, N-02, N-04, N-06, N-09, D-05, D-07 | A-17, N-03, N-05, N-07, N-08 | A-14, N-10, D-09, D-10 |
+| ASI08 | Cascading Failures | S-02, T-01, T-08, T-20, A-01, A-04, A-05, A-15, A-20, A-21, N-01, N-02, N-06, D-05, D-07 | T-22, A-13, A-22, N-03, N-05, N-07, N-08 | N-10, D-10 |
+| ASI09 | Human-Agent Trust Exploitation | S-05, T-08, T-09, T-14, T-17, T-20, A-06, A-11, A-12, A-19, A-25, N-01, D-02, D-04 | T-03, T-26, A-13, N-05, D-08 | A-14, D-09 |
+| ASI10 | Rogue Agents | S-02, S-03, T-05, A-07, A-08, A-09, A-10, A-15, A-20, A-23, N-01, N-02, N-06, N-09, D-05, D-07 | A-17, N-03, N-05, N-07, N-08 | A-14, N-10, D-09, D-10 |
 
 ## Counts
 

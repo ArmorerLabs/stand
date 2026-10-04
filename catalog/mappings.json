@@ -4,16 +4,16 @@
   "checked": "2026-10-03",
   "disclaimer": "These are engineering mappings between this catalog's controls and external frameworks, written in this project's own words. They are not certification, attestation or an audit opinion, and they do not claim conformance to, or coverage of, AIUC-1, NIST AI RMF 1.0, NIST AI 600-1, OWASP AISVS or any other framework. A mapped requirement is not evidence that an application's control works, and implementing a control does not by itself satisfy the mapped requirement.",
   "relations": {
-    "direct": "The external requirement covers essentially the same obligation as the control.",
-    "partial": "The external requirement covers part of the control, or the same obligation in a narrower scope.",
-    "supports": "The external requirement helps implement or evidence the control but is not equivalent to it."
+    "direct": "The control and the external item state essentially the same obligation.",
+    "partial": "The control and the external item overlap, and at least one of them includes obligations the other lacks. Where the external item is broader, as AI RMF subcategories and AI 600-1 actions usually are, the control achieves part of it; where the external item is narrower (for example limited to MCP, or to products that generate code), the control can achieve all of it and go further.",
+    "supports": "Implementing the control contributes to, or produces evidence toward, the external item without achieving it."
   },
   "aiuc1": {
     "framework": "AIUC-1",
     "source_version": "AIUC-1 release of July 15, 2026",
     "source_url": "https://standard.aiuc-1.com/",
     "notes": [
-      "Snapshot: the AIUC-1 release of July 15, 2026, which was still the most recent release when checked against the public changelog on 2026-10-03. The next release is announced for October 15, 2026. Recheck every identifier after each quarterly release, because releases can renumber controls (the July 2026 release renumbered controls under A003, A006, B008 and C008). Retired E007 and E014 are not cited.",
+      "Snapshot: the AIUC-1 release of July 15, 2026, which was still the most recent release when checked against the public changelog on 2026-10-03. The next release is announced for October 15, 2026. Recheck every identifier after each quarterly release, because releases can renumber controls (the July 2026 release renumbered or restructured controls under A003, A006, B008, C008 and E017: E017.1 is now the core transparency documentation control, the sharing policy became supplemental E017.2 and a supplemental E017.3 on platform and deployer security responsibilities was added; the DLP control became supplemental A006.2; agentic interface data integrity, now B008.3, became supplemental; and a supplemental A003 control on alerting for authentication failures was retired). Retired E007 and E014 are not cited.",
       "Structure: AIUC-1 requirements are mandatory or optional, and a requirement becomes optional when the agent lacks the capability it addresses. Each requirement lists core controls and supplemental controls. Each justification says whether the cited control is core or supplemental. Whether each cited requirement is mandatory or optional is recorded in the application map of catalog/mappings.json, which the validator checks against the Application column of the requirement table in references/frameworks.md; justifications do not repeat it. C008, E013 and E017, like B002, C007 and C009, are optional requirements.",
       "Capability scoping: D003, D004 and B006 carry the Automation capability. C006 applies to text-, voice- or code-generating products. A008 and B010 (Code-generation) apply only when the assessed product generates code for its users, so they are never evidence for a coding agent that builds the application. They appear only as capability-scoped supports: A008.3 on T-05 and T-23, A008.5 on N-01, and B010.3 on T-24.",
       "Relations: no AIUC-1 relation is direct. D003.1, B006.1 and B006.3 each cover parts of A-01, A-02 and S-05, but none requires one non-bypassable dispatcher, canonicalization or fail-closed behavior. B001, D004 and C012 require third-party testers while D-04 and D-08 do not, so those links are partial or supports.",
@@ -182,6 +182,11 @@
           "ref": "D003.4",
           "relation": "partial",
           "justification": "Supplemental control: human approval for sensitive or high-risk tool operations. S-05 sets the approval policy for each operation in the register and bars the model from lowering an operation's class."
+        },
+        {
+          "ref": "C007.1",
+          "relation": "supports",
+          "justification": "Core control: a documented definition of which outputs are high risk and go to human review. The consequence classes of the S-05 register play that role for actions, since they decide which operations reach approval; C007 frames it around outputs."
         }
       ],
       "S-06": [
@@ -364,6 +369,11 @@
           "ref": "D003.4",
           "relation": "partial",
           "justification": "Supplemental control: human confirmation before high-risk actions. A-10 offers reversibility by design as an alternative, and requires a side-effect-free dry-run diff in the approval. AIUC-1 requires neither."
+        },
+        {
+          "ref": "C007.2",
+          "relation": "supports",
+          "justification": "Core control: a mechanism that automatically spots high-risk outputs so they are flagged for review. A-10 sends operations registered as irreversible or high-cost to approval by registration rather than by detection, so it supports C007 for actions only."
         }
       ],
       "A-11": [
@@ -676,8 +686,8 @@
         },
         {
           "ref": "E011.1",
-          "relation": "partial",
-          "justification": "Core control: document provider processing locations and regions. This matches the region and provider part of an approved route."
+          "relation": "supports",
+          "justification": "Documentation only: E011.1 records where providers process data (regions and endpoints). T-10 enforces approved routes, including provider and region, at runtime, for fallbacks, telemetry and tracing too."
         },
         {
           "ref": "A001.1",
@@ -1203,7 +1213,7 @@
         {
           "ref": "C009.1",
           "relation": "partial",
-          "justification": "Core control: users can pause, stop or redirect system behavior. N-06 is an operator capability to stop a run and all its descendants and disable a tool, model or agent without a deploy, with no new effects afterwards."
+          "justification": "Core control: C009.1 gives end users controls to pause, stop or redirect the system, with accessibility features. N-06 is a different subject in part: an operator stop of a run and all its descendants and of a tool, model or agent without a deploy, plus a stop by the principal who started the run, with no new effects afterwards. It says nothing about accessibility."
         },
         {
           "ref": "E001.1",
@@ -1268,10 +1278,10 @@
     "notes": [
       "Sources: AI RMF 1.0 subcategories come from NIST AI 100-1 Tables 1 to 4, cited with the printed page where each subcategory ends. Suggested actions come from NIST AI 600-1 Section 3, cited with the printed page where each action starts. In the justifications in catalog/mappings.json, text in single quotes is quoted from the NIST publication, apart from whitespace, ligatures and dash normalization. NIST CSF is not used.",
       "Revision: NIST states that AI RMF 1.0 is being revised. Recheck these identifiers when a revision is published.",
-      "Relations: no AI RMF subcategory and no AI 600-1 action is marked direct. Each subcategory includes organization-level outcomes that no single control meets, and the AI 600-1 actions cited are broader or differently scoped than the control.",
-      "Generic anchors: every control recorded as implemented supports MAP 4.2 (internal risk controls identified and documented) and MANAGE 1.3 (risk responses documented). They are listed per control only where the control itself produces that documentation or response. Controls with no NIST reference are runtime authorization, credential, isolation and state mechanisms for which neither publication has a subcategory or action more specific than these anchors.",
+      "Relations: no AI RMF subcategory and no AI 600-1 action is marked direct. Each subcategory includes organization-level outcomes that no single control meets, and the AI 600-1 actions cited are broader or differently scoped than the control. Relations read from the control toward the NIST item: partial means that the control achieves part of the subcategory or action, and supports means that it contributes to it or produces evidence toward it. A record under this catalog never evidences a whole subcategory or action.",
+      "Generic anchors: every control recorded as implemented supports MAP 4.2 (internal risk controls identified and documented) and MANAGE 1.3 (risk responses documented). They are listed per control only where the control itself produces that documentation or response. Controls with no NIST reference are runtime authorization, credential, isolation and state mechanisms for which neither publication has a subcategory or action more specific than these anchors. MAP 3.5 ('Processes for human oversight are defined, assessed, and documented in accordance with organizational policies from the GOVERN function') is cited as supports on each control that defines or protects one point of human oversight, and each justification names that point. Only A-13 assesses oversight, so only A-13 carries it as partial; the organizational policy and assessment parts stay with the organization.",
       "Exclusions: GOVERN 1.7 (decommissioning) is not mapped, because stop and revocation map to MANAGE 2.4 with MG-2.4-002 and MG-2.4-004, and no control covers system retirement. MS-2.8-003 (tamper-proof content history) concerns digital content transparency, not audit logs, and is not used for N-02 or N-10. AI 600-1 Information Integrity actions about synthetic-content provenance are cited only where the wording fits data lineage (MP-2.1-001, MP-2.1-002, MG-2.2-007, MG-4.1-006, MP-3.4-001), and those justifications note the different framing.",
-      "Context, not cited as references: AI 600-1 section 2.9 (Information Security) describes indirect prompt injection and is relevant to T-01, A-06, A-08 and D-04; section 2.7 (Human-AI Configuration) to A-13; section 2.12 (Value Chain and Component Integration) to T-18, T-24 and T-25; and section 2.4 (Data Privacy) to S-06 and T-10.",
+      "Context, not cited as references: AI 600-1 section 2.9 (Information Security) is relevant only in part: its indirect prompt injection to T-01, T-02, A-06, A-08 and D-04, and its data poisoning, which AI 600-1 defines as compromise of a training dataset, to T-25 for fine-tuning and adapter data and, by analogy, to T-07 for agent memory; the GAI-enabled offensive cyber capability it describes and the confidentiality of model weights are outside this catalog's scope. Section 2.12 (Value Chain and Component Integration) is relevant to T-18, T-24 and T-25; section 2.7 (Human-AI Configuration) to A-12, A-13 and T-26; and section 2.4 (Data Privacy) to S-06, T-06 and T-10.",
       "Source quirks: AI 600-1 has no suggested actions for some subcategories used here (for example MAP 3.5, MAP 4.2, MEASURE 2.4, MANAGE 1.1 and MANAGE 1.4), so those carry only AI 100-1 references. AI 600-1 prints GV-4.3-001 as 'GV4.3--001'; that action is not used here."
     ],
     "refs": {
@@ -1331,7 +1341,7 @@
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined and documented; the recorded autonomy scope (1 to 4) states how much oversight each context has. [AI 100-1 Table 2 p.27]"
+          "justification": "The autonomy scope recorded for each context (1 to 4) documents how much human oversight that context has, one input to the oversight processes MAP 3.5 asks to be defined, assessed and documented under GOVERN policies. [AI 100-1 Table 2 p.27]"
         },
         {
           "ref": "GV-1.3-001",
@@ -1427,7 +1437,7 @@
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined and documented; S-05 records the approval policy of each consequential operation in trusted configuration. [AI 100-1 Table 2 p.27]"
+          "justification": "The register fixes the approval policy of each consequential operation in versioned configuration, which documents where human oversight applies; assessing those processes under GOVERN policies is outside S-05. [AI 100-1 Table 2 p.27]"
         },
         {
           "ref": "MAP 5.1",
@@ -1503,49 +1513,49 @@
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; A-06 requires fresh confirmation showing the value and its untrusted origin when a consequential value does not match its trusted source. [AI 100-1 Table 2 p.27]"
+          "justification": "A-06 defines when a person must confirm a consequential value (it occurs in content the principal supplied or designated) and when no confirmation may authorize it, one documented oversight rule for tainted contexts. [AI 100-1 Table 2 p.27]"
         }
       ],
       "A-07": [
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; out-of-scope consequential operations from tainted contexts are denied or freshly confirmed. [AI 100-1 Table 2 p.27]"
+          "justification": "A-07 routes consequential operations outside a tainted run's task scope to fresh confirmation, so oversight is triggered by deviation from the principal's request rather than by every action. [AI 100-1 Table 2 p.27]"
         }
       ],
       "A-08": [
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are 'defined, assessed, and documented'; A-08 fixes when human confirmation is required and which non-human alternative ((b) or (c)) applies when no human can confirm. [AI 100-1 Table 2 p.27]"
+          "justification": "A-08 decides for each trifecta context whether oversight is human confirmation of each effect (option (a)) or a recorded non-human alternative ((b) or (c)), the 'defined' and 'documented' part of MAP 3.5 for that context class. [AI 100-1 Table 2 p.27]"
         }
       ],
       "A-09": [
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; A-09 limits which tools may run without approval and forbids persistent always-allow grants for consequential tools. [AI 100-1 Table 2 p.27]"
+          "justification": "A-09 sets which tools may run without approval and forbids persistent always-allow grants for consequential tools, which bounds where oversight can be skipped. [AI 100-1 Table 2 p.27]"
         }
       ],
       "A-10": [
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; irreversible or high-cost operations need approval with a dry-run diff unless reversible by design. [AI 100-1 Table 2 p.27]"
+          "justification": "A-10 requires approval with a dry-run diff, or reversibility by design, for irreversible or high-cost operations, which defines the oversight step for the effects that cannot be undone. [AI 100-1 Table 2 p.27]"
         }
       ],
       "A-11": [
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; A-11 makes approvals bound, single-use and non-forgeable so model or client claims cannot bypass oversight. [AI 100-1 Table 2 p.27]"
+          "justification": "A-11 makes each approval bound, single-use and unforgeable, so model or client claims cannot replay or bypass the documented oversight step. [AI 100-1 Table 2 p.27]"
         }
       ],
       "A-12": [
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; A-12 protects the integrity of what the approver sees. [AI 100-1 Table 2 p.27]"
+          "justification": "A-12 protects what the approver sees (canonical data, provenance, new-payee flags) and from which session a confirmation is accepted, the integrity side of an oversight process. [AI 100-1 Table 2 p.27]"
         },
         {
           "ref": "MP-3.4-001",
@@ -1557,7 +1567,7 @@
         {
           "ref": "MAP 3.5",
           "relation": "partial",
-          "justification": "Human oversight processes are 'defined, assessed, and documented'; A-13 assesses oversight quality through approval rate, volume and time to decision per approver. [AI 100-1 Table 2 p.27]"
+          "justification": "Human oversight processes are 'defined, assessed, and documented in accordance with organizational policies from the GOVERN function'; A-13 assesses how well approval-based oversight works through approval rate, volume and time to decision per approver. The organizational policy side is outside the control. [AI 100-1 Table 2 p.27]"
         },
         {
           "ref": "MAP 3.4",
@@ -1584,7 +1594,7 @@
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined for highest-impact effects through step-up authentication and dual control. [AI 100-1 Table 2 p.27]"
+          "justification": "A-14 defines the oversight for the highest-impact effects as step-up authentication and two distinct human approvers, neither of them the requester. [AI 100-1 Table 2 p.27]"
         }
       ],
       "A-15": [],
@@ -1607,7 +1617,7 @@
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; unattended runs need owner approval or an explicit pre-authorized rule for consequential effects. [AI 100-1 Table 2 p.27]"
+          "justification": "A-19 requires owner approval or an explicit pre-authorized rule for the consequential effects of unattended runs, which documents the oversight that applies when no principal is present. [AI 100-1 Table 2 p.27]"
         },
         {
           "ref": "MEASURE 2.10",
@@ -1634,7 +1644,7 @@
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; A-23 keeps policies, thresholds, audit configuration and CI security gates outside agent write scope so the overseen agent cannot alter oversight. [AI 100-1 Table 2 p.27]"
+          "justification": "A-23 keeps policies, thresholds, audit configuration and CI security gates out of the agent's write scope, so the overseen agent cannot alter its own oversight. [AI 100-1 Table 2 p.27]"
         },
         {
           "ref": "MANAGE 2.4",
@@ -1653,7 +1663,7 @@
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; A-25 adds verification outside the agent's conversation, and notice to the previous destination, for changes that redirect communications, recovery or funds. [AI 100-1 Table 2 p.27]"
+          "justification": "A-25 adds human verification outside the agent's conversation, and notice to the previous destination, before a change that redirects communications, recovery or funds takes effect. [AI 100-1 Table 2 p.27]"
         }
       ],
       "T-01": [
@@ -1679,7 +1689,7 @@
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; T-03 lets reviewers view the exact text the model received. [AI 100-1 Table 2 p.27]"
+          "justification": "T-03 lets human reviewers view the exact text the model received, which oversight of injected content depends on. [AI 100-1 Table 2 p.27]"
         },
         {
           "ref": "MP-2.1-001",
@@ -1767,6 +1777,11 @@
           "ref": "GV-6.2-006",
           "relation": "supports",
           "justification": "'manage risks related to rollover and fallback technologies for GAI systems'; T-10 requires fallbacks to follow the same routing policy. [AI 600-1 p.22]"
+        },
+        {
+          "ref": "GV-6.2-001",
+          "relation": "supports",
+          "justification": "'Document GAI risks associated with system value chain to identify over-reliance on third-party data and to identify fallbacks'; T-10 records an approved route for each data class and requires fallbacks to follow the same policy, which documents part of that value-chain dependence. [AI 600-1 p.21]"
         }
       ],
       "T-11": [
@@ -1829,7 +1844,7 @@
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; consequential browser steps are confirmed outside the agent-controlled screen. [AI 100-1 Table 2 p.27]"
+          "justification": "T-17 requires consequential browser steps to be confirmed outside the agent-controlled screen, which defines oversight for browser and computer-use agents. [AI 100-1 Table 2 p.27]"
         },
         {
           "ref": "MP-2.2-002",
@@ -1926,7 +1941,7 @@
         {
           "ref": "MAP 3.5",
           "relation": "supports",
-          "justification": "Human oversight processes are defined; agent changes to CI workflows, branch protection, security tests and instruction files need human review. [AI 100-1 Table 2 p.27]"
+          "justification": "T-23 requires human review for agent changes to CI workflows, branch protection, security tests and instruction files. [AI 100-1 Table 2 p.27]"
         },
         {
           "ref": "MS-2.6-004",
@@ -2223,6 +2238,11 @@
           "ref": "MS-2.7-006",
           "relation": "supports",
           "justification": "'Measure the rate at which recommendations from security checks and incidents are implemented'; D-07 turns each confirmed incident or bypass into a regression fixture keyed by control ID. [AI 600-1 p.33]"
+        },
+        {
+          "ref": "MG-1.3-002",
+          "relation": "supports",
+          "justification": "'Monitor the robustness and effectiveness of risk controls and mitigation plans'; D-07 reruns control-keyed security tests on every relevant change and adds a regression fixture for each incident, one way to keep that monitoring continuous. [AI 600-1 p.40]"
         }
       ],
       "D-08": [
@@ -2454,6 +2474,11 @@
           "ref": "MG-2.4-004",
           "relation": "supports",
           "justification": "'Establish and regularly review specific criteria that warrants the deactivation of GAI systems'; recorded thresholds for automatic containment. [AI 600-1 p.42]"
+        },
+        {
+          "ref": "MG-1.3-002",
+          "relation": "supports",
+          "justification": "'Monitor the robustness and effectiveness of risk controls and mitigation plans'; N-05 records detector thresholds and false-positive rates for its behavioral detectors. [AI 600-1 p.40]"
         }
       ],
       "N-06": [
@@ -2519,7 +2544,7 @@
         {
           "ref": "GV-6.2-003",
           "relation": "partial",
-          "justification": "Third-party incident plans: 'Define ownership of GAI incident response functions; Rehearse third-party GAI incident response plans at a regular cadence'; N-08 requires an exercise per release cycle. [AI 600-1 p.22]"
+          "justification": "Third-party incident plans: 'Define ownership of GAI incident response functions; Rehearse third-party GAI incident response plans at a regular cadence'; N-08 requires an exercise at least every 12 months and after any change to the quarantine path. [AI 600-1 p.22]"
         },
         {
           "ref": "GV-1.5-002",

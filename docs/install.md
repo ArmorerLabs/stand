@@ -1,6 +1,6 @@
 # Install the skill
 
-This guide installs the skill into a coding-agent host, makes its workflow required in a project if you want that, and checks the result. Host paths were checked against each vendor's documentation on 2026-10-03; the [sources](#sources) are listed at the end. Hosts change their skill locations, so recheck the documentation for the version you use.
+This guide installs the skill into a coding-agent host, makes its workflow required in a project if you want that, and checks the result. Host paths were checked against each vendor's documentation on 2026-10-03, and the Claude Code and Codex details again on 2026-10-04; the [sources](#sources) are listed at the end. Hosts change their skill locations, so recheck the documentation for the version you use.
 
 ## What gets installed
 
@@ -46,7 +46,9 @@ python3 scripts/validate.py
 
 **Claude Code.** The [skills documentation](https://code.claude.com/docs/en/skills) lists personal skills at `~/.claude/skills/<skill-name>/SKILL.md` and project skills at `.claude/skills/<skill-name>/SKILL.md`, invoked as `/skill-name`. Claude Code watches these directories and picks up a new skill within the current session; if the top-level skills directory did not exist when the session started, run `/reload-skills`. `/skills` lists the available skills. The Claude Code documentation does not list `.agents/skills` as a skill location.
 
-**Codex.** The [Codex skills documentation](https://learn.chatgpt.com/docs/build-skills) (the target of `developers.openai.com/codex/skills`) lists user skills at `$HOME/.agents/skills` and scans `.agents/skills` in every directory from the working directory up to the repository root. Skills are invoked as `$skill-name`, and `/skills` lists them. Codex detects skill changes automatically; if the skill does not appear, restart Codex. `agents/openai.yaml` in the bundle holds optional Codex display metadata and a default prompt.
+Claude Code also loads skills from enabled plugins (`<plugin>/skills/<skill-name>/SKILL.md`), invoked as `/plugin-name:skill-name`. A plugin gives teams a versioned way to distribute a pinned copy, but this repository does not ship a plugin manifest. If you package the bundle in your own plugin, keep the skill folder named `stand` and keep the license files with it.
+
+**Codex.** The [Codex skills documentation](https://learn.chatgpt.com/docs/build-skills) (the target of `developers.openai.com/codex/skills`) lists user skills at `$HOME/.agents/skills` and scans `.agents/skills` in every directory from the working directory up to the repository root. In Codex CLI or the IDE extension, run `/skills` or type `$` to mention a skill, for example `$stand`. Codex detects skill changes automatically; if the skill does not appear, restart Codex. `agents/openai.yaml` in the bundle holds optional Codex display metadata and a default prompt.
 
 Earlier versions of the README installed the skill under `${CODEX_HOME:-$HOME/.codex}/skills`, in a folder named after the framework's former working name, following an OpenAI blog post. The current Codex skills documentation does not list that location, and whether current Codex still loads it could not be verified. Use `$HOME/.agents/skills/stand` instead, and remove an old copy after the new one is verified.
 
@@ -56,7 +58,7 @@ Earlier versions of the README installed the skill under `${CODEX_HOME:-$HOME/.c
 - Gemini CLI reads `.gemini/skills` or the `.agents/skills` alias in the workspace, and `~/.gemini/skills` or `~/.agents/skills` for the user. `/skills list` lists skills and `/skills reload` rescans them ([documentation](https://geminicli.com/docs/cli/using-agent-skills/)).
 - Cursor reads `.agents/skills` and `.cursor/skills` in the project, and `~/.agents/skills` and `~/.cursor/skills` for the user. It also loads `.claude/skills` and `.codex/skills` for compatibility ([documentation](https://cursor.com/docs/skills)).
 
-A team that uses Claude Code together with Codex or another `.agents/skills` host needs two project copies, `.claude/skills/stand` and `.agents/skills/stand`, installed from the same pinned commit and updated together.
+A team that uses Claude Code together with Codex or Gemini CLI needs two project copies, `.claude/skills/stand` and `.agents/skills/stand`, installed from the same pinned commit and updated together. Copilot CLI and Cursor also read `.claude/skills`, so a team that uses only Claude Code, Copilot CLI and Cursor needs one copy. Keep one copy where you can: two copies can drift apart.
 
 **Hosts without skill discovery.** Load the skill explicitly. For any coding agent that can read local files, give it a concrete request such as:
 
@@ -116,7 +118,7 @@ The staged check covers the bundle in the reviewed checkout; the loop above conf
 
 Then check the host:
 
-1. Open the host in the target project, list its skills (`/skills` in Claude Code and Codex, `/skills list` in Copilot CLI and Gemini CLI), and confirm that `stand` appears with its description.
+1. Open the host in the target project, list its skills (`/skills` in Claude Code, `/skills` or `$` in Codex, `/skills list` in Copilot CLI and Gemini CLI), and confirm that `stand` appears with its description.
 2. Invoke it on a small agentic task in a scratch repository, for example `/stand` in Claude Code or `$stand` in Codex followed by "Add a document-search agent with tenant isolation and scoped tools." The response names a triage tier (NONE, SCOPED or FULL), a capability profile with a computed level, and control IDs such as A-01 or T-06.
 3. Ask for a cosmetic change, such as fixing a typo in a README. Either the skill is not activated, or it classifies the task as NONE; in both cases no security assessment starts.
 
@@ -156,7 +158,7 @@ Keep `LICENSE`, `LICENSES/` and `THIRD_PARTY_NOTICES.md` with every copy you dis
 
 ## Sources
 
-Checked on 2026-10-03:
+Checked on 2026-10-03 (Claude Code and Codex skills pages rechecked on 2026-10-04):
 
 - Claude Code skills: <https://code.claude.com/docs/en/skills>
 - Claude Code and `AGENTS.md`: <https://code.claude.com/docs/en/memory>
