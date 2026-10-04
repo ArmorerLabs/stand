@@ -967,6 +967,20 @@ class NormativeChangeTests(FixtureTestCase):
         self.assertEqual(validate.weakenings(before, dict(before, applies_when=["all"])), [])
         self.assertEqual(validate.weakenings(before, dict(before, statement="The app MUST and MUST NOT x.")), [])
 
+    def test_removed_must_is_flagged_when_others_remain(self):
+        before = fixture_repo.control("A-01", "Dispatch", 1, "critical", "integration", ["tools", "mcp"], [])
+        before = dict(before, statement="The app MUST check a. The app MUST check b.")
+        found = " ".join(validate.weakenings(before, dict(before, statement="The app MUST check a.")))
+        self.assertIn("statement loses 1 of its MUST, SHALL and REQUIRED keywords (2 to 1)", found)
+
+    def test_edited_case_under_the_same_label_is_a_normative_change(self):
+        base = self.commit_base()
+        self.edit_control("N-01", lambda c: c.update(
+            verification=c["verification"].replace("(N-01/C1)", "and something weaker (N-01/C1)", 1)
+            if "(N-01/C1)" in c["verification"] else c["verification"] + " Edited."))
+        findings = self.findings_since(base)
+        self.assertTrue(any(f.code == "normative-change" and f.message.startswith("N-01 ") for f in findings), findings)
+
     def test_changed_control_must_be_named_in_the_newest_section(self):
         base = self.commit_base()
         self.edit_control("N-01", lambda c: c.update(statement="The audit log MUST be tamper-evident and signed."))

@@ -3048,6 +3048,10 @@ def normative_differences(before: dict, after: dict) -> list[str]:
                    != after.get(name, "active" if name == "lifecycle" else None))]
     if case_numbers(before) != case_numbers(after):
         changed.append("cases")
+    elif " ".join(str(before.get("verification", "")).split()) != " ".join(str(after.get("verification", "")).split()):
+        # The verification text is normative as to the cases it requires, so editing a hostile case or its
+        # authorized twin under an unchanged label is a normative change too.
+        changed.append("verification")
     return changed
 
 
@@ -3072,6 +3076,10 @@ def weakenings(before: dict, after: dict) -> list[str]:
                      f"{weak[0]} to {weak[1]} SHOULD/MAY)")
     elif strong[0] and not strong[1]:
         found.append("statement drops every MUST, SHALL and REQUIRED")
+    elif strong[1] < strong[0]:
+        # A removed requirement is a weakening even when other requirements remain.
+        found.append(f"statement loses {strong[0] - strong[1]} of its MUST, SHALL and REQUIRED keywords "
+                     f"({strong[0]} to {strong[1]})")
     if isinstance(before.get("level"), int) and isinstance(after.get("level"), int) \
             and after["level"] > before["level"]:
         found.append(f"level {before['level']} to {after['level']}")
