@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: MIT
+self-hosted-runner:
+  labels:
+    - warp-ubuntu-latest-x64-2x
