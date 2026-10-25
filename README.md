@@ -107,6 +107,16 @@ Install only the skill bundle, never a clone of the whole repository: `SKILL.md 
 
 The [installation guide](docs/install.md) explains cloning and pinning a reviewed commit, a copy command that refuses to overwrite an existing installation, adoption through `AGENTS.md`, and how to verify the result. The installed bundle is Markdown, YAML and license text: it ships no executable code and needs no network access, MCP server or credentials. Preserve LICENSE, LICENSES/ and THIRD_PARTY_NOTICES.md when distributing a copy.
 
+### Scan an existing application
+
+Ask for scan-only execution in natural language. It uses FULL assessment coverage without implementation or application execution. Read-only source inspection produces a report in the response, or at the report path you name. It does not change code, tests or configuration, run builds or tests, or make live calls. See the [scan-only rules](references/profile-and-levels.md#scan-only-execution) and [report format](assets/agent-security-record.md#scan-only-report).
+
+Codex example: `$stand Scan this repository in scan-only mode. Assess the agent enforcement paths and return the report here.`
+
+Claude Code example: `/stand Scan this repository in scan-only mode. Write only the report to /tmp/stand-scan.md.`
+
+These are natural-language requests, not CLI flags. Reports separate source inspection from retained evidence and proposed verification from actual results. Existing confidentiality and readiness restrictions still apply.
+
 ## Relationship to OWASP and other work
 
 The framework basis is fixed. Every mapping below is an engineering mapping, not a certification, conformance or coverage claim.

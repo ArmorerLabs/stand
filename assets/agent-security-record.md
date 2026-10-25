@@ -1,5 +1,35 @@
 # Agent security record
 
+## Scan-only report
+
+For FULL scan-only execution, use this report format instead of the implementation template below. Follow [the scan-only rules](../references/profile-and-levels.md#scan-only-execution). Return the report in the response unless the user names a report path. Preserve the confidentiality rule below, including private references for open critical or high details.
+
+- **Target and snapshot:** repository or source target, commit, inspection date, dirty paths or source identities, and snapshot limits.
+- **Scope:** requested boundaries, entry points, exclusions and unavailable sources.
+- **Profiles and coverage:** per-context properties, tags, levels, applicable controls, assessed IDs, not-applicable reasons and not-assessed IDs.
+- **Evidence:** fresh inspection references, separate retained receipts with their original snapshot and scope, and gaps that prevent current verification.
+- **Findings:** control ID, status, severity and rubric rationale, source file and function or line, failure path, smallest fix, proposed verification, and owner or unassigned. Do not invent an owner or exception.
+- **Unknowns and exclusions:** missing facts, unverified assumptions, external boundaries and checks that did not run.
+- **Gate:** readiness under the existing rubric, residual risks and required owner decisions. Do not claim execution results for proposed checks.
+
+If any required source, reference or applicable control remains unassessed, label the report partial in Scope and the final conclusion. In Unknowns and exclusions, list each affected control ID, missing source or section, and next inspection step.
+
+In Profiles and coverage, give the total unique IDs considered and the applicable and not-applicable counts. Give the assessed and not-assessed applicable counts. Give counts for every control status, even zero. Reconcile these counts with the IDs in the Controls rows and grouped exclusions. Assessed plus not-assessed equals applicable. Applicable plus not-applicable equals total considered.
+
+Apply the [status definitions](../references/conformance.md#status) to each row. Support each `failing` row with a failed required case or a source-proven bypass. Missing or unrun verification alone does not establish `failing`. For implemented statuses, cite the actual mechanism and identify documentation-only evidence. Do not invent implementation for absent or unknown mechanisms.
+
+Keep source conclusions within the inspected boundary. An unavailable host source does not prove an absent capability for a not-applicable reason. Apply the [unknown-property rules](../references/profile-and-levels.md#evaluation-rules) when architectural absence is unknown.
+
+Use complete local source to show when a required guard is absent. Record an external mechanism with no available source as unknown. Keep a source-proven bypass if host behavior is unknown.
+
+End Findings with a brief prioritized repair sequence for actual findings. Link actual findings to their smallest fixes, dependencies and proposed checks. Separate evidence acquisition and owner decisions from code repairs.
+
+For each finding, compare the proposed repair with all applicable requirements in the control statement and required verification. Include required clauses missing from the source outside the observed path. Record a repair as partial if it closes only that path with other required clauses open.
+
+Use the existing status and evidence-scope enums below. Include one Controls row per applicable control with the existing column names. Group not-applicable IDs by reason. In the test column, label proposed checks as proposed and retained results as retained. Source inspection does not establish a fresh test result.
+
+The rest of this template applies to implementation records. In scan-only mode, skip its execution and update instructions.
+
 > Template instructions. Remove these quoted blocks after adapting the record.
 >
 > - **Format.** Adapt the record to the project's existing evidence format, but keep the control IDs, the column names of the control table, and the enum values exactly as written here.

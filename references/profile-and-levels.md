@@ -416,7 +416,7 @@ On an existing system, a FULL change assesses every applicable control but imple
 
 A profile change re-assesses the whole system, not only the new feature, because a new property or tag can change which contexts are trifecta contexts and which controls bind, and the whole claim lapses when a FULL change lands without a new assessment ([conformance.md](conformance.md)). Re-assessing means recomputing every context's profile and level, re-running the cases of every carried-over row, and recording every other applicable control by inspection with its status and severity; implementation still follows the scope rule. A FULL change that adds an entry point but no property, tag or higher level verifies the new path and the carried-over cases on it, not the whole system. When the work expands well beyond the request, say so in the report and, in an interactive session, tell the user before re-assessing beyond the requested feature; in a non-interactive run, continue and report it. The whole-system re-assessment a profile change requires is part of the task, not an unrelated audit.
 
-An assessment, review or threat model that the user asked for, without asking for changes, is read-only: write no code or tests, record evidence scope as inspection unless existing tests were run, and return the record in the response, or write it only to a path the user names.
+A scan, assessment, review or threat model without requested changes uses [scan-only execution](#scan-only-execution). The implementation and record-update rules in this section do not apply to that mode.
 
 - When a record already exists, update it by control ID rather than starting a second one. A carried-over row keeps implemented-and-verified only if all its required cases re-ran and passed at the new commit at or above the minimum evidence scope. Isolated-runtime or deployed evidence that was not re-run becomes implemented-but-unverified. A newly applicable control enforced at a boundary this change adds or alters is implemented and verified in this change; any other newly applicable control is assessed by inspection and recorded as planned, failing or implemented-but-unverified, with its severity.
 - Build order: the critical-boundary set first, then the remaining Level 1 controls, then Level 2 and Level 3. Controls that need people, production data, unapproved model spend or infrastructure the repository lacks follow the rule in "Assessing and implementing" below, in this tier as in SCOPED.
@@ -536,3 +536,21 @@ The version in a citation is the catalog MAJOR.MINOR; PATCH releases are editori
 - A report that a control's guidance leads to an exploitable design goes through the source repository's private security reporting process, not a public issue. A confirmed defect is fixed in a new catalog version and announced by a security advisory in `CHANGELOG.md` that names the affected catalog versions and controls; claims lapse for those controls until reassessed against the fixed version ([conformance.md](conformance.md)).
 
 The source of truth is `catalog/controls.json` with `catalog/ledger.json` in the source repository. The files under [controls/](controls/index.md) are generated from it and are never edited by hand. Machine-readable schemas for the catalog, the record and the claim are planned for a later version.
+
+
+## Scan-only execution
+
+Scan-only is an execution mode within FULL. Keep the existing profile, level, applicability, control-status and evidence-scope rules.
+
+Use Steps 1 and 2 to assess every applicable control by source inspection. Do not follow subsequent implementation, execution, rerun or record-update instructions, including those in references or templates. Return the [scan report](../assets/agent-security-record.md#scan-only-report) in the response, or write it only to the user-named report path. Apply the Step 5 confidentiality rule and Step 6 severity and readiness restrictions to that report.
+
+Read the [status and evidence rules](conformance.md) before assessment. Read each selected control entry in full, with its metadata, statement and required verification. Check actual returned output for truncation or omitted sections. Recover missing source and reference text with bounded reads of the missing sections. Requested paths, listed IDs and retained terminal text outside the returned output do not prove retrieval. If gaps remain, return a partial report with the missing IDs, sources or sections, and next inspection steps.
+
+- Use read-only source inspection tools to trace entry points, enforcement paths and retained evidence within the requested target.
+- Do not change code, tests or configuration. Do not run builds, tests, experiments, live calls or the target application.
+- Write no files except a report at the exact path the user names. Without that path, return the report in the response.
+- Skip implementation, rerun and record-update instructions throughout the workflow and its references. Do not update an existing security record unless it is the user-named report path.
+- Distinguish fresh source inspection from retained evidence. Cite retained results with their original snapshot, date, scope and known limits. Do not present them as fresh execution or carry verified status to the current snapshot without the required current-case evidence.
+- Describe suggested checks only as proposed verification, never as actual results. Mark unavailable evidence and unknown reachability explicitly.
+
+Use the [scan report format](../assets/agent-security-record.md#scan-only-report). Apply the existing confidentiality and severity rules. Inspection alone cannot establish readiness where applicable controls require stronger evidence. Keep those controls unverified and apply the existing readiness gate. A scan grants no implementation or release authority.

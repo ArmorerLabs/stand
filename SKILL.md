@@ -1,6 +1,6 @@
 ---
 name: stand
-description: Builds, changes, reviews, threat-models, or hardens AI agents and LLM applications that call tools or functions, use MCP or A2A, run RAG or memory, delegate to subagents, execute code, operate a browser, gate actions on human approval, or run autonomously. Applies a versioned control catalog with guardrails enforced outside the model against prompt injection and data exfiltration, adversarial tests through the real execution path, and an evidence record. Not for non-LLM application security, configuring a coding assistant's own MCP servers, or unrelated cosmetic or documentation edits. Maps to the OWASP Top 10 for Agentic Applications 2026 (ASI01-ASI10), AIUC-1, NIST AI RMF 1.0 and ISO/IEC 42001 themes; not affiliated with OWASP and not a certification.
+description: Builds, changes, scans, reviews, threat-models, or hardens AI agents and LLM applications that call tools or functions, use MCP or A2A, run RAG or memory, delegate to subagents, execute code, operate a browser, gate actions on human approval, or run autonomously. Applies a versioned control catalog with guardrails enforced outside the model against prompt injection and data exfiltration, adversarial tests through the real execution path, and an evidence record. Not for non-LLM application security, configuring a coding assistant's own MCP servers, or unrelated cosmetic or documentation edits. Maps to the OWASP Top 10 for Agentic Applications 2026 (ASI01-ASI10), AIUC-1, NIST AI RMF 1.0 and ISO/IEC 42001 themes; not affiliated with OWASP and not a certification.
 license: CC-BY-SA-4.0
 metadata:
   version: "0.1.0"
@@ -15,7 +15,11 @@ metadata:
 
 Control IDs start with their pillar letter: **S** Scope & Stewardship, **T** Trust & Isolation, **A** Authority & Access, **N** Notice & Neutralize, **D** Demonstrated Defenses.
 
-If the context was compacted or this file looks truncated, re-read it (and, for SCOPED or FULL, the security record) first.
+If the context was compacted or this file looks truncated, re-read it (and, for SCOPED or FULL, the security record) first. In scan-only mode, read an existing record without updates.
+
+## Scan-only mode within FULL
+
+For scan, assessment, review or threat-model requests without changes, use FULL scan-only. Read and follow [scan-only execution](references/profile-and-levels.md#scan-only-execution) before other workflow instructions.
 
 ## Always-on invariants
 
@@ -47,13 +51,13 @@ Classify from the task-owned (or planned) diff, NONE row first; ties go higher. 
 | --- | --- | --- |
 | NONE | No trigger location: copy never entering model context or an outbound message, styling, static docs (retrieved docs' text too), comments, non-security tests, business logic no tool, adapter, retrieval, prompt or renderer reaches and no register fact uses. Tool descriptions, schemas, prompts and templates are not copy. | Make the change, report "Tier: NONE" and why, load nothing, write no record, weaken nothing. |
 | SCOPED | Trigger locations, profile unchanged: no new property, trifecta context, autonomy increase, entry point or feature tag (a first MCP server, consumed or exposed; browser; code execution; triggered runs). | Steps 1 to 6 for the routed controls, with a compact change record, even without a baseline. |
-| FULL | A new application, context or entry point (route, job, queue consumer, callback or trigger); a profile change or higher level; a new principal type or tenant model; a replaced enforcement component; external effects with no baseline; a request to assess, review or threat-model. | Steps 1 to 6: assess every applicable control, implement within the Step 3 scope rule, write the full record. Only assess, review or threat-model: read-only, no code or tests, inspection evidence unless existing tests ran, the record in the response or at a path the user names. |
+| FULL | A new application, context or entry point (route, job, queue consumer, callback or trigger); a profile change or higher level; a new principal type or tenant model; a replaced enforcement component; external effects with no baseline; a request to scan, assess, review or threat-model. | Steps 1 to 6: assess every applicable control, implement within the Step 3 scope rule, write the full record. Scan, assess, review or threat-model without requested changes: use scan-only execution above. |
 
 ## Step 1: Establish scope, profile and level
 
 **SCOPED:** list the trigger locations touched and confirm "Profile: unchanged" with a reason. Read the baseline record as a claim at the merge base, never as this diff edits it: recompute its level from its profile checked against the touched code, use the highest and say so, and say "baseline commit not stated" if it names none. With no level, or "Baseline: missing", route Level 1 only; no readiness value means blocked.
 
-**FULL:** start the record from [the template](assets/agent-security-record.md) or update it by control ID (a carried-over row stays verified only if its cases re-ran and passed). A profile change re-assesses the whole system; a new entry point verifies its own path. Load "Capability profile", "Applicability" and "Levels" in [profile-and-levels.md](references/profile-and-levels.md) and [the index](references/controls/index.md), then entries a pillar at a time, writing each row when done (claim audit first, Step 5).
+**FULL implementation:** start the record from [the template](assets/agent-security-record.md) or update it by control ID (a carried-over row stays verified only if its cases re-ran and passed). A profile change re-assesses the whole system; a new entry point verifies its own path. Load "Capability profile", "Applicability" and "Levels" in [profile-and-levels.md](references/profile-and-levels.md) and [the index](references/controls/index.md), then entries a pillar at a time, writing each row when done (claim audit first, Step 5).
 
 FULL fills scope and owner (S-01, a human or "unassigned"), inventory (S-04), the profile per context, subagent and worker (S-02: untrusted-input U, sensitive-data D and external-effect X with reasons, autonomy scope 1 to 4, feature tags; unknown counts as present; U and D propagate through outputs, memory and delegation unless T-02 separates) and the register (S-03, S-05, S-06), as the template defines; SCOPED updates only entries its diff adds or alters. Level per context: 3 if U, D and X, or autonomy 4 with X; else 2 if two, or autonomy 3+; else 1. Selected: the higher of owner-declared and the maximum.
 

@@ -1,6 +1,6 @@
 interface:
   display_name: "STAND"
   short_description: "Enforced security controls and evidence for AI agents"
-  default_prompt: "Use $stand to build, change, review, or threat-model this agentic application: triage the change, enforce the routed controls outside the model, verify them through the real execution path, and record the evidence."
+  default_prompt: "Use $stand to build, change, review, or threat-model this agentic application: respect the requested execution mode, use source inspection only for scan-only requests, or implement and verify the routed controls for requested changes."
 policy:
   allow_implicit_invocation: true
