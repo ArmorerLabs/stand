@@ -5,14 +5,17 @@
 For FULL scan-only execution, use this report format instead of the implementation template below. Follow [the scan-only rules](../references/profile-and-levels.md#scan-only-execution). Return the report in the response unless the user names a report path. Preserve the confidentiality rule below, including private references for open critical or high details.
 
 - **Target and snapshot:** repository or source target, commit, inspection date, dirty paths or source identities, and snapshot limits.
-- **Scope:** requested boundaries, entry points, exclusions and unavailable sources.
+- **Scope:** requested target and boundaries, architecture map, reachable entry points, and trust, data and effect boundaries.
+- **Source coverage:** complete or partial, component by component, with roles and boundary references. Distinguish paths only inventoried from files actually reviewed. Name unavailable or excluded sources with reasons.
 - **Profiles and coverage:** per-context properties, tags, levels, applicable controls, assessed IDs, not-applicable reasons and not-assessed IDs.
-- **Evidence:** fresh inspection references, separate retained receipts with their original snapshot and scope, and gaps that prevent current verification.
+- **Evidence:** fresh inspection references and dependency lockfile identities, source locations and gaps. Separate retained receipts with their original snapshot and scope.
+- **Runtime verification:** checks intentionally unrun in scan-only mode and gaps that prevent current verification. Keep this separate from source coverage.
+- **Strengths:** actual controls and useful defenses, with source references and inspection limits. Do not mark applicable controls not applicable because runtime evidence is unavailable.
 - **Findings:** control ID, status, severity and rubric rationale, source file and function or line, failure path, smallest fix, proposed verification, and owner or unassigned. Do not invent an owner or exception.
-- **Unknowns and exclusions:** missing facts, unverified assumptions, external boundaries and checks that did not run.
+- **Unknowns and exclusions:** missing facts, external boundaries, and assumptions or source gaps that can change the findings.
 - **Gate:** readiness under the existing rubric, residual risks and required owner decisions. Do not claim execution results for proposed checks.
 
-If any required source, reference or applicable control remains unassessed, label the report partial in Scope and the final conclusion. In Unknowns and exclusions, list each affected control ID, missing source or section, and next inspection step.
+If necessary source, required references or applicable controls remain unassessed, label source coverage partial in Scope and the final conclusion. Name each affected component, control ID, missing source or section, and next inspection step in Unknowns and exclusions. Intentionally unrun exploits or tests alone do not make source coverage partial. Complete high-level source coverage does not establish runtime verification or production readiness.
 
 In Profiles and coverage, give the total unique IDs considered and the applicable and not-applicable counts. Give the assessed and not-assessed applicable counts. Give counts for every control status, even zero. Reconcile these counts with the IDs in the Controls rows and grouped exclusions. Assessed plus not-assessed equals applicable. Applicable plus not-applicable equals total considered.
 
@@ -22,7 +25,7 @@ Keep source conclusions within the inspected boundary. An unavailable host sourc
 
 Use complete local source to show when a required guard is absent. Record an external mechanism with no available source as unknown. Keep a source-proven bypass if host behavior is unknown.
 
-End Findings with a brief prioritized repair sequence for actual findings. Link actual findings to their smallest fixes, dependencies and proposed checks. Separate evidence acquisition and owner decisions from code repairs.
+End Findings with a brief prioritized repair sequence for actual findings. Link actual findings to their smallest fixes, dependencies and proposed checks. Distinguish source-proven weaknesses from stricter catalog requirements that need a product decision. Keep the same status and readiness rules for both. Separate evidence acquisition and owner decisions from code repairs.
 
 For each finding, compare the proposed repair with all applicable requirements in the control statement and required verification. Include required clauses missing from the source outside the observed path. Record a repair as partial if it closes only that path with other required clauses open.
 
